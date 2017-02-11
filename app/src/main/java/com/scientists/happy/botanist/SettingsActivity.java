@@ -13,25 +13,23 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
-
 package com.scientists.happy.botanist;
-
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
-
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
-
 import java.util.Calendar;
-
 public class SettingsActivity extends AppCompatActivity {
 
     public static final String WATER_HOUR_KEY = "water_hour";
     public static final String WATER_MINUTE_KEY = "water_minute";
-
+    /**
+     * Upon launching the activity
+     * @param savedInstanceState - current app state
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,6 +38,10 @@ public class SettingsActivity extends AppCompatActivity {
 
     public static class SettingsFragment extends PreferenceFragment
     {
+        /**
+         * Run when fragment is created
+         * @param savedInstanceState - current fragment state
+         */
         @Override
         public void onCreate(final Bundle savedInstanceState)
         {
@@ -47,6 +49,11 @@ public class SettingsActivity extends AppCompatActivity {
             addPreferencesFromResource(R.xml.preferences);
             Preference btnDateFilter = findPreference("water_plants_time");
             btnDateFilter.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                /**
+                 * User clicked an option
+                 * @param preference - selected option
+                 * @return Returns false
+                 */
                 @Override
                 public boolean onPreferenceClick(Preference preference) {
                     showTimePicker();
@@ -55,6 +62,9 @@ public class SettingsActivity extends AppCompatActivity {
             });
         }
 
+        /**
+         * Show the clock
+         */
         private void showTimePicker(){
 
             final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
@@ -63,6 +73,13 @@ public class SettingsActivity extends AppCompatActivity {
             int minute = preferences.getInt("water_minute", c.get(Calendar.MINUTE));
 
             TimePickerDialog.OnTimeSetListener listener = new TimePickerDialog.OnTimeSetListener() {
+                /**
+                 * Handle time set
+                 * @param view - current app view
+                 * @param hourOfDay - selected hour
+                 * @param minute - selected minute
+                 * @param second - selected second
+                 */
                 @Override
                 public void onTimeSet(TimePickerDialog view, int hourOfDay, int minute, int second) {
                     SharedPreferences.Editor editor = preferences.edit();
