@@ -1,6 +1,7 @@
 // Add a plant to the database
 // @author: Chia George Washington
 package com.scientists.happy.botanist;
+import android.app.ActionBar;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;

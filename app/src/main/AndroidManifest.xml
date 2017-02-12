@@ -28,7 +28,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".AddPlantActivity"></activity>
+        <activity
+            android:name=".AddPlantActivity"
+            android:label="Add New Plant"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.scientists.happy.botanist.MainActivity" />
+        </activity>
         <activity
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings"
