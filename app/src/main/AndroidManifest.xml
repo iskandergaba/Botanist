@@ -38,6 +38,7 @@
          <activity
             android:name=".AddPlantActivity"
             android:label="Add New Plant"
+             android:screenOrientation="portrait"
             android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
