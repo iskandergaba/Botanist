@@ -37,9 +37,8 @@ public class ImageAdapter extends BaseAdapter {
             // if it's not recycled, initialize some attributes
             imageView = new ImageView(mContext);
             int width = mContext.getResources().getDisplayMetrics().widthPixels;
-            imageView.setLayoutParams(new GridView.LayoutParams(width/2 - 16, width/2 - 16));
+            imageView.setLayoutParams(new GridView.LayoutParams(width/2 - 50, width/2 - 50));
             imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            imageView.setPadding(8, 8, 8, 8);
         } else {
             imageView = (ImageView) convertView;
         }
