@@ -1,7 +1,6 @@
 // Add a plant to the database
 // @author: Chia George Washington
 package com.scientists.happy.botanist;
-import android.app.ActionBar;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -89,6 +88,7 @@ public class AddPlantActivity extends AppCompatActivity
             bmOptions.inJustDecodeBounds = false;
             bmOptions.inSampleSize = scaleFactor;
             Bitmap bitmap = BitmapFactory.decodeFile(photoPath, bmOptions);
+            bitmap = ImageUtils.correctRotation(photoPath, bitmap);
             iButton.setImageBitmap(bitmap);
         }
     }
