@@ -23,8 +23,6 @@ public class MainActivity extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        GridView gridview = (GridView) findViewById(R.id.gridview);
-        gridview.setAdapter(new ImageAdapter(this));
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -42,15 +40,23 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
+        GridView gridview = (GridView) findViewById(R.id.gridview);
+        gridview.setAdapter(new ImageAdapter(this, getIntent()));
         gridview.setOnItemClickListener(new OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
                 Toast.makeText(MainActivity.this, "Ooooo u click me",
                         Toast.LENGTH_SHORT).show();
                 Intent i = new Intent(getApplicationContext(), ProfileActivity.class);
-                i.putExtra("nickname", "Flowey");
-                i.putExtra("species", "A flower");
-                i.putExtra("photoPath", "");
+                if (getIntent().getExtras() != null) {
+                    i.putExtra("species", (String) getIntent().getExtras().get("species"));
+                    i.putExtra("nickname", (String) getIntent().getExtras().get("nickname"));
+                    i.putExtra("photoPath", (String) getIntent().getExtras().get("photoPath"));
+                } else {
+                    i.putExtra("nickname", "Flowey");
+                    i.putExtra("species", "A flower");
+                    i.putExtra("photoPath", "");
+                }
                 startActivity(i);
             }
         });
@@ -88,13 +94,5 @@ public class MainActivity extends AppCompatActivity
             return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    public void onButtonPress(View view) {
-        Intent i = new Intent(this, ProfileActivity.class);
-        i.putExtra("nickname", (String) getIntent().getExtras().get("nickname"));
-        i.putExtra("species", (String) getIntent().getExtras().get("species"));
-        i.putExtra("photoPath", (String) getIntent().getExtras().get("photoPath"));
-        startActivity(i);
     }
 }

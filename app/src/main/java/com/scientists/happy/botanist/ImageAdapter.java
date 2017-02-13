@@ -1,11 +1,16 @@
 package com.scientists.happy.botanist;
 
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
+
+import java.io.File;
 
 /**
  * Created by wzhang on 2/13/2017.
@@ -13,9 +18,15 @@ import android.widget.ImageView;
 
 public class ImageAdapter extends BaseAdapter {
     private Context mContext;
+    private Intent intent;
 
     public ImageAdapter(Context c) {
         mContext = c;
+    }
+
+    public ImageAdapter(Context c, Intent i) {
+        mContext = c;
+        intent = i;
     }
 
     public int getCount() {
@@ -43,7 +54,19 @@ public class ImageAdapter extends BaseAdapter {
             imageView = (ImageView) convertView;
         }
 
+        if (intent.getExtras() != null) {
+            String photoPath = (String) intent.getExtras().get("photoPath");
+            File f = new File(photoPath);
+
+            if(f.exists()) {
+                Bitmap bmp = BitmapFactory.decodeFile(f.getAbsolutePath());
+                bmp = ImageUtils.correctRotation(photoPath, bmp);
+                // ImageView image.setImageBitmap(bmp);
+            }
+        }
+
         imageView.setImageResource(mThumbIds[position]);
+
         return imageView;
     }
 
@@ -52,6 +75,6 @@ public class ImageAdapter extends BaseAdapter {
             R.drawable.flowey, R.drawable.flowey,
             R.drawable.flowey, R.drawable.flowey,
             R.drawable.flowey, R.drawable.flowey,
-            R.drawable.flowey, R.drawable.flowey,
+            R.drawable.flowey, R.drawable.flowey
     };
 }
