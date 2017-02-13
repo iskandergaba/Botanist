@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/widget"
     android:fitsSystemWindows="true"
     tools:context="com.scientists.happy.botanist.MainActivity">
 
@@ -23,7 +24,7 @@
 
     <include layout="@layout/content_main"
         android:id="@+id/include" />
-  
+
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
         android:layout_width="wrap_content"
@@ -32,14 +33,19 @@
         android:layout_margin="@dimen/fab_margin"
         app:srcCompat="@android:drawable/ic_menu_add" />
 
-    <Button
-        android:text="Flowey"
-        android:layout_width="wrap_content"
+    <GridView
+        android:id="@+id/gridview"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        app:layout_anchor="@+id/include"
-        app:layout_anchorGravity="center_vertical|center_horizontal"
-        android:layout_gravity="top|center_horizontal"
-        android:id="@+id/Button"
-        android:onClick="onButtonPress" />
+        android:layout_margin="5dp"
+        android:columnWidth="100dp"
+        android:drawSelectorOnTop="true"
+        android:gravity="center"
+        android:numColumns="2"
+        android:stretchMode="columnWidth"
+        android:verticalSpacing="5dp"
+        android:focusable="true"
+        android:layout_below="@+id/widget"
+        android:clickable="true" />
 
 </android.support.design.widget.CoordinatorLayout>
