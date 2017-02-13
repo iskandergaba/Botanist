@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">Botanist</string>
     <string name="action_settings">Settings</string>
+    <string name="title_activity_profile">Flowey\'s Profile</string>
+    <string name="plant_nickname">Flowey</string>
     <string name="title_activity_settings">Settings</string>
 
     <!-- Strings related to Settings -->

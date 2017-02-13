@@ -29,6 +29,13 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".ProfileActivity"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.scientists.happy.botanist.MainActivity" />
+         </activity>
+         <activity
             android:name=".AddPlantActivity"
             android:label="Add New Plant"
             android:parentActivityName=".MainActivity">
