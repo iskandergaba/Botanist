@@ -49,6 +49,7 @@ public class ProfileActivity extends AppCompatActivity {
 
         if(f.exists()) {
             Bitmap bmp = BitmapFactory.decodeFile(f.getAbsolutePath());
+            bmp = ImageUtils.correctRotation(photoPath, bmp);
             image.setImageBitmap(bmp);
         }
     }
