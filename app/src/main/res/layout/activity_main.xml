@@ -32,4 +32,14 @@
         android:layout_margin="@dimen/fab_margin"
         app:srcCompat="@android:drawable/ic_menu_add" />
 
+    <Button
+        android:text="Flowey"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_anchor="@+id/include"
+        app:layout_anchorGravity="center_vertical|center_horizontal"
+        android:layout_gravity="top|center_horizontal"
+        android:id="@+id/Button"
+        android:onClick="onButtonPress" />
+
 </android.support.design.widget.CoordinatorLayout>
