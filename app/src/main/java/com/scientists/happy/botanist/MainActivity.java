@@ -69,4 +69,12 @@ public class MainActivity extends AppCompatActivity
         }
         return super.onOptionsItemSelected(item);
     }
+
+    public void onButtonPress(View view) {
+        Intent i = new Intent(this, ProfileActivity.class);
+        i.putExtra("nickname", (String) getIntent().getExtras().get("nickname"));
+        i.putExtra("species", (String) getIntent().getExtras().get("species"));
+        i.putExtra("photoPath", (String) getIntent().getExtras().get("photoPath"));
+        startActivity(i);
+    }
 }
