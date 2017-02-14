@@ -25,7 +25,7 @@ public class ImageAdapter extends BaseAdapter {
     }
 
     public ImageAdapter(Context c, Intent i) {
-        mContext = c;
+        this(c);
         intent = i;
     }
 
@@ -56,12 +56,14 @@ public class ImageAdapter extends BaseAdapter {
 
         if (intent.getExtras() != null) {
             String photoPath = (String) intent.getExtras().get("photoPath");
-            File f = new File(photoPath);
+            if(photoPath != null) {
+                File f = new File(photoPath);
 
-            if(f.exists()) {
-                Bitmap bmp = BitmapFactory.decodeFile(f.getAbsolutePath());
-                bmp = ImageUtils.correctRotation(photoPath, bmp);
-                // ImageView image.setImageBitmap(bmp);
+                if(f.exists()) {
+                    Bitmap bmp = BitmapFactory.decodeFile(f.getAbsolutePath());
+                    bmp = ImageUtils.correctRotation(photoPath, bmp);
+                    // ImageView image.setImageBitmap(bmp);
+                }
             }
         }
 

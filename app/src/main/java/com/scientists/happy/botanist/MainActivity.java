@@ -1,15 +1,19 @@
 package com.scientists.happy.botanist;
+
+import android.app.Activity;
+import android.app.ActivityOptions;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.AdapterView;
-import android.widget.GridView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.GridView;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity
@@ -40,7 +44,8 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        GridView gridview = (GridView) findViewById(R.id.gridview);
+        final Activity activity = MainActivity.this;
+        final GridView gridview = (GridView) findViewById(R.id.gridview);
         gridview.setAdapter(new ImageAdapter(this, getIntent()));
         gridview.setOnItemClickListener(new OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,
@@ -57,7 +62,14 @@ public class MainActivity extends AppCompatActivity
                     i.putExtra("species", "A flower");
                     i.putExtra("photoPath", "");
                 }
-                startActivity(i);
+                if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    View sharedView = gridview.getChildAt(position - gridview.getFirstVisiblePosition());
+                    sharedView.setTransitionName("main_to_profile_transition");
+                    Bundle bundle = ActivityOptions.makeSceneTransitionAnimation(activity, sharedView, sharedView.getTransitionName()).toBundle();
+                    startActivity(i, bundle);
+                } else {
+                   startActivity(i);
+                }
             }
         });
     }

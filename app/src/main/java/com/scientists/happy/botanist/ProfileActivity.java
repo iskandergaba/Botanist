@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import java.io.File;
 
 public class ProfileActivity extends AppCompatActivity {
@@ -43,14 +44,17 @@ public class ProfileActivity extends AppCompatActivity {
         //update the ImageView on the app screen to match the stored image
         //if stored image doesn't exist, put in a default image
 
-        File f = new File(photoPath);
-
         ImageView image = (ImageView)findViewById(R.id.plant_picture);
 
-        if(f.exists()) {
-            Bitmap bmp = BitmapFactory.decodeFile(f.getAbsolutePath());
-            bmp = ImageUtils.correctRotation(photoPath, bmp);
-            image.setImageBitmap(bmp);
+        if(photoPath != null) {
+            File f = new File(photoPath);
+            if(f.exists()) {
+                Bitmap bmp = BitmapFactory.decodeFile(f.getAbsolutePath());
+                bmp = ImageUtils.correctRotation(photoPath, bmp);
+                image.setImageBitmap(bmp);
+            }
+        } else {
+            image.setImageResource(R.drawable.flowey);
         }
     }
 }
