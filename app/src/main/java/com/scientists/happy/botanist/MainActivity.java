@@ -14,7 +14,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
-import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity
 {
@@ -50,8 +49,6 @@ public class MainActivity extends AppCompatActivity
         gridview.setOnItemClickListener(new OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
-                Toast.makeText(MainActivity.this, "Ooooo u click me",
-                        Toast.LENGTH_SHORT).show();
                 Intent i = new Intent(getApplicationContext(), ProfileActivity.class);
                 if (getIntent().getExtras() != null) {
                     i.putExtra("species", (String) getIntent().getExtras().get("species"));

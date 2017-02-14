@@ -57,4 +57,10 @@ public class ProfileActivity extends AppCompatActivity {
             image.setImageResource(R.drawable.flowey);
         }
     }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        super.onBackPressed();
+        return true;
+    }
 }
