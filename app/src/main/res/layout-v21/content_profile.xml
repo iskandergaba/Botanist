@@ -34,8 +34,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingTop="8dp"
-                android:paddingBottom="8dp">
+                android:paddingTop="8dp">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -50,15 +49,13 @@
                     android:id="@+id/plant_nickname"
                     android:paddingLeft="8dp"
                     android:paddingRight="8dp"
-                    android:paddingBottom="8dp"
                     android:textColor="@android:color/black" />
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingTop="8dp"
-                android:paddingBottom="8dp">
+                android:paddingTop="8dp">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -73,14 +70,14 @@
                     android:id="@+id/plant_species"
                     android:paddingLeft="8dp"
                     android:paddingRight="8dp"
-                    android:paddingBottom="8dp"
                     android:textColor="@android:color/black" />
             </LinearLayout>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Care Tips"
+                android:paddingTop="8dp"
+                android:text="Care Tips:"
                 android:id="@+id/title_care_tips"
                 android:layout_weight="1"
                 android:textSize="15sp"
@@ -96,6 +93,7 @@
                 android:textColor="@android:color/black"/>
 
         </LinearLayout>
+
         <Button
             android:text="Delete Plant"
             android:layout_width="match_parent"
