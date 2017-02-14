@@ -62,11 +62,12 @@ public class ImageAdapter extends BaseAdapter {
                 if(f.exists()) {
                     Bitmap bmp = BitmapFactory.decodeFile(f.getAbsolutePath());
                     bmp = ImageUtils.correctRotation(photoPath, bmp);
-                    // ImageView image.setImageBitmap(bmp);
+                    //imageView.setImageBitmap(bmp);
                 }
             }
         }
 
+        imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
         imageView.setImageResource(mThumbIds[position]);
 
         return imageView;
