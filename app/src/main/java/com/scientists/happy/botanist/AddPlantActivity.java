@@ -77,19 +77,7 @@ public class AddPlantActivity extends AppCompatActivity
     {
         if ((requestCode == REQUEST_IMAGE_CAPTURE) && (resultCode == RESULT_OK))
         {
-            int targetW = iButton.getWidth();
-            int targetH = iButton.getHeight();
-            BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-            bmOptions.inJustDecodeBounds = true;
-            BitmapFactory.decodeFile(photoPath, bmOptions);
-            int photoW = bmOptions.outWidth;
-            int photoH = bmOptions.outHeight;
-            int scaleFactor = Math.min(photoW / targetW, photoH / targetH);
-            bmOptions.inJustDecodeBounds = false;
-            bmOptions.inSampleSize = scaleFactor;
-            Bitmap bitmap = BitmapFactory.decodeFile(photoPath, bmOptions);
-            bitmap = ImageUtils.correctRotation(photoPath, bitmap);
-            iButton.setImageBitmap(bitmap);
+            iButton.setImageBitmap(ImageUtils.loadScaledImage(photoPath, iButton.getWidth(), iButton.getHeight()));
         }
     }
 

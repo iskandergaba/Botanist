@@ -2,18 +2,40 @@
 // @author: Chia George Washington
 package com.scientists.happy.botanist;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.media.ExifInterface;
 import java.io.IOException;
 public class ImageUtils
 {
     /**
+     * Load scaled image
+     * @param photoPath - path to image
+     * @param width - width of image
+     * @param height - height of image
+     * @return Returns the scaled Bitmap
+     */
+    public static Bitmap loadScaledImage(String photoPath, int width, int height)
+    {
+        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+        bmOptions.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(photoPath, bmOptions);
+        int photoW = bmOptions.outWidth;
+        int photoH = bmOptions.outHeight;
+        int scaleFactor = Math.min(photoW / width, photoH / height);
+        bmOptions.inJustDecodeBounds = false;
+        bmOptions.inSampleSize = scaleFactor;
+        Bitmap bitmap = BitmapFactory.decodeFile(photoPath, bmOptions);
+        return ImageUtils.correctRotation(photoPath, bitmap);
+    }
+
+    /**
      * Rotate the image if need be
      * @param photoPath - string path to photo
      * @param bitmap - the image
      * @return Returns the angle to rotate the image
      */
-    public static Bitmap correctRotation(String photoPath, Bitmap bitmap)
+    private static Bitmap correctRotation(String photoPath, Bitmap bitmap)
     {
         try
         {
