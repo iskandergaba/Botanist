@@ -24,6 +24,7 @@ public class AddPlantActivity extends AppCompatActivity
     protected EditText speciesBox;
     protected EditText nicknameBox;
     protected String photoPath;
+    private Bitmap img;
     /**
      * Launch the add plant screen
      * @param savedInstanceState - Current app state
@@ -77,7 +78,8 @@ public class AddPlantActivity extends AppCompatActivity
     {
         if ((requestCode == REQUEST_IMAGE_CAPTURE) && (resultCode == RESULT_OK))
         {
-            iButton.setImageBitmap(ImageUtils.loadScaledImage(photoPath, iButton.getWidth(), iButton.getHeight()));
+            img = ImageUtils.loadScaledImage(photoPath, iButton.getWidth(), iButton.getHeight());
+            iButton.setImageBitmap(img);
         }
     }
 
@@ -103,9 +105,23 @@ public class AddPlantActivity extends AppCompatActivity
     protected void onPressSubmit(View view)
     {
         Intent i = new Intent(this, MainActivity.class);
-        i.putExtra("species", speciesBox.getText().toString());
-        i.putExtra("nickname", nicknameBox.getText().toString());
-        i.putExtra("photoPath", photoPath);
+        Plant p = new Plant(nicknameBox.getText().toString(), speciesBox.getText().toString(),
+                photoPath);
+        PlantArray pa = PlantArray.getInstance();
+        pa.add(p);
         startActivity(i);
+    }
+
+    /**
+     * Delete old image
+     */
+    @Override
+    protected void onDestroy()
+    {
+        super.onDestroy();
+        if (img != null)
+        {
+            img.recycle();
+        }
     }
 }

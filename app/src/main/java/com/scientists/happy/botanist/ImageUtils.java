@@ -20,9 +20,18 @@ public class ImageUtils
         BitmapFactory.Options bmOptions = new BitmapFactory.Options();
         bmOptions.inJustDecodeBounds = true;
         BitmapFactory.decodeFile(photoPath, bmOptions);
+        int orientation = 0;
+        try
+        {
+            ExifInterface ei = new ExifInterface(photoPath);
+            orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED);
+        }
+        catch (IOException e)
+        {
+        }
         int photoW = bmOptions.outWidth;
         int photoH = bmOptions.outHeight;
-        int scaleFactor = Math.min(photoW / width, photoH / height);
+        int scaleFactor = Math.max((int) Math.round((double) photoW / width), (int) Math.round((double) photoH / height));
         bmOptions.inJustDecodeBounds = false;
         bmOptions.inSampleSize = scaleFactor;
         Bitmap bitmap = BitmapFactory.decodeFile(photoPath, bmOptions);

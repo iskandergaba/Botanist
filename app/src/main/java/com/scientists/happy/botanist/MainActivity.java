@@ -15,8 +15,11 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
 
+import java.util.ArrayList;
+
 public class MainActivity extends AppCompatActivity
 {
+    private static final String DELIMETER = "\t";
     /**
      * Launch app
      * @param savedInstanceState - app state
@@ -25,6 +28,10 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+        final PlantArray plants = PlantArray.getInstance();
+        if (getIntent().getExtras() != null) {
+
+        }
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -50,15 +57,13 @@ public class MainActivity extends AppCompatActivity
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
                 Intent i = new Intent(getApplicationContext(), ProfileActivity.class);
-                if (getIntent().getExtras() != null) {
-                    i.putExtra("species", (String) getIntent().getExtras().get("species"));
-                    i.putExtra("nickname", (String) getIntent().getExtras().get("nickname"));
-                    i.putExtra("photoPath", (String) getIntent().getExtras().get("photoPath"));
+                Plant plant = plants.get(position);
+                if (plant != null) {
+                    i.putExtra("plant", plant.toString());
                 } else {
-                    i.putExtra("nickname", "Flowey");
-                    i.putExtra("species", "A flower");
-                    i.putExtra("photoPath", "");
+                    i.putExtra("plant", "Flowey\tUndertalus asrielus\t");
                 }
+
                 if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     View sharedView = gridview.getChildAt(position - gridview.getFirstVisiblePosition());
                     sharedView.setTransitionName("main_to_profile_transition");
