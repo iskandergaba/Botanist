@@ -77,4 +77,8 @@
 
     <string name="pref_title_vibrate">Vibrate</string>
     <string name="set_time">Set Time</string>
+    <string name="delete_message">Are you sure you want to delete this plant?</string>
+    <string name="delete_dialog_title">Delete Plant</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 </resources>

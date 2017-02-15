@@ -11,14 +11,20 @@ import android.widget.GridView;
 import android.widget.ImageView;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.HashSet;
 
 /**
  * Created by wzhang on 2/13/2017.
  */
 
 public class ImageAdapter extends BaseAdapter {
+    private static final Integer DEFAULT_IMAGE = R.drawable.flowey;
+
     private Context mContext;
     private Intent intent;
+    private HashSet<Bitmap> imgs = new HashSet<Bitmap>();
+    PlantArray plantArray = PlantArray.getInstance();
 
     public ImageAdapter(Context c) {
         mContext = c;
@@ -30,7 +36,7 @@ public class ImageAdapter extends BaseAdapter {
     }
 
     public int getCount() {
-        return mThumbIds.length;
+        return plantArray.size();
     }
 
     public Object getItem(int position) {
@@ -44,40 +50,50 @@ public class ImageAdapter extends BaseAdapter {
     // create a new ImageView for each item referenced by the Adapter
     public View getView(int position, View convertView, ViewGroup parent) {
         ImageView imageView;
+        int width = mContext.getResources().getDisplayMetrics().widthPixels;
         if (convertView == null) {
             // if it's not recycled, initialize some attributes
             imageView = new ImageView(mContext);
-            int width = mContext.getResources().getDisplayMetrics().widthPixels;
+
             imageView.setLayoutParams(new GridView.LayoutParams(width/2 - 50, width/2 - 50));
             imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
         } else {
             imageView = (ImageView) convertView;
         }
 
-        if (intent.getExtras() != null) {
-            String photoPath = (String) intent.getExtras().get("photoPath");
-            if(photoPath != null) {
-                File f = new File(photoPath);
+        if (position < plantArray.size()) {
+            Plant p = plantArray.get(position);
+            if (p != null) {
+                String photoPath = p.getPhotoPath();
+                if(photoPath != null) {
+                    File f = new File(photoPath);
 
-                if(f.exists()) {
-                    Bitmap bmp = BitmapFactory.decodeFile(f.getAbsolutePath());
-                    bmp = ImageUtils.correctRotation(photoPath, bmp);
-                    //imageView.setImageBitmap(bmp);
+                    if(f.exists()) {
+                        Bitmap bmp = ImageUtils.loadScaledImage(photoPath, width, width);
+                        imgs.add(bmp);
+                        imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                        imageView.setImageBitmap(bmp);
+                    } else {
+                        imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                        imageView.setImageResource(DEFAULT_IMAGE);
+                    }
+                } else {
+                    imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                    imageView.setImageResource(DEFAULT_IMAGE);
                 }
+            } else {
+                imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                imageView.setImageResource(DEFAULT_IMAGE);
             }
+        } else {
+            imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+            imageView.setImageResource(DEFAULT_IMAGE);
         }
-
-        imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
-        imageView.setImageResource(mThumbIds[position]);
-
         return imageView;
     }
 
-    // references to our images
-    private Integer[] mThumbIds = {
-            R.drawable.flowey, R.drawable.flowey,
-            R.drawable.flowey, R.drawable.flowey,
-            R.drawable.flowey, R.drawable.flowey,
-            R.drawable.flowey, R.drawable.flowey
-    };
+    public HashSet<Bitmap> getImgs()
+    {
+        return imgs;
+    }
 }
