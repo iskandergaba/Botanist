@@ -15,23 +15,19 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
 
-import java.util.ArrayList;
+public class MainActivity extends AppCompatActivity {
 
-public class MainActivity extends AppCompatActivity
-{
-    private static final String DELIMETER = "\t";
+    static final int REQUEST_NEW_PLANT = 1;
+    static final int VIEW_PLANT = 2;
+
     /**
      * Launch app
      * @param savedInstanceState - app state
      */
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         final PlantArray plants = PlantArray.getInstance();
-        if (getIntent().getExtras() != null) {
-
-        }
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -43,16 +39,14 @@ public class MainActivity extends AppCompatActivity
              * @param view - current view
              */
             @Override
-            public void onClick(View view)
-            {
-                Intent i = new Intent(MainActivity.this, AddPlantActivity.class);
-                startActivity(i);
+            public void onClick(View view) {
+                startActivityForResult(new Intent(MainActivity.this, AddPlantActivity.class), REQUEST_NEW_PLANT);
             }
         });
 
         final Activity activity = MainActivity.this;
         final GridView gridview = (GridView) findViewById(R.id.gridview);
-        gridview.setAdapter(new ImageAdapter(this, getIntent()));
+        gridview.setAdapter(new ImageAdapter(this));
         gridview.setOnItemClickListener(new OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
@@ -68,9 +62,9 @@ public class MainActivity extends AppCompatActivity
                     View sharedView = gridview.getChildAt(position - gridview.getFirstVisiblePosition());
                     sharedView.setTransitionName("main_to_profile_transition");
                     Bundle bundle = ActivityOptions.makeSceneTransitionAnimation(activity, sharedView, sharedView.getTransitionName()).toBundle();
-                    startActivity(i, bundle);
+                    startActivityForResult(i, VIEW_PLANT, bundle);
                 } else {
-                   startActivity(i);
+                   startActivityForResult(i, VIEW_PLANT);
                 }
             }
         });
@@ -82,8 +76,7 @@ public class MainActivity extends AppCompatActivity
      * @return Returns success code
      */
     @Override
-    public boolean onCreateOptionsMenu(Menu menu)
-    {
+    public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
@@ -95,18 +88,23 @@ public class MainActivity extends AppCompatActivity
      * @return Returns success code
      */
     @Override
-    public boolean onOptionsItemSelected(MenuItem item)
-    {
+    public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings)
-        {
+        if (id == R.id.action_settings) {
             startActivity(new Intent(this, SettingsActivity.class));
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if ((requestCode == REQUEST_NEW_PLANT || requestCode == VIEW_PLANT) && resultCode == RESULT_OK) {
+            recreate();
+        }
     }
 }

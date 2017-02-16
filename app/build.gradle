@@ -30,5 +30,6 @@ dependencies {
     compile 'com.android.support:support-v4:25.1.1'
     compile 'com.android.support:support-vector-drawable:25.1.1'
     compile 'com.wdullaer:materialdatetimepicker:3.1.1'
+    compile 'com.squareup.picasso:picasso:2.5.2'
     testCompile 'junit:junit:4.12'
 }
