@@ -15,7 +15,6 @@ import java.util.List;
 
 public class ProgressBarAdapter extends BaseAdapter {
 
-
     private ArrayList<ProgressItem> mData;
     private LayoutInflater mInflater;
 
@@ -56,7 +55,7 @@ public class ProgressBarAdapter extends BaseAdapter {
         ViewHolder vh = null;
         if (convertView == null) {
             vh = new ViewHolder();
-            convertView = mInflater.inflate(R.layout.row_grid_view, parent, false);
+            convertView = mInflater.inflate(R.layout.content_main, parent, false);
             vh.mProgress = (ProgressBar) convertView.findViewById(R.id.progress);
             convertView.setTag(vh);
         } else {

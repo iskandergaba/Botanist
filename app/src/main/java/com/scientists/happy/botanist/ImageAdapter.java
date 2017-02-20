@@ -1,14 +1,19 @@
 package com.scientists.happy.botanist;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import static android.widget.GridView.AUTO_FIT;
 
@@ -22,9 +27,14 @@ public class ImageAdapter extends BaseAdapter {
     private Context mContext;
     //private HashSet<Bitmap> imgs = new HashSet<>();
     private PlantArray plantArray = PlantArray.getInstance();
+    private Activity activity;
+    private LayoutInflater mInflater;
 
-    public ImageAdapter(Context c) {
+    public ImageAdapter(Context c, Activity activity) {
+        super();
         mContext = c;
+        this.mInflater = LayoutInflater.from(c);
+        this.activity = activity;
     }
 
     public int getCount() {
@@ -39,17 +49,28 @@ public class ImageAdapter extends BaseAdapter {
         return 0;
     }
 
+    private static class ViewHolder {
+        private ImageView imageView;
+        private ProgressBar mProgress;
+    }
+
     // create a new ImageView for each item referenced by the Adapter
     public View getView(int position, View convertView, ViewGroup parent) {
         ImageView imageView;
+        ViewHolder vh = null;
         int height = (int)mContext.getResources().getDimension(R.dimen.profile_picture_height);
         int width = height / 2;
         if (convertView == null) {
             // if it's not recycled, initialize some attributes
+            vh = new ViewHolder();
+            convertView = mInflater.inflate(R.layout.row_grid_view, parent, false);
+            vh.mProgress = (ProgressBar) convertView.findViewById(R.id.progress);
             imageView = new ImageView(mContext);
             imageView.setLayoutParams(new GridView.LayoutParams(AUTO_FIT, height));
+            vh.imageView = imageView;
+            convertView.setTag(vh);
         } else {
-            imageView = (ImageView) convertView;
+            vh = (ViewHolder) convertView.getTag();
         }
         if (position < plantArray.size()) {
             Plant p = plantArray.get(position);
@@ -61,20 +82,23 @@ public class ImageAdapter extends BaseAdapter {
                     if(f.exists()) {
                         Bitmap bmp = ImageUtils.loadScaledImage(photoPath, width, height);
                         //imgs.add(bmp);
-                        imageView.setImageBitmap(bmp);
+                        vh.imageView.setImageBitmap(bmp);
                     } else {
-                        imageView.setImageResource(DEFAULT_IMAGE);
+                        vh.imageView.setImageResource(DEFAULT_IMAGE);
                     }
                 } else {
-                    imageView.setImageResource(DEFAULT_IMAGE);
+                    vh.imageView.setImageResource(DEFAULT_IMAGE);
                 }
             } else {
-                imageView.setImageResource(DEFAULT_IMAGE);
+                vh.imageView.setImageResource(DEFAULT_IMAGE);
             }
         } else {
-            imageView.setImageResource(DEFAULT_IMAGE);
+            vh.imageView.setImageResource(DEFAULT_IMAGE);
         }
-        imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        return imageView;
+        ProgressItem mItem = new ProgressItem(5);
+        vh.mProgress.setProgress(mItem.getProgress());
+        vh.imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        return convertView;
     }
+
 }
