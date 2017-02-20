@@ -67,7 +67,6 @@ public class ImageAdapter extends BaseAdapter {
             imageView = new ImageView(mContext);
             imageView.setLayoutParams(new GridView.LayoutParams(AUTO_FIT, height));
             vh.imageView = imageView;
-            convertView.setTag(vh);
         } else {
             vh = (ViewHolder) convertView.getTag();
         }
@@ -84,9 +83,10 @@ public class ImageAdapter extends BaseAdapter {
                 }
             }
         }
-        ProgressItem mItem = new ProgressItem(20);
+        ProgressItem mItem = new ProgressItem(20); // placeholder for future watering time
         vh.mProgress.setProgress(mItem.getProgress());
         vh.imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        convertView.setTag(vh);
         return convertView;
     }
 
