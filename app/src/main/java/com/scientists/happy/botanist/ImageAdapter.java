@@ -7,33 +7,26 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
-import static android.widget.GridView.AUTO_FIT;
 
 /**
  * Created by wzhang on 2/13/2017.
  */
 
 public class ImageAdapter extends BaseAdapter {
-    private static final Integer DEFAULT_IMAGE = R.drawable.flowey;
 
     private Context mContext;
     private PlantArray plantArray = PlantArray.getInstance();
-    private Activity activity;
     private LayoutInflater mInflater;
 
     public ImageAdapter(Context c, Activity activity) {
         super();
         mContext = c;
         this.mInflater = LayoutInflater.from(c);
-        this.activity = activity;
     }
 
     public int getCount() {
@@ -50,23 +43,24 @@ public class ImageAdapter extends BaseAdapter {
 
     private static class ViewHolder {
         private ImageView imageView;
+        private TextView nickName;
+        private TextView species;
         private ProgressBar mProgress;
     }
 
     // create a new ImageView for each item referenced by the Adapter
     public View getView(int position, View convertView, ViewGroup parent) {
-        ImageView imageView;
-        ViewHolder vh = null;
+        ViewHolder vh;
         int height = (int)mContext.getResources().getDimension(R.dimen.profile_picture_height);
         int width = height / 2;
         if (convertView == null) {
             // if it's not recycled, initialize some attributes
             vh = new ViewHolder();
-            convertView = mInflater.inflate(R.layout.row_grid_view, parent, false);
-            vh.mProgress = (ProgressBar) convertView.findViewById(R.id.progress);
-            imageView = new ImageView(mContext);
-            imageView.setLayoutParams(new GridView.LayoutParams(AUTO_FIT, height));
-            vh.imageView = imageView;
+            convertView = mInflater.inflate(R.layout.grid_item_view, parent, false);
+            vh.mProgress = (ProgressBar)convertView.findViewById(R.id.progress);
+            vh.imageView = (ImageView)convertView.findViewById(R.id.grid_item_image_view);
+            vh.nickName = (TextView)convertView.findViewById(R.id.grid_item_nickname);
+            vh.species = (TextView)convertView.findViewById(R.id.grid_item_species);
         } else {
             vh = (ViewHolder) convertView.getTag();
         }
@@ -81,6 +75,8 @@ public class ImageAdapter extends BaseAdapter {
                         vh.imageView.setImageBitmap(bmp);
                     }
                 }
+                vh.nickName.setText(p.getNickname());
+                vh.species.setText(p.getSpecies());
             }
         }
         ProgressItem mItem = new ProgressItem(20); // placeholder for future watering time
@@ -89,5 +85,4 @@ public class ImageAdapter extends BaseAdapter {
         convertView.setTag(vh);
         return convertView;
     }
-
 }

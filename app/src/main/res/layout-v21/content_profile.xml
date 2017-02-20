@@ -20,7 +20,7 @@
             app:srcCompat="@drawable/flowey"
             android:id="@+id/plant_picture"
             android:layout_weight="1"
-            android:transitionName="main_to_profile_transition"/>
+            android:transitionName="image_main_to_profile_transition"/>
 
         <LinearLayout
             android:orientation="vertical"
@@ -42,15 +42,18 @@
                     android:layout_height="wrap_content"
                     android:text="Nickname:"
                     android:id="@+id/title_nickname"
-                    android:textSize="15sp"
-                    android:textStyle="bold"/>
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="@android:color/black"/>
                 <TextView
+                    android:id="@+id/plant_nickname"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/plant_nickname"
-                    android:paddingLeft="8dp"
-                    android:paddingRight="8dp"
-                    android:textColor="@android:color/black" />
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:paddingLeft="@dimen/activity_horizontal_margin"
+                    android:paddingRight="@dimen/activity_horizontal_margin"
+                    android:transitionName="nickname_main_to_profile_transition"/>
             </LinearLayout>
 
             <LinearLayout
@@ -63,51 +66,43 @@
                     android:layout_height="wrap_content"
                     android:text="Species:"
                     android:id="@+id/title_species"
-                    android:textSize="15sp"
-                    android:textStyle="bold"/>
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="@android:color/black"/>
                 <TextView
+                    android:id="@+id/plant_species"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/plant_species"
-                    android:paddingLeft="8dp"
-                    android:paddingRight="8dp"
-                    android:textColor="@android:color/black" />
+                    android:paddingLeft="@dimen/activity_horizontal_margin"
+                    android:paddingRight="@dimen/activity_horizontal_margin"
+                    android:textSize="16sp" />
             </LinearLayout>
 
             <TextView
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="0dp"
                 android:paddingTop="8dp"
                 android:text="Care Tips:"
                 android:id="@+id/title_care_tips"
                 android:layout_weight="1"
-                android:textSize="15sp"
-                android:textStyle="bold"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="PLANTING: Grow in full sun. Soil should be moderately fertile, not overly rich, moist but well-drained. Sow seeds in containers in a cold frame in autumn or spring. Divide perennials in early spring or late summer. If you seed directly, expect bloom the following spring after one season’s growth. If purchasing a plant in a container, plant in spring. Loosen the soil to a depth of 12 to 15 inches, then mix in a 2- to 4-inch layer of compost. Space plants 1 to 2 feet apart. Dig a hole twice the diameter of the container. When placing plant in the hole, make sure the top of the root ball is level with the soil surface. Fill around the root ball and firm the soil. Water thoroughly. Many of the taller plants need support/staking."
-                android:id="@+id/planting_tips"
-                android:paddingTop="8dp"
-                android:paddingBottom="8dp"
+                android:textSize="16sp"
+                android:textStyle="bold"
                 android:textColor="@android:color/black"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="CARE: Water during the summer only if rainfall is less than 1 inch per week. After the first killing frost, cut stems back to an inch or two above the soil line. Every spring, apply some compost and mulch to help control weeds. Every 3 to 4 years, divide perennials again in early spring or late summer."
+                android:text="PLANTING Grow in full sun. Soil should be moderately fertile, not overly rich, moist but well-drained. Sow seeds in containers in a cold frame in autumn or spring. Divide perennials in early spring or late summer. If you seed directly, expect bloom the following spring after one season’s growth. If purchasing a plant in a container, plant in spring. Loosen the soil to a depth of 12 to 15 inches, then mix in a 2- to 4-inch layer of compost. Space plants 1 to 2 feet apart. Dig a hole twice the diameter of the container. When placing plant in the hole, make sure the top of the root ball is level with the soil surface. Fill around the root ball and firm the soil. Water thoroughly. Many of the taller plants need support/staking. CARE Water during the summer only if rainfall is less than 1 inch per week. After the first killing frost, cut stems back to an inch or two above the soil line. Every spring, apply some compost and mulch to help control weeds. Every 3 to 4 years, divide perennials again in early spring or late summer."
                 android:id="@+id/care_tips"
                 android:paddingTop="8dp"
-                android:paddingBottom="8dp"
-                android:textColor="@android:color/black"/>
+                android:paddingBottom="8dp" />
 
         </LinearLayout>
 
         <Button
             android:text="Delete Plant"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="wrap_content"
             android:id="@+id/button"
             android:layout_weight="1"
             android:textColorLink="@android:color/holo_red_light"
