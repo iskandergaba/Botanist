@@ -25,7 +25,6 @@ public class ImageAdapter extends BaseAdapter {
     private static final Integer DEFAULT_IMAGE = R.drawable.flowey;
 
     private Context mContext;
-    //private HashSet<Bitmap> imgs = new HashSet<>();
     private PlantArray plantArray = PlantArray.getInstance();
     private Activity activity;
     private LayoutInflater mInflater;
@@ -78,24 +77,14 @@ public class ImageAdapter extends BaseAdapter {
                 String photoPath = p.getPhotoPath();
                 if(photoPath != null) {
                     File f = new File(photoPath);
-
                     if(f.exists()) {
                         Bitmap bmp = ImageUtils.loadScaledImage(photoPath, width, height);
-                        //imgs.add(bmp);
                         vh.imageView.setImageBitmap(bmp);
-                    } else {
-                        vh.imageView.setImageResource(DEFAULT_IMAGE);
                     }
-                } else {
-                    vh.imageView.setImageResource(DEFAULT_IMAGE);
                 }
-            } else {
-                vh.imageView.setImageResource(DEFAULT_IMAGE);
             }
-        } else {
-            vh.imageView.setImageResource(DEFAULT_IMAGE);
         }
-        ProgressItem mItem = new ProgressItem(5);
+        ProgressItem mItem = new ProgressItem(20);
         vh.mProgress.setProgress(mItem.getProgress());
         vh.imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
         return convertView;
