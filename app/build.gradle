@@ -33,3 +33,5 @@ dependencies {
     compile 'com.wdullaer:materialdatetimepicker:3.1.1'
     testCompile 'junit:junit:4.12'
 }
+
+apply plugin: 'com.google.gms.google-services'
