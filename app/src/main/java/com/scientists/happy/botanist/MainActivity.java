@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -46,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
 
         final Activity activity = MainActivity.this;
         final GridView gridview = (GridView) findViewById(R.id.gridview);
-        gridview.setAdapter(new ImageAdapter(this));
+        gridview.setAdapter(new ImageAdapter(this, activity));
         gridview.setOnItemClickListener(new OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
@@ -60,9 +61,12 @@ public class MainActivity extends AppCompatActivity {
 
                 if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     View sharedView = gridview.getChildAt(position - gridview.getFirstVisiblePosition());
-                    sharedView.setTransitionName("main_to_profile_transition");
-                    Bundle bundle = ActivityOptions.makeSceneTransitionAnimation(activity, sharedView, sharedView.getTransitionName()).toBundle();
-                    startActivityForResult(i, VIEW_PLANT, bundle);
+                    View sharedImageView = sharedView.findViewById(R.id.grid_item_image_view);
+                    View sharedNicknameView = sharedView.findViewById(R.id.grid_item_nickname);
+                    Pair<View, String> p1 = Pair.create(sharedImageView, "image_main_to_profile_transition");
+                    Pair<View, String> p2 = Pair.create(sharedNicknameView, "nickname_main_to_profile_transition");
+                    ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(MainActivity.this, p1, p2);
+                    startActivityForResult(i, VIEW_PLANT, options.toBundle());
                 } else {
                    startActivityForResult(i, VIEW_PLANT);
                 }
