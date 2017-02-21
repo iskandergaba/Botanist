@@ -1,0 +1,64 @@
+<?xml version = "1.0"?>
+
+<project name = "PlantCrawler" default = "build" basedir = ".">
+    <property name = "shared.root" location = "${basedir}"/>
+    <property name = "file.separator" location = "/"/>
+    <property name = "project.root" location = "${basedir}"/>
+    <property name = "build.dir" location = "${project.root}"/>
+    <property name = "build.target.dir" location = "${project.root}${file.separator}bin"/>
+    <property name = "test-classes.dir" location = "${build.target.dir}${file.separator}test"/>
+    <property name = "inputlib.dir" location = "${build.dir}${file.separator}lib"/>
+    <property name = "src.main.dir" location = "${build.dir}${file.separator}src${file.separator}"/>
+    <property name = "src.test.dir" location = "${src.main.dir}test${file.separator}"/>
+    
+    <target name = "compile" description = "Compiles the crawler">
+        <mkdir dir = "${build.target.dir}"/>
+        <javac srcdir = "${src.main.dir}" destdir = "${build.target.dir}" debug = "on" deprecation = "off" optimize = "on" includeAntRuntime = "no">
+            <classpath>
+                <fileset dir = "${inputlib.dir}">
+                    <include name = "*.jar"/>
+                </fileset>
+            </classpath>
+        </javac>
+    </target>
+    
+    <target name = "compile-tests" description = "compiles test Java source code">
+        <mkdir dir = "${test-classes.dir}"/>
+        <javac srcdir = "${src.test.dir}" destdir = "${test-classes.dir}" debug = "on" deprecation = "off" optimize = "on" includeAntRuntime = "no">
+	        <classpath>
+	            <pathelement path="${build.target.dir}"/>
+	            <fileset dir="${inputlib.dir}">
+	                <include name="*.jar"/>
+	            </fileset>
+	        </classpath>
+        </javac>
+    </target>
+    
+    <target name = "test" depends = "compile-tests, compile" description = "Run tests">
+        <java failonerror = "true" fork = "true" classname = "junit.textui.TestRunner">
+            <classpath>
+                <pathelement location = "${test-classes.dir}"/>
+                <pathelement location = "${build.target.dir}"/>
+                <fileset dir = "${inputlib.dir}">
+                    <include name = "*.jar"/>
+                </fileset>
+            </classpath>
+            <arg value = "bin.test.RunAllTests"/>
+        </java>
+    </target>
+  
+    <target name = "clean" description = "Deletes all the compiled files">
+        <delete dir = "${build.target.dir}"/>
+        <delete file = "crawler.jar"/>
+    </target>
+    
+    <target name = "build" depends = "compile" description = "Makes the JAR file for the crawler">
+        <delete file = "crawler.jar"/>
+        <jar destfile = "crawler.jar" update = "true">
+            <fileset dir = "${build.target.dir}">
+                <include name = "**/*.class"/>
+            </fileset>
+            <zipgroupfileset dir = "./lib/"/>
+	    </jar>
+    </target>
+</project>
