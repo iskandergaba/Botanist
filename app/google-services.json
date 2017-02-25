@@ -15,11 +15,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "993462563911-3nkmjcl1qjhbd9o7ok2p7c167clmidc7.apps.googleusercontent.com",
+          "client_id": "993462563911-og2qift9rr2ga7p38cdnufcmv6see0j0.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.scientists.happy.botanist",
-            "certificate_hash": "936f68551c672ef1af78bf45e85142e835d8ecb7"
+            "certificate_hash": "8f154cb7efb0d8f6f828897271249231e4d8f1ef"
           }
         },
         {
@@ -29,7 +29,7 @@
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCsNuha9AGWsBGD8DEqwME-v5cDEj79OLc"
+          "current_key": "AIzaSyBYz_rvVNhzjGdohVBa1wSPkt9bazy8GSw"
         }
       ],
       "services": {
