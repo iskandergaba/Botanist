@@ -17,7 +17,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.OptionalPendingResult;
 import com.google.android.gms.common.api.ResultCallback;
@@ -30,7 +29,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
-public class SignInActivity extends AppCompatActivity implements
+public class AccountActivity extends AppCompatActivity implements
         GoogleApiClient.OnConnectionFailedListener,
         View.OnClickListener {
 
@@ -57,13 +56,12 @@ public class SignInActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_sign_in);
+        setContentView(R.layout.activity_account);
 
         // Views
         mStatusTextView = (TextView) findViewById(R.id.status);
 
         // Button listeners
-        findViewById(R.id.sign_in_button).setOnClickListener(this);
         findViewById(R.id.sign_out_button).setOnClickListener(this);
         findViewById(R.id.disconnect_button).setOnClickListener(this);
 
@@ -100,12 +98,6 @@ public class SignInActivity extends AppCompatActivity implements
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
         // [END build_client]
-
-        // [START customize_button]
-        // Set the dimensions of the sign-in button.
-        SignInButton signInButton = (SignInButton) findViewById(R.id.sign_in_button);
-        signInButton.setSize(SignInButton.SIZE_WIDE);
-        // [END customize_button]
     }
 
     @Override
@@ -158,11 +150,7 @@ public class SignInActivity extends AppCompatActivity implements
             if (acct != null) {
                 firebaseAuthWithGoogle(acct);
                 mStatusTextView.setText(getString(R.string.signed_in_fmt, acct.getDisplayName()));
-                updateUI(true);
             }
-        } else {
-            // Signed out, show unauthenticated UI.
-            updateUI(false);
         }
     }
     // [END handleSignInResult]
@@ -187,7 +175,7 @@ public class SignInActivity extends AppCompatActivity implements
                         // signed in user can be handled in the listener.
                         if (!task.isSuccessful()) {
                             Log.w(TAG, "signInWithCredential", task.getException());
-                            Toast.makeText(SignInActivity.this, "Authentication failed.",
+                            Toast.makeText(AccountActivity.this, "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
                         }
                         // [START_EXCLUDE]
@@ -198,13 +186,6 @@ public class SignInActivity extends AppCompatActivity implements
     }
 // [END auth_with_google]
 
-    // [START signIn]
-    private void signIn() {
-        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
-        startActivityForResult(signInIntent, RC_SIGN_IN);
-    }
-    // [END signIn]
-
     // [START signOut]
     private void signOut() {
         Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
@@ -212,7 +193,12 @@ public class SignInActivity extends AppCompatActivity implements
                     @Override
                     public void onResult(@NonNull Status status) {
                         // [START_EXCLUDE]
-                        updateUI(false);
+                        showProgressDialog();
+                        mAuth.signOut();
+                        Intent resultIntent = new Intent();
+                        setResult(RESULT_OK, resultIntent);
+                        hideProgressDialog();
+                        finish();
                         // [END_EXCLUDE]
                     }
                 });
@@ -226,8 +212,12 @@ public class SignInActivity extends AppCompatActivity implements
                     @Override
                     public void onResult(@NonNull Status status) {
                         // [START_EXCLUDE]
+                        showProgressDialog();
                         deleteUser();
-                        updateUI(false);
+                        Intent resultIntent = new Intent();
+                        setResult(RESULT_OK, resultIntent);
+                        hideProgressDialog();
+                        finish();
                         // [END_EXCLUDE]
                     }
                 });
@@ -270,18 +260,6 @@ public class SignInActivity extends AppCompatActivity implements
     private void hideProgressDialog() {
         if (mProgressDialog != null && mProgressDialog.isShowing()) {
             mProgressDialog.hide();
-        }
-    }
-
-    private void updateUI(boolean signedIn) {
-        if (signedIn) {
-            findViewById(R.id.sign_in_button).setVisibility(View.GONE);
-            findViewById(R.id.sign_out_and_disconnect).setVisibility(View.VISIBLE);
-        } else {
-            mStatusTextView.setText(R.string.signed_out);
-
-            findViewById(R.id.sign_in_button).setVisibility(View.VISIBLE);
-            findViewById(R.id.sign_out_and_disconnect).setVisibility(View.GONE);
         }
     }
 
@@ -334,9 +312,6 @@ public class SignInActivity extends AppCompatActivity implements
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.sign_in_button:
-                signIn();
-                break;
             case R.id.sign_out_button:
                 AlertDialog dialog = buildSignOutDialog();
                 dialog.show();
