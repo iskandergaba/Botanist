@@ -23,8 +23,8 @@
         </provider>
 
         <activity
-            android:name=".SignInActivity"
-            android:label="@string/title_activity_sign_in"
+            android:name=".AccountActivity"
+            android:label="@string/title_activity_account"
             android:theme="@style/AppTheme.NoTitle">
 
         </activity>
