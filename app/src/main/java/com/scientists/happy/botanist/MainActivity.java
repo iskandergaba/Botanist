@@ -20,6 +20,7 @@ public class MainActivity extends AppCompatActivity {
 
     static final int REQUEST_NEW_PLANT = 1;
     static final int VIEW_PLANT = 2;
+    static final int VIEW_ACCOUNT = 3;
 
     /**
      * Launch app
@@ -103,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
         else if (id == R.id.action_account) {
-            startActivity(new Intent(MainActivity.this, SignInActivity.class));
+            startActivityForResult(new Intent(MainActivity.this, AccountActivity.class), VIEW_ACCOUNT);
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -113,6 +114,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if ((requestCode == REQUEST_NEW_PLANT || requestCode == VIEW_PLANT) && resultCode == RESULT_OK) {
             recreate();
+        } else if (requestCode == VIEW_ACCOUNT && resultCode == RESULT_OK) {
+            startActivity(new Intent(MainActivity.this, LoginActivity.class));
+            finish();
         }
     }
 }
