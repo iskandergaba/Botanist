@@ -27,6 +27,7 @@ public class AddPlantActivity extends AppCompatActivity
     protected EditText speciesBox;
     protected EditText nicknameBox;
     protected String mCurrentPhotoPath;
+    protected String mPhotoPath;
     /**
      * Launch the add plant screen
      * @param savedInstanceState - Current app state
@@ -59,7 +60,8 @@ public class AddPlantActivity extends AppCompatActivity
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
         if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
-            Bitmap bmp = ImageUtils.loadScaledImage(mCurrentPhotoPath, imageButton.getWidth(), imageButton.getHeight());
+            mPhotoPath = mCurrentPhotoPath;
+            Bitmap bmp = ImageUtils.loadScaledImage(mPhotoPath, imageButton.getWidth(), imageButton.getHeight());
             imageButton.setImageBitmap(bmp);
         }
     }
@@ -107,7 +109,7 @@ public class AddPlantActivity extends AppCompatActivity
      */
     protected void onPressSubmit(View view) {
         Plant p = new Plant(nicknameBox.getText().toString(), speciesBox.getText().toString(),
-                mCurrentPhotoPath);
+                mPhotoPath);
         PlantArray plantArray = PlantArray.getInstance();
         plantArray.add(p);
         Intent resultIntent = new Intent();

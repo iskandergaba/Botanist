@@ -58,8 +58,6 @@ public class ProfileActivity extends AppCompatActivity {
                 Bitmap bmp = ImageUtils.loadScaledImage(photoPath, width, height);
                 imageView.setImageBitmap(bmp);
             }
-        } else {
-            imageView.setImageResource(R.drawable.flowey);
         }
     }
 

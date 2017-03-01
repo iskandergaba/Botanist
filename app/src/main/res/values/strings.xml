@@ -12,7 +12,9 @@
     <string name="sign_out">Sign out</string>
     <string name="disconnect">Delete Account</string>
 
-    <string name="signed_in_fmt">Signed in as: %s</string>
+    <string name="name_fmt">Name: %s</string>
+    <string name="email_fmt">Email: %s</string>
+    <string name="plants_number_fmt">Number of plants: %s</string>
 
     <!-- Server Client ID.  This should be a valid Web OAuth 2.0 Client ID obtained
          from https://console.developers.google.com/ -->
@@ -29,5 +31,6 @@
     <string name="no">No</string>
     <string name="account">Account</string>
     <string name="signed_out">Signed out</string>
+    <string name="account_picture">Account Picture</string>
 
 </resources>

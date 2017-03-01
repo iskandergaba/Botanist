@@ -3,82 +3,89 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorPrimary"
     android:orientation="vertical"
-    tools:context=".AccountActivity">
+    tools:context=".AccountActivity"
+    android:weightSum="20">
 
-    <ScrollView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="3"
-        android:gravity="center_horizontal"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:gravity="center"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        android:layout_weight="17">
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <ImageView
+            android:id="@+id/account_picture"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_marginBottom="@dimen/activity_vertical_margin"
+            android:src="@mipmap/ic_launcher"
+            android:contentDescription="@string/account_picture" />
+        <TextView
+            android:id="@+id/name"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:paddingBottom="@dimen/activity_vertical_margin"
-            android:paddingLeft="@dimen/activity_horizontal_margin"
-            android:paddingRight="@dimen/activity_horizontal_margin"
-            android:paddingTop="@dimen/activity_vertical_margin">
+            android:layout_marginBottom="@dimen/activity_vertical_margin"
+            android:text="@string/name_fmt"
+            android:textStyle="bold"
+            android:textSize="16sp" />
 
-            <ImageView
-                android:id="@+id/google_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/activity_vertical_margin"
-                android:layout_marginTop="@dimen/activity_vertical_margin"
-                android:src="@mipmap/ic_launcher" />
+        <TextView
+            android:id="@+id/email"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:text="@string/email_fmt"
+            android:textSize="16sp"/>
 
-            <TextView
-                android:id="@+id/title_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:text="@string/app_name"
-                android:gravity="center"
-                android:textColor="@android:color/white"
-                android:textSize="38sp" />
+        <TextView
+            android:id="@+id/plants_number"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/plants_number_fmt"
+            android:textSize="16sp"/>
 
-            <TextView
-                android:id="@+id/status"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/signed_in_fmt"
-                android:textColor="@android:color/white"
-                android:textSize="16sp" />
-        </LinearLayout>
-
-    </ScrollView>
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/sign_out_and_disconnect"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="3"
         android:orientation="horizontal"
-        android:background="@color/colorPrimaryDark">
+        android:background="@color/colorPrimary">
 
         <Button
             android:id="@+id/sign_out_button"
             android:layout_width="0dp"
-            android:layout_height="96sp"
-            android:layout_gravity="center_vertical"
+            android:layout_height="match_parent"
             android:layout_weight="1"
             android:text="@string/sign_out"
             android:textColor="@android:color/white"
             style="?android:attr/borderlessButtonStyle"/>
 
+        <LinearLayout
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            android:background="@android:color/white">
+
+        </LinearLayout>
+
         <Button
-            android:id="@+id/disconnect_button"
+            android:id="@+id/revoke_access_button"
             android:layout_width="0dp"
-            android:layout_height="96dp"
-            android:layout_gravity="center_vertical"
+            android:layout_height="match_parent"
             android:layout_weight="1"
             android:text="@string/disconnect"
             android:textColor="@android:color/white"
             style="?android:attr/borderlessButtonStyle"/>
+
     </LinearLayout>
 
 </LinearLayout>
