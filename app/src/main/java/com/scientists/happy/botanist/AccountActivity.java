@@ -3,15 +3,21 @@ package com.scientists.happy.botanist;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -36,16 +42,11 @@ public class AccountActivity extends AppCompatActivity implements
     private static final String TAG = "SignInActivity";
     private static final int RC_SIGN_IN = 9001;
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        if (mAuthListener != null) {
-            mAuth.removeAuthStateListener(mAuthListener);
-        }
-    }
-
     private GoogleApiClient mGoogleApiClient;
-    private TextView mStatusTextView;
+    private ImageView mAccountImageView;
+    private TextView mNameTextView;
+    private TextView mEmailTextView;
+    private TextView mPlantsNumberTextView;
     private ProgressDialog mProgressDialog;
 
     // [START declare_auth]
@@ -54,16 +55,33 @@ public class AccountActivity extends AppCompatActivity implements
     // [END declare_auth]
 
     @Override
+    protected void onStop() {
+        super.onStop();
+        if (mAuthListener != null) {
+            mAuth.removeAuthStateListener(mAuthListener);
+        }
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        super.onBackPressed();
+        return true;
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_account);
 
         // Views
-        mStatusTextView = (TextView) findViewById(R.id.status);
+        mNameTextView = (TextView) findViewById(R.id.name);
+        mEmailTextView = (TextView) findViewById(R.id.email);
+        mPlantsNumberTextView = (TextView) findViewById(R.id.plants_number);
+        mAccountImageView = (ImageView) findViewById(R.id.account_picture);
 
         // Button listeners
         findViewById(R.id.sign_out_button).setOnClickListener(this);
-        findViewById(R.id.disconnect_button).setOnClickListener(this);
+        findViewById(R.id.revoke_access_button).setOnClickListener(this);
 
         mAuth = FirebaseAuth.getInstance();
         mAuthListener = new FirebaseAuth.AuthStateListener() {
@@ -149,7 +167,18 @@ public class AccountActivity extends AppCompatActivity implements
             GoogleSignInAccount acct = result.getSignInAccount();
             if (acct != null) {
                 firebaseAuthWithGoogle(acct);
-                mStatusTextView.setText(getString(R.string.signed_in_fmt, acct.getDisplayName()));
+                mNameTextView.setText(acct.getDisplayName());
+                mEmailTextView.setText(getString(R.string.email_fmt, acct.getEmail()));
+                mPlantsNumberTextView.setText(getString(R.string.plants_number_fmt, "0"));
+                Glide.with(this).load(acct.getPhotoUrl()).asBitmap().centerCrop().into(new BitmapImageViewTarget(mAccountImageView) {
+                    @Override
+                    protected void setResource(Bitmap resource) {
+                        RoundedBitmapDrawable circularBitmapDrawable =
+                                RoundedBitmapDrawableFactory.create(getResources(), resource);
+                        circularBitmapDrawable.setCircular(true);
+                        mAccountImageView.setImageDrawable(circularBitmapDrawable);
+                    }
+                });
             }
         }
     }
@@ -316,7 +345,7 @@ public class AccountActivity extends AppCompatActivity implements
                 AlertDialog dialog = buildSignOutDialog();
                 dialog.show();
                 break;
-            case R.id.disconnect_button:
+            case R.id.revoke_access_button:
                 dialog = buildRevokeAccessDialog();
                 dialog.show();
                 break;

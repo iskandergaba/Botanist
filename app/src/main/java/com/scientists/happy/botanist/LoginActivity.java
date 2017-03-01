@@ -14,6 +14,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.OptionalPendingResult;
 import com.google.android.gms.common.api.ResultCallback;
@@ -32,6 +33,17 @@ public class LoginActivity extends AppCompatActivity implements
     private static final String TAG = "LoginActivity";
     private static final int RC_SIGN_IN = 9001;
 
+    private GoogleApiClient mGoogleApiClient;
+
+    // [START declare_auth]
+    private FirebaseAuth mAuth;
+    private FirebaseAuth.AuthStateListener mAuthListener;
+    // [END declare_auth]
+
+    SignInButton mSignInButton;
+    private ProgressBar mProgressBar;
+
+
     @Override
     protected void onStop() {
         super.onStop();
@@ -40,22 +52,14 @@ public class LoginActivity extends AppCompatActivity implements
         }
     }
 
-    private GoogleApiClient mGoogleApiClient;
-
-    // [START declare_auth]
-    private FirebaseAuth mAuth;
-    private FirebaseAuth.AuthStateListener mAuthListener;
-    // [END declare_auth]
-
-    private ProgressBar mProgressBar;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
         // Button listeners
-        findViewById(R.id.sign_in_button).setOnClickListener(this);
+        mSignInButton = (SignInButton) findViewById(R.id.sign_in_button);
+        mSignInButton.setOnClickListener(this);
 
         mProgressBar = (ProgressBar) findViewById(R.id.sign_in_progress);
 
@@ -151,14 +155,12 @@ public class LoginActivity extends AppCompatActivity implements
     }
     // [END handleSignInResult]
 
-
     // [START auth_with_google]
     private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
         Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getId());
-        // [START_EXCLUDE silent]
-        showProgressBar();
-        // [END_EXCLUDE]
 
+        showProgressBar();
+        mSignInButton.setEnabled(false);
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -173,15 +175,14 @@ public class LoginActivity extends AppCompatActivity implements
                             Log.w(TAG, "signInWithCredential", task.getException());
                             Toast.makeText(LoginActivity.this, "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
+                            mSignInButton.setEnabled(true);
                         } else {
                             Toast.makeText(LoginActivity.this, "Authentication successful.",
                                     Toast.LENGTH_SHORT).show();
                             startActivity(new Intent(LoginActivity.this, MainActivity.class));
                             finish();
                         }
-                        // [START_EXCLUDE]
                         hideProgressBar();
-                        // [END_EXCLUDE]
                     }
                 });
     }
