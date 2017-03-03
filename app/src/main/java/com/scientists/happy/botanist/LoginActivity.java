@@ -168,7 +168,7 @@ public class LoginActivity extends AppCompatActivity implements
                                     Toast.LENGTH_SHORT).show();
                             mSignInButton.setEnabled(true);
                         } else {
-                            mDatabase.addNewUserRecords(user.getUid(), acct.getDisplayName(), acct.getEmail());
+                            mDatabase.addUserRecords(user.getUid(), acct.getDisplayName(), acct.getEmail());
                             Toast.makeText(LoginActivity.this, "Authentication successful.",
                                     Toast.LENGTH_SHORT).show();
                             startActivity(new Intent(LoginActivity.this, MainActivity.class));

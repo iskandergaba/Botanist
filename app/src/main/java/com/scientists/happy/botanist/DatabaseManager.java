@@ -1,7 +1,10 @@
 package com.scientists.happy.botanist;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class DatabaseManager {
 
@@ -21,9 +24,21 @@ public class DatabaseManager {
         return mDatabaseManager;
     }
 
-    public void addNewUserRecords(String userId, String name, String email) {
-        User user = new User(userId, name, email, 0);
-        mDatabase.child("users").child(userId).setValue(user);
+    public void addUserRecords(final String userId, final String name, final String email) {
+        mDatabase.child("users").child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                if (!snapshot.exists()) {
+                    User user = new User(userId, name, email, 0);
+                    mDatabase.child("users").child(userId).setValue(user);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
     public void deleteUserRecords(String userId) {
@@ -32,5 +47,4 @@ public class DatabaseManager {
             // TODO: add listeners
         }
     }
-
 }
