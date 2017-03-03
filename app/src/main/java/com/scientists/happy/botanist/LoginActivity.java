@@ -33,36 +33,27 @@ public class LoginActivity extends AppCompatActivity implements
     private static final String TAG = "LoginActivity";
     private static final int RC_SIGN_IN = 9001;
 
-    private GoogleApiClient mGoogleApiClient;
-
-    // [START declare_auth]
-    private FirebaseAuth mAuth;
-    private FirebaseAuth.AuthStateListener mAuthListener;
-    // [END declare_auth]
-
-    SignInButton mSignInButton;
+    private SignInButton mSignInButton;
     private ProgressBar mProgressBar;
 
+    private DatabaseManager mDatabase;
+    private FirebaseAuth mAuth;
+    private FirebaseAuth.AuthStateListener mAuthListener;
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        if (mAuthListener != null) {
-            mAuth.removeAuthStateListener(mAuthListener);
-        }
-    }
+    private GoogleApiClient mGoogleApiClient;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        // Button listeners
+        // init views
         mSignInButton = (SignInButton) findViewById(R.id.sign_in_button);
         mSignInButton.setOnClickListener(this);
-
         mProgressBar = (ProgressBar) findViewById(R.id.sign_in_progress);
 
+        mDatabase = DatabaseManager.getInstance();
         mAuth = FirebaseAuth.getInstance();
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -79,23 +70,19 @@ public class LoginActivity extends AppCompatActivity implements
             }
         };
 
-        // [START configure_signin]
         // Configure sign-in to request the user's ID, email address, and basic
         // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .build();
-        // [END configure_signin]
 
-        // [START build_client]
         // Build a GoogleApiClient with access to the Google Sign-In API and the
         // options specified by gso.
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
-        // [END build_client]
     }
 
     @Override
@@ -126,7 +113,14 @@ public class LoginActivity extends AppCompatActivity implements
         mAuth.addAuthStateListener(mAuthListener);
     }
 
-    // [START onActivityResult]
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (mAuthListener != null) {
+            mAuth.removeAuthStateListener(mAuthListener);
+        }
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -137,9 +131,7 @@ public class LoginActivity extends AppCompatActivity implements
             handleSignInResult(result);
         }
     }
-    // [END onActivityResult]
 
-    // [START handleSignInResult]
     private void handleSignInResult(GoogleSignInResult result) {
         Log.d(TAG, "handleSignInResult:" + result.isSuccess());
         if (result.isSuccess()) {
@@ -153,10 +145,8 @@ public class LoginActivity extends AppCompatActivity implements
                     Toast.LENGTH_SHORT).show();
         }
     }
-    // [END handleSignInResult]
 
-    // [START auth_with_google]
-    private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
+    private void firebaseAuthWithGoogle(final GoogleSignInAccount acct) {
         Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getId());
 
         showProgressBar();
@@ -167,16 +157,18 @@ public class LoginActivity extends AppCompatActivity implements
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         Log.d(TAG, "signInWithCredential:onComplete:" + task.isSuccessful());
+                        FirebaseUser user = mAuth.getCurrentUser();
 
                         // If sign in fails, display a message to the user. If sign in succeeds
                         // the auth state listener will be notified and logic to handle the
                         // signed in user can be handled in the listener.
-                        if (!task.isSuccessful()) {
+                        if (!task.isSuccessful() || user == null) {
                             Log.w(TAG, "signInWithCredential", task.getException());
                             Toast.makeText(LoginActivity.this, "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
                             mSignInButton.setEnabled(true);
                         } else {
+                            mDatabase.addNewUserRecords(user.getUid(), acct.getDisplayName(), acct.getEmail());
                             Toast.makeText(LoginActivity.this, "Authentication successful.",
                                     Toast.LENGTH_SHORT).show();
                             startActivity(new Intent(LoginActivity.this, MainActivity.class));
@@ -186,20 +178,10 @@ public class LoginActivity extends AppCompatActivity implements
                     }
                 });
     }
-// [END auth_with_google]
 
-    // [START signIn]
     private void signIn() {
         Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
         startActivityForResult(signInIntent, RC_SIGN_IN);
-    }
-    // [END signIn]
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        // An unresolvable error has occurred and Google APIs (including Sign-In) will not
-        // be available.
-        Log.d(TAG, "onConnectionFailed:" + connectionResult);
     }
 
     private void showProgressBar() {
@@ -210,6 +192,12 @@ public class LoginActivity extends AppCompatActivity implements
         mProgressBar.setVisibility(View.INVISIBLE);
     }
 
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        // An unresolvable error has occurred and Google APIs (including Sign-In) will not
+        // be available.
+        Log.d(TAG, "onConnectionFailed:" + connectionResult);
+    }
 
     @Override
     public void onClick(View v) {
