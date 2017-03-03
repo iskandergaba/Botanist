@@ -43,16 +43,16 @@ public class AccountActivity extends AppCompatActivity implements
     private static final int RC_SIGN_IN = 9001;
 
     private GoogleApiClient mGoogleApiClient;
+
     private ImageView mAccountImageView;
     private TextView mNameTextView;
     private TextView mEmailTextView;
     private TextView mPlantsNumberTextView;
     private ProgressDialog mProgressDialog;
 
-    // [START declare_auth]
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
-    // [END declare_auth]
+    private DatabaseManager mDatabase;
 
     @Override
     protected void onStop() {
@@ -84,6 +84,7 @@ public class AccountActivity extends AppCompatActivity implements
         findViewById(R.id.revoke_access_button).setOnClickListener(this);
 
         mAuth = FirebaseAuth.getInstance();
+        mDatabase = DatabaseManager.getInstance();
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
@@ -266,6 +267,8 @@ public class AccountActivity extends AppCompatActivity implements
                             }
                         }
                     });
+            String userId = user.getUid();
+            mDatabase.deleteUserRecords(userId);
         }
     }
 
