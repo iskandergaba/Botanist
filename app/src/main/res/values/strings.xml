@@ -32,5 +32,6 @@
     <string name="account">Account</string>
     <string name="signed_out">Signed out</string>
     <string name="account_picture">Account Picture</string>
+    <string name="no_plants">No plants added</string>
 
 </resources>

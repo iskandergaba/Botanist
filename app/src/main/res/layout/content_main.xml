@@ -6,13 +6,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:gravity="center"
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
+    android:layout_marginTop="?attr/actionBarSize"
     tools:context="com.scientists.happy.botanist.MainActivity"
-    tools:showIn="@layout/activity_main"
-    android:layout_marginTop="?attr/actionBarSize">
+    tools:showIn="@layout/activity_main">
 
     <GridView
         android:id="@+id/gridview"
@@ -21,5 +22,13 @@
         android:numColumns="2"
         android:verticalSpacing="4dp"
         android:horizontalSpacing="8dp" />
+    <TextView
+        android:id="@+id/empty_grid_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-condensed"
+        android:textAppearance="?android:textAppearanceMedium"
+        android:text="@string/no_plants"
+        android:visibility="gone"/>
 
 </LinearLayout>
