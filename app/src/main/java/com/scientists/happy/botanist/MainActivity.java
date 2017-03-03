@@ -48,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
 
         final Activity activity = MainActivity.this;
         final GridView gridview = (GridView) findViewById(R.id.gridview);
+        gridview.setEmptyView(findViewById(R.id.empty_grid_view));
         gridview.setAdapter(new ImageAdapter(this, activity));
         gridview.setOnItemClickListener(new OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,
