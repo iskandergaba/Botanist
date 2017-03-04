@@ -1,6 +1,6 @@
 package com.scientists.happy.botanist;
 
-import java.util.Date;
+import java.util.GregorianCalendar;
 
 public class Plant /*implements Parcelable*/ {
     private static final String DELIMETER = "\t";
@@ -8,17 +8,17 @@ public class Plant /*implements Parcelable*/ {
     private String nickname;
     private String species;
     private String photoPath;
-    private Date birthday;
-    private Date lastWatered;
+    private GregorianCalendar birthday;
+    private GregorianCalendar lastWatered;
     private int id;
 
-    private int mData;
     private boolean deleted = false;
 
-    public Plant(String nickname, String species, String photoPath) {
+    public Plant(String nickname, String species, String photoPath, GregorianCalendar birthday) {
         this.nickname = nickname;
         this.species = species;
         this.photoPath = photoPath;
+        this.birthday = birthday;
     }
 
     public String getNickname() {
@@ -37,11 +37,11 @@ public class Plant /*implements Parcelable*/ {
         deleted = true;
     }
 
-    public Date getBirthday() {
+    public GregorianCalendar getBirthday() {
         return birthday;
     }
 
-    public Date getLastWatered() {
+    public GregorianCalendar getLastWatered() {
         return lastWatered;
     }
 
