@@ -19,7 +19,7 @@
 
     <!-- Server Client ID.  This should be a valid Web OAuth 2.0 Client ID obtained
          from https://console.developers.google.com/ -->
-    <string name="server_client_id" translatable="false">993462563911–9h2lig8m0klrfst5ob8lu2lprnqgf2nf.apps.googleusercontent.com</string>
+    <string name="server_client_id" translatable="false">993462563911-9h2lig8m0klrfst5ob8lu2lprnqgf2nf.apps.googleusercontent.com</string>
 
     <string name="set_time">Set Time</string>
     <string name="revoke_access_message">All your data will be permanently deleted. Are you sure you want to delete your account?</string>
