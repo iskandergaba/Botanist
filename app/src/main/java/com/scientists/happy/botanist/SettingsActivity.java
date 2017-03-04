@@ -20,7 +20,9 @@ import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
+
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
+
 import java.util.Calendar;
 public class SettingsActivity extends AppCompatActivity {
 
@@ -65,12 +67,12 @@ public class SettingsActivity extends AppCompatActivity {
         /**
          * Show the clock
          */
-        private void showTimePicker(){
+        private void showTimePicker() {
 
             final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
             final Calendar c = Calendar.getInstance();
-            int hour = preferences.getInt("water_hour", c.get(Calendar.HOUR_OF_DAY));
-            int minute = preferences.getInt("water_minute", c.get(Calendar.MINUTE));
+            int hour = preferences.getInt(WATER_HOUR_KEY, c.get(Calendar.HOUR_OF_DAY));
+            int minute = preferences.getInt(WATER_MINUTE_KEY, c.get(Calendar.MINUTE));
 
             TimePickerDialog.OnTimeSetListener listener = new TimePickerDialog.OnTimeSetListener() {
                 /**
@@ -90,6 +92,7 @@ public class SettingsActivity extends AppCompatActivity {
             };
 
             TimePickerDialog timePickerDialog = TimePickerDialog.newInstance(listener, hour, minute, false);
+            timePickerDialog.setVersion(TimePickerDialog.Version.VERSION_2);
             timePickerDialog.setTitle(getActivity().getString(R.string.set_time));
             timePickerDialog.vibrate(false);
             timePickerDialog.dismissOnPause(true);
