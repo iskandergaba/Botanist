@@ -11,43 +11,91 @@ import android.provider.MediaStore;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Locale;
 
-public class AddPlantActivity extends AppCompatActivity
-{
+public class AddPlantActivity extends AppCompatActivity {
     static final int REQUEST_TAKE_PHOTO = 1;
-    protected ImageButton imageButton;
-    protected EditText speciesBox;
-    protected EditText nicknameBox;
+    protected ImageView picture;
+    protected TextView pictureHint;
+    protected AutoCompleteTextView speciesEditText;
+    protected EditText nameEditText;
+    protected EditText birthdayEditText;
+    protected Button addPlantButton;
+
     protected String mCurrentPhotoPath;
     protected String mPhotoPath;
+
+    protected GregorianCalendar birthday;
     /**
      * Launch the add plant screen
      * @param savedInstanceState - Current app state
      */
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_plant);
-        imageButton = (ImageButton) findViewById(R.id.imageButton);
-        speciesBox = (EditText) findViewById(R.id.Species);
-        nicknameBox = (EditText) findViewById(R.id.Nickname);
-    }
+        picture = (ImageView) findViewById(R.id.picture);
+        picture.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                // Ensure that there's a camera activity to handle the intent
+                if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+                    // Create the File where the photo should go
+                    File photoFile = null;
+                    try {
+                        photoFile = createImageFile();
+                    } catch (IOException ex) {
+                        // Error occurred while creating the File
+                    }
+                    // Continue only if the File was successfully created
+                    if (photoFile != null) {
+                        Uri photoURI = FileProvider.getUriForFile(AddPlantActivity.this, "com.scientists.happy.botanist.fileprovider", photoFile);
+                        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                        startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
+                    }
+                }
+            }
+        });
+        pictureHint = (TextView) findViewById(R.id.picture_hint);
+        speciesEditText = (AutoCompleteTextView) findViewById(R.id.species_edit_text);
+        nameEditText = (EditText) findViewById(R.id.name_edit_text);
+        birthdayEditText = (EditText) findViewById(R.id.birthday_edit_text);
+        birthdayEditText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDatePicker();
+            }
+        });
+        addPlantButton = (Button) findViewById(R.id.add_plant_button);
+        addPlantButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Plant p = new Plant(nameEditText.getText().toString(), speciesEditText.getText().toString(),
+                        mPhotoPath, birthday);
+                PlantArray plantArray = PlantArray.getInstance();
+                plantArray.add(p);
+                Intent resultIntent = new Intent();
+                setResult(RESULT_OK, resultIntent);
+                finish();
+            }
+        });
 
-    /**
-     * Take a picture
-     * @param view - current activity view
-     */
-    protected void onPressImageButton(View view) {
-        dispatchTakePictureIntent();
+        birthday = new GregorianCalendar();
     }
 
     /**
@@ -61,28 +109,9 @@ public class AddPlantActivity extends AppCompatActivity
 
         if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
             mPhotoPath = mCurrentPhotoPath;
-            Bitmap bmp = ImageUtils.loadScaledImage(mPhotoPath, imageButton.getWidth(), imageButton.getHeight());
-            imageButton.setImageBitmap(bmp);
-        }
-    }
-
-    private void dispatchTakePictureIntent() {
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        // Ensure that there's a camera activity to handle the intent
-        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            // Create the File where the photo should go
-            File photoFile = null;
-            try {
-                photoFile = createImageFile();
-            } catch (IOException ex) {
-                // Error occurred while creating the File
-            }
-            // Continue only if the File was successfully created
-            if (photoFile != null) {
-                Uri photoURI = FileProvider.getUriForFile(this, "com.scientists.happy.botanist.fileprovider", photoFile);
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-                startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
-            }
+            Bitmap bmp = ImageUtils.loadScaledImage(mPhotoPath, picture.getWidth(), picture.getHeight());
+            picture.setImageBitmap(bmp);
+            pictureHint.setText(R.string.update_picture);
         }
     }
 
@@ -104,16 +133,28 @@ public class AddPlantActivity extends AppCompatActivity
     }
 
     /**
-     * Send information back to main page
-     * @param view - current app view
+     * Show the date picker
      */
-    protected void onPressSubmit(View view) {
-        Plant p = new Plant(nicknameBox.getText().toString(), speciesBox.getText().toString(),
-                mPhotoPath);
-        PlantArray plantArray = PlantArray.getInstance();
-        plantArray.add(p);
-        Intent resultIntent = new Intent();
-        setResult(RESULT_OK, resultIntent);
-        finish();
+    private void showDatePicker() {
+
+        DatePickerDialog.OnDateSetListener listener = new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePickerDialog view, int year, int monthOfYear, int dayOfMonth) {
+                birthday.set(year, monthOfYear, dayOfMonth);
+                SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy", Locale.US);
+                birthdayEditText.setText(dateFormat.format(birthday.getTime()));
+            }
+
+        };
+        DatePickerDialog datePickerDialog = DatePickerDialog.newInstance(listener,
+                birthday.get(Calendar.YEAR),
+                birthday.get(Calendar.MONTH),
+                birthday.get(Calendar.DAY_OF_MONTH));
+        datePickerDialog.setVersion(DatePickerDialog.Version.VERSION_2);
+        datePickerDialog.setTitle(getString(R.string.set_birthday));
+        datePickerDialog.vibrate(false);
+        datePickerDialog.dismissOnPause(true);
+        datePickerDialog.setOnDateSetListener(listener);
+        datePickerDialog.show(getFragmentManager(), "date_picker");
     }
 }
