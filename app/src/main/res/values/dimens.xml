@@ -8,4 +8,6 @@
 
     <dimen name="profile_picture_height">200dp</dimen>
     <dimen name="profile_drop_back_height">256dp</dimen>
+
+    <dimen name="g_top_margin">100dp</dimen>
 </resources>
