@@ -31,7 +31,7 @@ public class AddPlantActivity extends AppCompatActivity {
     static final int REQUEST_TAKE_PHOTO = 1;
     protected ImageView picture;
     protected TextView pictureHint;
-    protected AutoCompleteTextView speciesEditText;
+    protected AutoCompleteTextView speciesAutoCompleteText;
     protected EditText nameEditText;
     protected EditText birthdayEditText;
     protected Button addPlantButton;
@@ -39,6 +39,7 @@ public class AddPlantActivity extends AppCompatActivity {
     protected String mCurrentPhotoPath;
     protected String mPhotoPath;
 
+    DatabaseManager mDatabase;
     protected GregorianCalendar birthday;
     /**
      * Launch the add plant screen
@@ -48,6 +49,9 @@ public class AddPlantActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_plant);
+
+        mDatabase = DatabaseManager.getInstance();
+
         picture = (ImageView) findViewById(R.id.picture);
         picture.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -72,7 +76,8 @@ public class AddPlantActivity extends AppCompatActivity {
             }
         });
         pictureHint = (TextView) findViewById(R.id.picture_hint);
-        speciesEditText = (AutoCompleteTextView) findViewById(R.id.species_edit_text);
+        speciesAutoCompleteText = (AutoCompleteTextView) findViewById(R.id.species_edit_text);
+        mDatabase.setSpeciesAutoComplete(this, speciesAutoCompleteText);
         nameEditText = (EditText) findViewById(R.id.name_edit_text);
         birthdayEditText = (EditText) findViewById(R.id.birthday_edit_text);
         birthdayEditText.setOnClickListener(new View.OnClickListener() {
@@ -85,7 +90,7 @@ public class AddPlantActivity extends AppCompatActivity {
         addPlantButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Plant p = new Plant(nameEditText.getText().toString(), speciesEditText.getText().toString(),
+                Plant p = new Plant(nameEditText.getText().toString(), speciesAutoCompleteText.getText().toString(),
                         mPhotoPath, birthday);
                 PlantArray plantArray = PlantArray.getInstance();
                 plantArray.add(p);
@@ -96,6 +101,7 @@ public class AddPlantActivity extends AppCompatActivity {
         });
 
         birthday = new GregorianCalendar();
+        //new SetAutocompleteTask().execute();
     }
 
     /**
@@ -157,4 +163,5 @@ public class AddPlantActivity extends AppCompatActivity {
         datePickerDialog.setOnDateSetListener(listener);
         datePickerDialog.show(getFragmentManager(), "date_picker");
     }
+
 }

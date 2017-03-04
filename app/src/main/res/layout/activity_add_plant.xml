@@ -89,7 +89,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/species"
-            android:maxLines="1"/>
+            android:maxLines="3"/>
 
     </LinearLayout>
 
