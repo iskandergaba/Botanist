@@ -29,11 +29,12 @@ import java.util.Locale;
 
 public class AddPlantActivity extends AppCompatActivity {
     static final int REQUEST_TAKE_PHOTO = 1;
+
     protected ImageView picture;
     protected TextView pictureHint;
-    protected AutoCompleteTextView speciesAutoCompleteText;
     protected EditText nameEditText;
     protected EditText birthdayEditText;
+    protected AutoCompleteTextView speciesAutoCompleteText;
     protected Button addPlantButton;
 
     protected String mCurrentPhotoPath;
@@ -90,10 +91,13 @@ public class AddPlantActivity extends AppCompatActivity {
         addPlantButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // TODO: changes here
                 Plant p = new Plant(nameEditText.getText().toString(), speciesAutoCompleteText.getText().toString(),
-                        mPhotoPath, birthday);
+                        mPhotoPath, birthday.getTimeInMillis());
                 PlantArray plantArray = PlantArray.getInstance();
                 plantArray.add(p);
+                mDatabase.addPlant(nameEditText.getText().toString(), speciesAutoCompleteText.getText().toString(),
+                        mPhotoPath, birthday.getTimeInMillis());
                 Intent resultIntent = new Intent();
                 setResult(RESULT_OK, resultIntent);
                 finish();

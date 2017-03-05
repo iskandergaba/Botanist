@@ -170,7 +170,7 @@ public class AccountActivity extends AppCompatActivity implements
                 firebaseAuthWithGoogle(acct);
                 mNameTextView.setText(acct.getDisplayName());
                 mEmailTextView.setText(getString(R.string.email_fmt, acct.getEmail()));
-                mPlantsNumberTextView.setText(getString(R.string.plants_number_fmt, "0"));
+                mPlantsNumberTextView.setText(getString(R.string.plants_number_fmt, mDatabase.getPlantsNumber()));
                 Glide.with(this).load(acct.getPhotoUrl()).asBitmap().centerCrop().into(new BitmapImageViewTarget(mAccountImageView) {
                     @Override
                     protected void setResource(Bitmap resource) {

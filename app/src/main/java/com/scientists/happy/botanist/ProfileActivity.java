@@ -16,9 +16,11 @@ import java.io.File;
 public class ProfileActivity extends AppCompatActivity {
     private static final String PLANT_KEY = "plant";
     private static final String DELIMETER = "\t";
-    private String nickname;
+    private String name;
     private String species;
     private String photoPath;
+
+    private DatabaseManager mDatabase;
 
     /**
      * Launch the activity
@@ -32,15 +34,14 @@ public class ProfileActivity extends AppCompatActivity {
         //store individual plant information from the extras passed through the intent
         String[] plantData = ((String) getIntent().getExtras().get(PLANT_KEY)).split(DELIMETER);
 
-        nickname = plantData[0];
+        name = plantData[0];
         species = plantData[1];
         photoPath = plantData[2];
 
+        setTitle(name + "\'s Profile");
 
-        setTitle(nickname + "\'s Profile");
-
-        TextView nicknameTextView = (TextView)findViewById(R.id.plant_nickname);
-        nicknameTextView.setText(nickname);
+        TextView nameTextView = (TextView)findViewById(R.id.plant_name);
+        nameTextView.setText(name);
 
         TextView speciesTextView = (TextView)findViewById(R.id.plant_species);
         speciesTextView.setText(species);
@@ -49,6 +50,8 @@ public class ProfileActivity extends AppCompatActivity {
         //if stored image doesn't exist, put in a default image
 
         ImageView imageView = (ImageView)findViewById(R.id.plant_picture);
+
+        mDatabase = DatabaseManager.getInstance();
 
         if(photoPath != null) {
             File f = new File(photoPath);
@@ -87,7 +90,8 @@ public class ProfileActivity extends AppCompatActivity {
         builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 PlantArray plantArray = PlantArray.getInstance();
-                plantArray.remove(nickname);
+                plantArray.remove(name);
+                mDatabase.deletePlant(name, species);
                 Intent resultIntent = new Intent();
                 setResult(RESULT_OK, resultIntent);
                 finish();

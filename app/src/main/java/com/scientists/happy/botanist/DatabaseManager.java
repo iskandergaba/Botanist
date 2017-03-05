@@ -5,6 +5,8 @@ import android.os.AsyncTask;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -18,9 +20,12 @@ public class DatabaseManager {
 
     private static final String TAG = "DatabaseManager";
 
+    private int plantsNumber;
+
     private List<String> mAutoComplete;
     private DatabaseReference mDatabase;
     private static DatabaseManager mDatabaseManager;
+
     private class PrepareAutocompleteTask extends AsyncTask<Void, Void, Void> {
 
         @Override
@@ -44,7 +49,7 @@ public class DatabaseManager {
             };
 
             //Child the root before all the push() keys are found and add a ValueEventListener()
-            mDatabase.child("CommonNames").addValueEventListener(listener);
+            //mDatabase.child("CommonNames").addValueEventListener(listener);
             mDatabase.child("SpeciesNames").addValueEventListener(listener);
             return null;
         }
@@ -86,9 +91,68 @@ public class DatabaseManager {
         }
     }
 
+    public void addPlant(String name, String species, String photoPath, long birthday) {
+        final Plant plant = new Plant(name, species, photoPath, birthday);
+        final String plantId = plant.getId();
+        final String userId = getUserId();
+        if (userId != null) {
+            mDatabase.child("users").child(userId).child("plants").child(plantId)
+                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot snapshot) {
+                    if (!snapshot.exists()) {
+                        mDatabase.child("users").child(userId).child("plants").child(plantId).setValue(plant);
+                        setPlantsNumber(++plantsNumber);
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+        }
+    }
+
+    public void deletePlant(String name, String species) {
+        final String userId = getUserId();
+        final String plantId = species + "_" + name;
+        mDatabase.child("users").child(userId).child("plants").child(plantId)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot snapshot) {
+                        if (snapshot.exists()) {
+                            mDatabase.child("users").child(userId).child("plants").child(plantId).removeValue();
+                            setPlantsNumber(--plantsNumber);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+    }
+
     public void setSpeciesAutoComplete(Context context, AutoCompleteTextView autoCompleteTextView) {
         final ArrayAdapter<String> autoComplete = new ArrayAdapter<>(context, android.R.layout.simple_list_item_1);
         autoComplete.addAll(mAutoComplete);
         autoCompleteTextView.setAdapter(autoComplete);
+    }
+
+    public int getPlantsNumber() {
+        return plantsNumber;
+    }
+
+    private String getUserId() {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        return user != null ? user.getUid() : null;
+    }
+
+    private void setPlantsNumber(int count) {
+        String userId = getUserId();
+        if (userId != null) {
+            mDatabase.child("users").child(userId).child("plantsNumber").setValue(count);
+        }
     }
 }

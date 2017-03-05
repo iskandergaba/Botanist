@@ -1,6 +1,5 @@
 package com.scientists.happy.botanist;
 
-import android.app.Activity;
 import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Build;
@@ -46,10 +45,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        final Activity activity = MainActivity.this;
         final GridView gridview = (GridView) findViewById(R.id.gridview);
         gridview.setEmptyView(findViewById(R.id.empty_grid_view));
-        gridview.setAdapter(new ImageAdapter(this, activity));
+        gridview.setAdapter(new ImageAdapter(this));
         gridview.setOnItemClickListener(new OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {

@@ -1,28 +1,29 @@
 package com.scientists.happy.botanist;
 
-import java.util.GregorianCalendar;
-
 public class Plant /*implements Parcelable*/ {
     private static final String DELIMETER = "\t";
 
-    private String nickname;
+    private String name;
     private String species;
     private String photoPath;
-    private GregorianCalendar birthday;
-    private GregorianCalendar lastWatered;
-    private int id;
+    private long birthday;
+    private long lastWatered;
+    private String id;
 
     private boolean deleted = false;
 
-    public Plant(String nickname, String species, String photoPath, GregorianCalendar birthday) {
-        this.nickname = nickname;
+    private Plant() {}
+
+    public Plant(String name, String species, String photoPath, long birthday) {
+        this.id = species + "_" + name;
+        this.name = name;
         this.species = species;
         this.photoPath = photoPath;
         this.birthday = birthday;
     }
 
-    public String getNickname() {
-        return nickname;
+    public String getName() {
+        return name;
     }
 
     public String getSpecies() {
@@ -33,25 +34,25 @@ public class Plant /*implements Parcelable*/ {
         return photoPath;
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public long getBirthday() {
+        return birthday;
+    }
+
+    public long getLastWatered() {
+        return lastWatered;
+    }
+
     public void delete() {
         deleted = true;
     }
 
-    public GregorianCalendar getBirthday() {
-        return birthday;
-    }
-
-    public GregorianCalendar getLastWatered() {
-        return lastWatered;
-    }
-
-    public int getId() {
-        return id;
-    }
-
     @Override
     public String toString() {
-        return nickname + DELIMETER + species + DELIMETER + photoPath;
+        return name + DELIMETER + species + DELIMETER + photoPath;
     }
 
 //    // 99.9% of the time you can just ignore this

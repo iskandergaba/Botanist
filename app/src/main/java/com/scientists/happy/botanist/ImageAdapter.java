@@ -1,6 +1,5 @@
 package com.scientists.happy.botanist;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.view.LayoutInflater;
@@ -13,17 +12,13 @@ import android.widget.TextView;
 
 import java.io.File;
 
-/**
- * Created by wzhang on 2/13/2017.
- */
-
 public class ImageAdapter extends BaseAdapter {
 
     private Context mContext;
     private PlantArray plantArray = PlantArray.getInstance();
     private LayoutInflater mInflater;
 
-    public ImageAdapter(Context c, Activity activity) {
+    public ImageAdapter(Context c) {
         super();
         mContext = c;
         this.mInflater = LayoutInflater.from(c);
@@ -75,7 +70,7 @@ public class ImageAdapter extends BaseAdapter {
                         vh.imageView.setImageBitmap(bmp);
                     }
                 }
-                vh.nickName.setText(p.getNickname());
+                vh.nickName.setText(p.getName());
                 vh.species.setText(p.getSpecies());
             }
         }
