@@ -2,10 +2,6 @@ package com.scientists.happy.botanist;
 
 import java.util.ArrayList;
 
-/**
- * Created by amusc on 2/14/2017.
- */
-
 public class PlantArray {
     private static PlantArray pa;
     private static ArrayList<Plant>  plants;
@@ -45,7 +41,7 @@ public class PlantArray {
     public Plant remove(String nickname) {
         int tgt = -1;
         for (int i = 0; i < plants.size(); i++) {
-            if (plants.get(i).getNickname().equals(nickname)) {
+            if (plants.get(i).getName().equals(nickname)) {
                 tgt = i;
                 break;
             }
@@ -65,7 +61,7 @@ public class PlantArray {
 
     public Plant get(String nickname) {
         for (int i = 0; i < plants.size(); i++) {
-            if (plants.get(i).getNickname().equals(nickname)) {
+            if (plants.get(i).getName().equals(nickname)) {
                 return plants.get(i);
             }
         }

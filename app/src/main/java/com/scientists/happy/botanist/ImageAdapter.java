@@ -1,8 +1,6 @@
 package com.scientists.happy.botanist;
 
-import android.app.Activity;
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,19 +9,13 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import java.io.File;
-
-/**
- * Created by wzhang on 2/13/2017.
- */
-
 public class ImageAdapter extends BaseAdapter {
 
     private Context mContext;
     private PlantArray plantArray = PlantArray.getInstance();
     private LayoutInflater mInflater;
 
-    public ImageAdapter(Context c, Activity activity) {
+    public ImageAdapter(Context c) {
         super();
         mContext = c;
         this.mInflater = LayoutInflater.from(c);
@@ -64,21 +56,21 @@ public class ImageAdapter extends BaseAdapter {
         } else {
             vh = (ViewHolder) convertView.getTag();
         }
-        if (position < plantArray.size()) {
-            Plant p = plantArray.get(position);
-            if (p != null) {
-                String photoPath = p.getPhotoPath();
-                if(photoPath != null) {
-                    File f = new File(photoPath);
-                    if(f.exists()) {
-                        Bitmap bmp = ImageUtils.loadScaledImage(photoPath, width, height);
-                        vh.imageView.setImageBitmap(bmp);
-                    }
-                }
-                vh.nickName.setText(p.getNickname());
-                vh.species.setText(p.getSpecies());
-            }
-        }
+//        if (position < plantArray.size()) {
+//            Plant p = plantArray.get(position);
+//            if (p != null) {
+//                String photoPath = p.getPhotoPath();
+//                if(photoPath != null) {
+//                    File f = new File(photoPath);
+//                    if(f.exists()) {
+//                        Bitmap bmp = ImageUtils.loadScaledImage(photoPath, width, height);
+//                        vh.imageView.setImageBitmap(bmp);
+//                    }
+//                }
+//                vh.nickName.setText(p.getName());
+//                vh.species.setText(p.getSpecies());
+//            }
+//        }
         ProgressItem mItem = new ProgressItem(20); // placeholder for future watering time
         vh.mProgress.setProgress(mItem.getProgress());
         vh.imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);

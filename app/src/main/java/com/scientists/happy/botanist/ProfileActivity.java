@@ -3,7 +3,6 @@
 package com.scientists.happy.botanist;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -11,14 +10,18 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.io.File;
+import com.bumptech.glide.Glide;
+import com.firebase.ui.storage.images.FirebaseImageLoader;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 public class ProfileActivity extends AppCompatActivity {
-    private static final String PLANT_KEY = "plant";
-    private static final String DELIMETER = "\t";
-    private String nickname;
+    private static final String NAME_KEY = "name";
+    private static final String SPECIES_KEY = "species";
+    private String name;
     private String species;
-    private String photoPath;
+
+    private DatabaseManager mDatabase;
 
     /**
      * Launch the activity
@@ -29,36 +32,31 @@ public class ProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
+        mDatabase = DatabaseManager.getInstance();
+
         //store individual plant information from the extras passed through the intent
-        String[] plantData = ((String) getIntent().getExtras().get(PLANT_KEY)).split(DELIMETER);
+        Intent i = getIntent();
 
-        nickname = plantData[0];
-        species = plantData[1];
-        photoPath = plantData[2];
+        name = i.getExtras().getString(NAME_KEY);
+        species = i.getExtras().getString(SPECIES_KEY);
 
+        setTitle(name + "\'s Profile");
 
-        setTitle(nickname + "\'s Profile");
-
-        TextView nicknameTextView = (TextView)findViewById(R.id.plant_nickname);
-        nicknameTextView.setText(nickname);
+        TextView nameTextView = (TextView)findViewById(R.id.plant_name);
+        nameTextView.setText(name);
 
         TextView speciesTextView = (TextView)findViewById(R.id.plant_species);
         speciesTextView.setText(species);
 
-        //update the ImageView on the app screen to match the stored image
-        //if stored image doesn't exist, put in a default image
-
-        ImageView imageView = (ImageView)findViewById(R.id.plant_picture);
-
-        if(photoPath != null) {
-            File f = new File(photoPath);
-            if(f.exists()) {
-                final int width =  this.getResources().getDisplayMetrics().widthPixels;;
-                final int height = (int)this.getResources().getDimension(R.dimen.profile_drop_back_height);
-                Bitmap bmp = ImageUtils.loadScaledImage(photoPath, width, height);
-                imageView.setImageBitmap(bmp);
-            }
-        }
+        ImageView picture = (ImageView) findViewById(R.id.plant_picture);
+        StorageReference storageReference = FirebaseStorage.getInstance().getReference()
+                // TODO: clean a bit
+                .child(mDatabase.getUserId()).child(species + "_" + name + ".jpg");
+        Glide.with(this)
+                .using(new FirebaseImageLoader())
+                .load(storageReference)
+                .placeholder(R.drawable.flowey)
+                .into(picture);
     }
 
     @Override
@@ -87,7 +85,8 @@ public class ProfileActivity extends AppCompatActivity {
         builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 PlantArray plantArray = PlantArray.getInstance();
-                plantArray.remove(nickname);
+                plantArray.remove(name);
+                mDatabase.deletePlant(name, species);
                 Intent resultIntent = new Intent();
                 setResult(RESULT_OK, resultIntent);
                 finish();

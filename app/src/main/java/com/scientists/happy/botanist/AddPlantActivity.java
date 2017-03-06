@@ -6,9 +6,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AutoCompleteTextView;
@@ -19,28 +17,26 @@ import android.widget.TextView;
 
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 
-import java.io.File;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 
 public class AddPlantActivity extends AppCompatActivity {
     static final int REQUEST_TAKE_PHOTO = 1;
+
     protected ImageView picture;
     protected TextView pictureHint;
-    protected AutoCompleteTextView speciesAutoCompleteText;
     protected EditText nameEditText;
     protected EditText birthdayEditText;
+    protected AutoCompleteTextView speciesAutoCompleteText;
     protected Button addPlantButton;
-
-    protected String mCurrentPhotoPath;
-    protected String mPhotoPath;
 
     DatabaseManager mDatabase;
     protected GregorianCalendar birthday;
+
+    protected Uri photoUri;
+
     /**
      * Launch the add plant screen
      * @param savedInstanceState - Current app state
@@ -59,19 +55,7 @@ public class AddPlantActivity extends AppCompatActivity {
                 Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 // Ensure that there's a camera activity to handle the intent
                 if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-                    // Create the File where the photo should go
-                    File photoFile = null;
-                    try {
-                        photoFile = createImageFile();
-                    } catch (IOException ex) {
-                        // Error occurred while creating the File
-                    }
-                    // Continue only if the File was successfully created
-                    if (photoFile != null) {
-                        Uri photoURI = FileProvider.getUriForFile(AddPlantActivity.this, "com.scientists.happy.botanist.fileprovider", photoFile);
-                        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-                        startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
-                    }
+                    startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
                 }
             }
         });
@@ -90,52 +74,26 @@ public class AddPlantActivity extends AppCompatActivity {
         addPlantButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Plant p = new Plant(nameEditText.getText().toString(), speciesAutoCompleteText.getText().toString(),
-                        mPhotoPath, birthday);
-                PlantArray plantArray = PlantArray.getInstance();
-                plantArray.add(p);
-                Intent resultIntent = new Intent();
-                setResult(RESULT_OK, resultIntent);
+                // TODO: changes here
+                mDatabase.addPlant(AddPlantActivity.this, nameEditText.getText().toString(), speciesAutoCompleteText.getText().toString(),
+                        birthday.getTimeInMillis(), photoUri);
                 finish();
             }
         });
 
         birthday = new GregorianCalendar();
-        //new SetAutocompleteTask().execute();
     }
 
-    /**
-     * Update ImageButton
-     * @param requestCode - code for the update request?
-     * @param resultCode - camera result
-     * @param data - camera data
-     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-
+        super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
-            mPhotoPath = mCurrentPhotoPath;
-            Bitmap bmp = ImageUtils.loadScaledImage(mPhotoPath, picture.getWidth(), picture.getHeight());
+            photoUri = data.getData();
+            Bitmap bmp = ImageUtils.correctRotation(this, photoUri);
             picture.setImageBitmap(bmp);
-            pictureHint.setText(R.string.update_picture);
+
+            //TODO: delete image after upload
         }
-    }
-
-    /**
-     * Store the captured image
-     * @return Returns the image
-     * @throws IOException if the write fails
-     */
-    private File createImageFile() throws IOException {
-        // Create an image file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
-        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File image = File.createTempFile(imageFileName, ".jpg", storageDir);
-
-        // Save a file: path for use with ACTION_VIEW intents
-        mCurrentPhotoPath = image.getAbsolutePath();
-        return image;
     }
 
     /**
@@ -163,5 +121,4 @@ public class AddPlantActivity extends AppCompatActivity {
         datePickerDialog.setOnDateSetListener(listener);
         datePickerDialog.show(getFragmentManager(), "date_picker");
     }
-
 }
