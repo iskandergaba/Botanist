@@ -1,25 +1,25 @@
 package com.scientists.happy.botanist;
 
-import android.app.ActivityOptions;
+import android.app.ProgressDialog;
 import android.content.Intent;
-import android.os.Build;
+import android.database.DataSetObserver;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
+import android.widget.ListAdapter;
 
 public class MainActivity extends AppCompatActivity {
 
-    static final int REQUEST_NEW_PLANT = 1;
-    static final int VIEW_PLANT = 2;
-    static final int VIEW_ACCOUNT = 3;
+    private static final int VIEW_ACCOUNT = 1;
+
+    private DatabaseManager mDatabase;
+
+    ProgressDialog mProgressDialog;
 
     /**
      * Launch app
@@ -28,8 +28,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        final PlantArray plants = PlantArray.getInstance();
         setContentView(R.layout.activity_main);
+        showProgressDialog();
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -41,37 +41,25 @@ public class MainActivity extends AppCompatActivity {
              */
             @Override
             public void onClick(View view) {
-                startActivityForResult(new Intent(MainActivity.this, AddPlantActivity.class), REQUEST_NEW_PLANT);
+                startActivity(new Intent(MainActivity.this, AddPlantActivity.class));
             }
         });
 
-        final GridView gridview = (GridView) findViewById(R.id.gridview);
-        gridview.setEmptyView(findViewById(R.id.empty_grid_view));
-        gridview.setAdapter(new ImageAdapter(this));
-        gridview.setOnItemClickListener(new OnItemClickListener() {
-            public void onItemClick(AdapterView<?> parent, View v,
-                                    int position, long id) {
-                Intent i = new Intent(getApplicationContext(), ProfileActivity.class);
-                Plant plant = plants.get(position);
-                if (plant != null) {
-                    i.putExtra("plant", plant.toString());
-                } else {
-                    i.putExtra("plant", "Flowey\tUndertalus asrielus\t");
-                }
+        mDatabase = DatabaseManager.getInstance();
 
-                if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    View sharedView = gridview.getChildAt(position - gridview.getFirstVisiblePosition());
-                    View sharedImageView = sharedView.findViewById(R.id.grid_item_image_view);
-                    View sharedNicknameView = sharedView.findViewById(R.id.grid_item_nickname);
-                    Pair<View, String> p1 = Pair.create(sharedImageView, "image_main_to_profile_transition");
-                    Pair<View, String> p2 = Pair.create(sharedNicknameView, "nickname_main_to_profile_transition");
-                    ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(MainActivity.this, p1, p2);
-                    startActivityForResult(i, VIEW_PLANT, options.toBundle());
-                } else {
-                   startActivityForResult(i, VIEW_PLANT);
-                }
+        GridView gridView = (GridView) findViewById(R.id.gridview);
+        gridView.setEmptyView(findViewById(R.id.empty_grid_view));
+        ListAdapter adapter = mDatabase.getPlantsAdapter(this);
+        adapter.registerDataSetObserver(new DataSetObserver() {
+            @Override
+            public void onChanged() {
+                super.onChanged();
+                hideProgressDialog();
             }
+
         });
+        gridView.setAdapter(adapter);
+
     }
 
     /**
@@ -111,11 +99,25 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if ((requestCode == REQUEST_NEW_PLANT || requestCode == VIEW_PLANT) && resultCode == RESULT_OK) {
-            recreate();
-        } else if (requestCode == VIEW_ACCOUNT && resultCode == RESULT_OK) {
+        if (requestCode == VIEW_ACCOUNT && resultCode == RESULT_OK) {
             startActivity(new Intent(MainActivity.this, LoginActivity.class));
             finish();
+        }
+    }
+
+    private void showProgressDialog() {
+        if (mProgressDialog == null) {
+            mProgressDialog = new ProgressDialog(this);
+            mProgressDialog.setMessage(getString(R.string.loading));
+            mProgressDialog.setIndeterminate(true);
+        }
+
+        mProgressDialog.show();
+    }
+
+    private void hideProgressDialog() {
+        if (mProgressDialog != null && mProgressDialog.isShowing()) {
+            mProgressDialog.hide();
         }
     }
 }
