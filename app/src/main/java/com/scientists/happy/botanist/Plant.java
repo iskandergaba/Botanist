@@ -5,7 +5,6 @@ public class Plant /*implements Parcelable*/ {
 
     private String name;
     private String species;
-    private String photoPath;
     private long birthday;
     private long lastWatered;
     private String id;
@@ -14,11 +13,10 @@ public class Plant /*implements Parcelable*/ {
 
     private Plant() {}
 
-    public Plant(String name, String species, String photoPath, long birthday) {
+    public Plant(String name, String species, long birthday) {
         this.id = species + "_" + name;
         this.name = name;
         this.species = species;
-        this.photoPath = photoPath;
         this.birthday = birthday;
     }
 
@@ -28,10 +26,6 @@ public class Plant /*implements Parcelable*/ {
 
     public String getSpecies() {
         return species;
-    }
-
-    public String getPhotoPath() {
-        return photoPath;
     }
 
     public String getId() {
@@ -52,7 +46,7 @@ public class Plant /*implements Parcelable*/ {
 
     @Override
     public String toString() {
-        return name + DELIMETER + species + DELIMETER + photoPath;
+        return name + DELIMETER + species + DELIMETER + "";
     }
 
 //    // 99.9% of the time you can just ignore this

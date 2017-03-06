@@ -2,51 +2,27 @@
 // @author: Chia George Washington
 package com.scientists.happy.botanist;
 
+import android.content.Context;
+import android.content.CursorLoader;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.media.ExifInterface;
+import android.net.Uri;
+import android.provider.MediaStore;
 
 import java.io.IOException;
 public class ImageUtils {
 
     /**
-     * Load scaled image
-     * @param photoPath - path to image
-     * @param targetW - width of image
-     * @param targetH - height of image
-     * @return Returns the scaled Bitmap
-     */
-
-    public static Bitmap loadScaledImage(String photoPath, int targetW, int targetH) {
-        // Get the dimensions of the View
-
-        // Get the dimensions of the bitmap
-        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-        bmOptions.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(photoPath, bmOptions);
-        int photoW = bmOptions.outWidth;
-        int photoH = bmOptions.outHeight;
-
-        // Determine how much to scale down the image
-        int scaleFactor = Math.max(photoW/targetW, photoH/targetH);
-
-        // Decode the image file into a Bitmap sized to fill the View
-        bmOptions.inJustDecodeBounds = false;
-        bmOptions.inSampleSize = scaleFactor;
-
-        Bitmap bitmap = BitmapFactory.decodeFile(photoPath, bmOptions);
-        return correctRotation(photoPath, bitmap);
-    }
-
-    /**
      * Rotate the image if need be
-     * @param photoPath - string path to photo
-     * @param bitmap - the image
      * @return Returns the angle to rotate the image
      */
-    private static Bitmap correctRotation(String photoPath, Bitmap bitmap) {
+    public static Bitmap correctRotation(Context context, Uri photoUri) {
         try {
+            String photoPath = getPath(context, photoUri);
+            Bitmap bitmap = BitmapFactory.decodeFile(photoPath);
             ExifInterface ei = new ExifInterface(photoPath);
             int orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED);
             if (orientation == ExifInterface.ORIENTATION_ROTATE_90) {
@@ -61,7 +37,7 @@ public class ImageUtils {
         }
         catch (IOException ignored) {
         }
-        return bitmap;
+        return null;
     }
 
     /**
@@ -74,5 +50,14 @@ public class ImageUtils {
         Matrix matrix = new Matrix();
         matrix.postRotate(angle);
         return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
+    }
+
+    private static String getPath(Context context, Uri uri) {
+        String[]  data = { MediaStore.Images.Media.DATA };
+        CursorLoader loader = new CursorLoader(context, uri, data, null, null, null);
+        Cursor cursor = loader.loadInBackground();
+        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        cursor.moveToFirst();
+        return cursor.getString(column_index);
     }
 }
