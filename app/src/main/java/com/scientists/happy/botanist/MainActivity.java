@@ -2,7 +2,6 @@ package com.scientists.happy.botanist;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.database.DataSetObserver;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -50,14 +49,14 @@ public class MainActivity extends AppCompatActivity {
         GridView gridView = (GridView) findViewById(R.id.gridview);
         gridView.setEmptyView(findViewById(R.id.empty_grid_view));
         ListAdapter adapter = mDatabase.getPlantsAdapter(this);
-        adapter.registerDataSetObserver(new DataSetObserver() {
-            @Override
-            public void onChanged() {
-                super.onChanged();
-                hideProgressDialog();
-            }
-
-        });
+//        adapter.registerDataSetObserver(new DataSetObserver() {
+//            @Override
+//            public void onChanged() {
+//                super.onChanged();
+//                hideProgressDialog();
+//            }
+//
+//        });
         gridView.setAdapter(adapter);
 
     }
