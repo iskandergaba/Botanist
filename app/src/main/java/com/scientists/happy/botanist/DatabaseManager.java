@@ -36,6 +36,7 @@ public class DatabaseManager {
     private static final String TAG = "DatabaseManager";
 
     private long mPlantsNumber;
+    private long mBotanistSince;
 
     ProgressDialog mProgressDialog;
 
@@ -79,6 +80,7 @@ public class DatabaseManager {
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mStorage = FirebaseStorage.getInstance().getReference();
         mPlantsNumber = getPlantsNumber();
+        mBotanistSince = getBotanistSince();
         new PrepareAutocompleteTask().execute();
     }
 
@@ -234,6 +236,26 @@ public class DatabaseManager {
     public String getUserId() {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         return user != null ? user.getUid() : null;
+    }
+
+    public long getBotanistSince() {
+        final String userId = getUserId();
+        if (userId != null) {
+            mDatabase.child("users").child(userId).child("botanistSince").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot snapshot) {
+                    if (snapshot.exists()) {
+                        mBotanistSince = (long) snapshot.getValue();
+                    }
+                }
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+            return mBotanistSince;
+        }
+        return -1;
     }
 
     private void setPlantsNumber(long count) {

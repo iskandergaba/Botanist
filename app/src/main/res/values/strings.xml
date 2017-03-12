@@ -15,6 +15,7 @@
 
     <string name="name_fmt">Name: %s</string>
     <string name="email_fmt">Email: %s</string>
+    <string name="botanist_since_fmt">Botanist Since: %s</string>
     <string name="plants_number_fmt">Number of plants: %d</string>
 
     <!-- Server Client ID.  This should be a valid Web OAuth 2.0 Client ID obtained
