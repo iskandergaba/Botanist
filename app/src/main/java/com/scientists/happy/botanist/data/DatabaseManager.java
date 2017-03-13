@@ -1,4 +1,4 @@
-package com.scientists.happy.botanist;
+package com.scientists.happy.botanist.data;
 
 import android.app.Activity;
 import android.app.ActivityOptions;
@@ -8,7 +8,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
-import android.util.Pair;
+import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -27,6 +27,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.scientists.happy.botanist.R;
+import com.scientists.happy.botanist.ui.ProfileActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +38,7 @@ public class DatabaseManager {
     private static final String TAG = "DatabaseManager";
 
     private long mPlantsNumber;
+    private long mBotanistSince;
 
     ProgressDialog mProgressDialog;
 
@@ -79,6 +82,7 @@ public class DatabaseManager {
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mStorage = FirebaseStorage.getInstance().getReference();
         mPlantsNumber = getPlantsNumber();
+        mBotanistSince = getBotanistSince();
         new PrepareAutocompleteTask().execute();
     }
 
@@ -189,11 +193,10 @@ public class DatabaseManager {
                             i.putExtra("species", plant.getSpecies());
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                                 View sharedImageView = view.findViewById(R.id.grid_item_image_view);
-                                View sharedNicknameView = view.findViewById(R.id.grid_item_nickname);
-                                Pair<View, String> p1 = Pair.create(sharedImageView, "image_main_to_profile_transition");
-                                Pair<View, String> p2 = Pair.create(sharedNicknameView, "nickname_main_to_profile_transition");
-                                ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(activity, p1, p2);
-                                activity.startActivity(i, options.toBundle());
+                                Bundle bundle = ActivityOptions
+                                        .makeSceneTransitionAnimation(activity, sharedImageView, "image_main_to_profile_transition")
+                                        .toBundle();
+                                activity.startActivity(i, bundle);
                             } else {
                                 activity.startActivity(i);
                             }
@@ -236,6 +239,26 @@ public class DatabaseManager {
         return user != null ? user.getUid() : null;
     }
 
+    public long getBotanistSince() {
+        final String userId = getUserId();
+        if (userId != null) {
+            mDatabase.child("users").child(userId).child("botanistSince").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot snapshot) {
+                    if (snapshot.exists()) {
+                        mBotanistSince = (long) snapshot.getValue();
+                    }
+                }
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+            return mBotanistSince;
+        }
+        return -1;
+    }
+
     private void setPlantsNumber(long count) {
         String userId = getUserId();
         if (userId != null) {
@@ -243,7 +266,7 @@ public class DatabaseManager {
         }
     }
 
-    private void showProgressDialog(Context context) {
+    public void showProgressDialog(Context context) {
         if (mProgressDialog == null) {
             mProgressDialog = new ProgressDialog(context);
             mProgressDialog.setMessage(context.getString(R.string.loading));
@@ -254,7 +277,7 @@ public class DatabaseManager {
         mProgressDialog.show();
     }
 
-    private void hideProgressDialog() {
+    public void hideProgressDialog() {
         if (mProgressDialog != null && mProgressDialog.isShowing()) {
             mProgressDialog.hide();
         }

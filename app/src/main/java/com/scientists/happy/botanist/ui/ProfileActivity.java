@@ -1,6 +1,7 @@
 // Plant profile
 // @author: Cactus
-package com.scientists.happy.botanist;
+package com.scientists.happy.botanist.ui;
+
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -14,6 +15,8 @@ import com.bumptech.glide.Glide;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.scientists.happy.botanist.data.DatabaseManager;
+import com.scientists.happy.botanist.R;
 
 public class ProfileActivity extends AppCompatActivity {
     private static final String NAME_KEY = "name";
@@ -43,10 +46,10 @@ public class ProfileActivity extends AppCompatActivity {
         setTitle(name + "\'s Profile");
 
         TextView nameTextView = (TextView)findViewById(R.id.plant_name);
-        nameTextView.setText(name);
+        nameTextView.setText(getString(R.string.name_fmt, name));
 
         TextView speciesTextView = (TextView)findViewById(R.id.plant_species);
-        speciesTextView.setText(species);
+        speciesTextView.setText(getString(R.string.species_fmt, species));
 
         ImageView picture = (ImageView) findViewById(R.id.plant_picture);
         StorageReference storageReference = FirebaseStorage.getInstance().getReference()
@@ -84,8 +87,6 @@ public class ProfileActivity extends AppCompatActivity {
         // Add the buttons
         builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                PlantArray plantArray = PlantArray.getInstance();
-                plantArray.remove(name);
                 mDatabase.deletePlant(name, species);
                 Intent resultIntent = new Intent();
                 setResult(RESULT_OK, resultIntent);

@@ -1,10 +1,11 @@
-package com.scientists.happy.botanist;
+package com.scientists.happy.botanist.data;
 
 public class User {
     private String userName;
     private String email;
     private String userId;
     private int plantsNumber;
+    private long botanistSince;
 
     User() {
         this(null, null, null, 0);
@@ -15,6 +16,7 @@ public class User {
         this.userName = userName;
         this.email = email;
         this.plantsNumber = plantsNumber;
+        this.botanistSince = System.currentTimeMillis();
     }
 
     public String getUserName() {
@@ -31,5 +33,9 @@ public class User {
 
     public int getPlantsNumber() {
         return plantsNumber;
+    }
+
+    public long getBotanistSince() {
+        return botanistSince;
     }
 }

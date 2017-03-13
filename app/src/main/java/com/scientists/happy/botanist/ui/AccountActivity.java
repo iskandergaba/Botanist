@@ -1,4 +1,4 @@
-package com.scientists.happy.botanist;
+package com.scientists.happy.botanist.ui;
 
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -34,6 +34,11 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.scientists.happy.botanist.data.DatabaseManager;
+import com.scientists.happy.botanist.R;
+
+import java.text.SimpleDateFormat;
+import java.util.Locale;
 
 public class AccountActivity extends AppCompatActivity implements
         GoogleApiClient.OnConnectionFailedListener,
@@ -47,6 +52,7 @@ public class AccountActivity extends AppCompatActivity implements
     private ImageView mAccountImageView;
     private TextView mNameTextView;
     private TextView mEmailTextView;
+    private TextView mBotanistSinceTextView;
     private TextView mPlantsNumberTextView;
     private ProgressDialog mProgressDialog;
 
@@ -76,6 +82,7 @@ public class AccountActivity extends AppCompatActivity implements
         // Views
         mNameTextView = (TextView) findViewById(R.id.name);
         mEmailTextView = (TextView) findViewById(R.id.email);
+        mBotanistSinceTextView = (TextView) findViewById(R.id.botanist_since);
         mPlantsNumberTextView = (TextView) findViewById(R.id.plants_number);
         mAccountImageView = (ImageView) findViewById(R.id.account_picture);
 
@@ -168,8 +175,10 @@ public class AccountActivity extends AppCompatActivity implements
             GoogleSignInAccount acct = result.getSignInAccount();
             if (acct != null) {
                 firebaseAuthWithGoogle(acct);
+                SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy", Locale.US);
                 mNameTextView.setText(acct.getDisplayName());
                 mEmailTextView.setText(getString(R.string.email_fmt, acct.getEmail()));
+                mBotanistSinceTextView.setText(getString(R.string.botanist_since_fmt, dateFormat.format(mDatabase.getBotanistSince())));
                 mPlantsNumberTextView.setText(getString(R.string.plants_number_fmt, mDatabase.getPlantsNumber()));
                 Glide.with(this).load(acct.getPhotoUrl()).asBitmap().centerCrop().into(new BitmapImageViewTarget(mAccountImageView) {
                     @Override
