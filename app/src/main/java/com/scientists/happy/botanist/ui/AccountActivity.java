@@ -1,4 +1,4 @@
-package com.scientists.happy.botanist;
+package com.scientists.happy.botanist.ui;
 
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -34,6 +34,8 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.scientists.happy.botanist.data.DatabaseManager;
+import com.scientists.happy.botanist.R;
 
 import java.text.SimpleDateFormat;
 import java.util.Locale;

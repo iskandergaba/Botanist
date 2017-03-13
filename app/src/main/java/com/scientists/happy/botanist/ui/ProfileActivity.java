@@ -1,6 +1,6 @@
 // Plant profile
 // @author: Cactus
-package com.scientists.happy.botanist;
+package com.scientists.happy.botanist.ui;
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -15,6 +15,8 @@ import com.bumptech.glide.Glide;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.scientists.happy.botanist.data.DatabaseManager;
+import com.scientists.happy.botanist.R;
 
 public class ProfileActivity extends AppCompatActivity {
     private static final String NAME_KEY = "name";

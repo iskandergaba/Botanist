@@ -1,4 +1,4 @@
-package com.scientists.happy.botanist;
+package com.scientists.happy.botanist.data;
 
 public class User {
     private String userName;

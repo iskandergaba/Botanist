@@ -1,8 +1,9 @@
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <Preference
         android:key="water_plants_time"
         android:summary="Set when the app should remind you of watering your plants"
-        android:title="Set time" />
+        android:title="Set watering time" />
 
 </PreferenceScreen>

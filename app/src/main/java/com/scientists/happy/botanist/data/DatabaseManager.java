@@ -1,4 +1,4 @@
-package com.scientists.happy.botanist;
+package com.scientists.happy.botanist.data;
 
 import android.app.Activity;
 import android.app.ActivityOptions;
@@ -27,6 +27,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.scientists.happy.botanist.R;
+import com.scientists.happy.botanist.ui.ProfileActivity;
 
 import java.util.ArrayList;
 import java.util.List;

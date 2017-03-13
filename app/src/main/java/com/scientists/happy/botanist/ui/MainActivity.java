@@ -1,4 +1,4 @@
-package com.scientists.happy.botanist;
+package com.scientists.happy.botanist.ui;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -11,6 +11,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.GridView;
 import android.widget.ListAdapter;
+
+import com.scientists.happy.botanist.data.DatabaseManager;
+import com.scientists.happy.botanist.R;
 
 public class MainActivity extends AppCompatActivity {
 
