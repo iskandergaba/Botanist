@@ -50,6 +50,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="@dimen/activity_vertical_margin"
+                android:enabled="false"
                 app:buttonSize="wide" />
 
             <!-- Login progress -->

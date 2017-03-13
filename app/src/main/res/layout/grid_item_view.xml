@@ -19,8 +19,9 @@
                 android:id="@+id/grid_item_image_view"
                 android:layout_width="match_parent"
                 android:layout_height="180dp"
-                android:scaleType="centerCrop"
-                android:src="@drawable/flowey"/>
+                android:src="@drawable/flowey"
+                android:contentDescription="@string/plant_picture_desc"
+                android:scaleType="centerCrop"/>
 
             <TextView
                 android:id="@+id/grid_item_nickname"
@@ -28,7 +29,9 @@
                 android:layout_height="wrap_content"
                 android:paddingLeft="@dimen/activity_horizontal_margin"
                 android:paddingRight="@dimen/activity_horizontal_margin"
-                android:text="Nickname"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:text="@string/name"
                 android:textStyle="bold"
                 android:textSize="16sp"/>
 
@@ -38,7 +41,9 @@
                 android:layout_height="wrap_content"
                 android:paddingLeft="@dimen/activity_horizontal_margin"
                 android:paddingRight="@dimen/activity_horizontal_margin"
-                android:text="Species"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:text="@string/species"
                 android:textSize="12sp" />
 
             <ProgressBar
