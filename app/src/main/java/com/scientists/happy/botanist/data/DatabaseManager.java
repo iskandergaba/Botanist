@@ -2,6 +2,8 @@ package com.scientists.happy.botanist.data;
 
 import android.app.Activity;
 import android.app.ActivityOptions;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -28,11 +30,15 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.scientists.happy.botanist.R;
+import com.scientists.happy.botanist.services.BirthdayReceiver;
 import com.scientists.happy.botanist.ui.ProfileActivity;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+
+import static android.content.Context.ALARM_SERVICE;
 
 public class DatabaseManager {
 
@@ -41,7 +47,7 @@ public class DatabaseManager {
     private long mPlantsNumber;
     private long mBotanistSince;
 
-    ProgressDialog mProgressDialog;
+    private ProgressDialog mProgressDialog;
 
     private List<String> mAutoComplete;
     private StorageReference mStorage;
@@ -149,9 +155,10 @@ public class DatabaseManager {
         hideProgressDialog();
     }
 
-    public void deletePlant(String name, String species) {
+    public void deletePlant(Context context, String name, String species) {
         final String userId = getUserId();
         final String plantId = species + "_" + name;
+        deleteAllBirthdayReminders(context);
         if (userId != null) {
             mDatabase.child("users").child(userId).child("plants").child(plantId)
                     .addListenerForSingleValueEvent(new ValueEventListener() {
@@ -179,7 +186,7 @@ public class DatabaseManager {
             DatabaseReference databaseRef = mDatabase.child("users").child(userId).child("plants");
             return new FirebaseListAdapter<Plant>(activity, Plant.class, R.layout.grid_item_view, databaseRef) {
                 @Override
-                protected void populateView(final View view, final Plant plant, int position) {
+                protected void populateView(final View view, final Plant plant, final int position) {
                     StorageReference storageReference = mStorage.child(userId).child(plant.getId() + ".jpg");
                     ((TextView)view.findViewById(R.id.grid_item_nickname)).setText(plant.getName());
                     ((TextView)view.findViewById(R.id.grid_item_species)).setText(plant.getSpecies());
@@ -193,6 +200,7 @@ public class DatabaseManager {
                         @Override
                         public void onClick(View v) {
                             Intent i = new Intent(activity.getApplicationContext(), ProfileActivity.class);
+                            i.putExtra("id", position);
                             i.putExtra("name", plant.getName());
                             i.putExtra("species", plant.getSpecies());
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -206,6 +214,7 @@ public class DatabaseManager {
                             }
                         }
                     });
+                    setBirthdayReminder(activity, plant, position);
                 }
             };
         }
@@ -263,6 +272,14 @@ public class DatabaseManager {
         return -1;
     }
 
+    public void deleteAllBirthdayReminders(Context context) {
+        AlarmManager am = (AlarmManager)context.getSystemService(ALARM_SERVICE);
+        for (int i = 0; i < mPlantsNumber; i++) {
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(context, i, new Intent(context, BirthdayReceiver.class), 0);
+            am.cancel(pendingIntent);
+        }
+    }
+
     private void setPlantsNumber(long count) {
         String userId = getUserId();
         if (userId != null) {
@@ -270,7 +287,30 @@ public class DatabaseManager {
         }
     }
 
-    public void showProgressDialog(Context context) {
+    private void setBirthdayReminder(Context context, Plant plant, int id) {
+        Intent intent = new Intent(context, BirthdayReceiver.class);
+        intent.putExtra("name", plant.getName());
+        intent.putExtra("species", plant.getSpecies());
+        intent.putExtra("birthday", plant.getBirthday());
+        intent.putExtra("id", id);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, id, intent, 0);
+
+        Calendar now = Calendar.getInstance();
+        now.setTimeInMillis(System.currentTimeMillis());
+
+        Calendar birthday = Calendar.getInstance();
+        birthday.setTimeInMillis(plant.getBirthday());
+        if (now.get(Calendar.DAY_OF_YEAR) < birthday.get(Calendar.DAY_OF_YEAR)) {
+            birthday.set(Calendar.YEAR, now.get((Calendar.YEAR)));
+        } else {
+            birthday.set(Calendar.YEAR, now.get((Calendar.YEAR)) + 1);
+        }
+
+        AlarmManager am = (AlarmManager)context.getSystemService(ALARM_SERVICE);
+        am.set(AlarmManager.RTC_WAKEUP, birthday.getTimeInMillis(), pendingIntent);
+    }
+
+    private void showProgressDialog(Context context) {
         if (mProgressDialog == null) {
             mProgressDialog = new ProgressDialog(context);
             mProgressDialog.setMessage(context.getString(R.string.loading));
@@ -281,7 +321,7 @@ public class DatabaseManager {
         mProgressDialog.show();
     }
 
-    public void hideProgressDialog() {
+    private void hideProgressDialog() {
         if (mProgressDialog != null && mProgressDialog.isShowing()) {
             mProgressDialog.hide();
         }
