@@ -11,6 +11,7 @@ import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -300,11 +301,13 @@ public class DatabaseManager {
 
         Calendar birthday = Calendar.getInstance();
         birthday.setTimeInMillis(plant.getBirthday());
-        if (now.get(Calendar.DAY_OF_YEAR) < birthday.get(Calendar.DAY_OF_YEAR)) {
-            birthday.set(Calendar.YEAR, now.get((Calendar.YEAR)));
-        } else {
+
+        birthday.set(Calendar.YEAR, now.get((Calendar.YEAR)));
+        if (birthday.getTimeInMillis() < now.getTimeInMillis()) {
             birthday.set(Calendar.YEAR, now.get((Calendar.YEAR)) + 1);
         }
+
+        Log.v("fuck", birthday.toString());
 
         AlarmManager am = (AlarmManager)context.getSystemService(ALARM_SERVICE);
         am.set(AlarmManager.RTC_WAKEUP, birthday.getTimeInMillis(), pendingIntent);
