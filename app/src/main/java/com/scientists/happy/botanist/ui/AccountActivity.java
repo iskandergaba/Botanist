@@ -225,24 +225,21 @@ public class AccountActivity extends AppCompatActivity implements
     }
 // [END auth_with_google]
 
-    // [START signOut]
     private void signOut() {
         Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
                 new ResultCallback<Status>() {
                     @Override
                     public void onResult(@NonNull Status status) {
-                        // [START_EXCLUDE]
                         showProgressDialog();
                         mAuth.signOut();
+                        mDatabase.deleteAllBirthdayReminders(AccountActivity.this);
                         Intent resultIntent = new Intent();
                         setResult(RESULT_OK, resultIntent);
                         hideProgressDialog();
                         finish();
-                        // [END_EXCLUDE]
                     }
                 });
     }
-    // [END signOut]
 
     // [START revokeAccess]
     private void revokeAccess() {
@@ -250,14 +247,12 @@ public class AccountActivity extends AppCompatActivity implements
                 new ResultCallback<Status>() {
                     @Override
                     public void onResult(@NonNull Status status) {
-                        // [START_EXCLUDE]
                         showProgressDialog();
                         deleteUser();
                         Intent resultIntent = new Intent();
                         setResult(RESULT_OK, resultIntent);
                         hideProgressDialog();
                         finish();
-                        // [END_EXCLUDE]
                     }
                 });
     }
@@ -278,6 +273,7 @@ public class AccountActivity extends AppCompatActivity implements
                     });
             String userId = user.getUid();
             mDatabase.deleteUserRecords(userId);
+            mDatabase.deleteAllBirthdayReminders(AccountActivity.this);
         }
     }
 
@@ -288,21 +284,27 @@ public class AccountActivity extends AppCompatActivity implements
         Log.d(TAG, "onConnectionFailed:" + connectionResult);
     }
 
-    private void showProgressDialog() {
-        if (mProgressDialog == null) {
-            mProgressDialog = new ProgressDialog(this);
-            mProgressDialog.setMessage(getString(R.string.loading));
-            mProgressDialog.setIndeterminate(true);
-            mProgressDialog.setCancelable(false);
-        }
+    private AlertDialog buildSignOutDialog() {
+        //Instantiate an AlertDialog.Builder with its constructor
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
-        mProgressDialog.show();
-    }
+        //Chain together various setter methods to set the dialog characteristics
+        builder.setMessage(R.string.sign_out_message).setTitle(R.string.sign_out_title);
 
-    private void hideProgressDialog() {
-        if (mProgressDialog != null && mProgressDialog.isShowing()) {
-            mProgressDialog.hide();
-        }
+        // Add the buttons
+        builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                signOut();
+            }
+        });
+        builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // User cancelled the dialog
+            }
+        });
+        //Get the AlertDialog from create()
+
+        return builder.create();
     }
 
     private AlertDialog buildRevokeAccessDialog() {
@@ -328,27 +330,21 @@ public class AccountActivity extends AppCompatActivity implements
         return builder.create();
     }
 
-    private AlertDialog buildSignOutDialog() {
-        //Instantiate an AlertDialog.Builder with its constructor
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+    private void showProgressDialog() {
+        if (mProgressDialog == null) {
+            mProgressDialog = new ProgressDialog(this);
+            mProgressDialog.setMessage(getString(R.string.loading));
+            mProgressDialog.setIndeterminate(true);
+            mProgressDialog.setCancelable(false);
+        }
 
-        //Chain together various setter methods to set the dialog characteristics
-        builder.setMessage(R.string.sign_out_message).setTitle(R.string.sign_out_title);
+        mProgressDialog.show();
+    }
 
-        // Add the buttons
-        builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                signOut();
-            }
-        });
-        builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                // User cancelled the dialog
-            }
-        });
-        //Get the AlertDialog from create()
-
-        return builder.create();
+    private void hideProgressDialog() {
+        if (mProgressDialog != null && mProgressDialog.isShowing()) {
+            mProgressDialog.hide();
+        }
     }
 
     @Override

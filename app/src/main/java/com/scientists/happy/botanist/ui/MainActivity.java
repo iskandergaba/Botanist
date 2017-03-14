@@ -1,6 +1,5 @@
 package com.scientists.happy.botanist.ui;
 
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -12,8 +11,8 @@ import android.view.View;
 import android.widget.GridView;
 import android.widget.ListAdapter;
 
-import com.scientists.happy.botanist.data.DatabaseManager;
 import com.scientists.happy.botanist.R;
+import com.scientists.happy.botanist.data.DatabaseManager;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -21,7 +20,7 @@ public class MainActivity extends AppCompatActivity {
 
     private DatabaseManager mDatabase;
 
-    ProgressDialog mProgressDialog;
+//    private ProgressDialog mProgressDialog;
 
     /**
      * Launch app

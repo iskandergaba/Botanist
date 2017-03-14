@@ -6,4 +6,10 @@
         android:summary="Set when the app should remind you of watering your plants"
         android:title="Set watering time" />
 
+    <SwitchPreference
+        android:key="height_record_reminder"
+        android:summary="Disable height recording reminder notifications"
+        android:summaryOff="Enable height recording reminder notifications"
+        android:title="Height recording reminder" />
+
 </PreferenceScreen>

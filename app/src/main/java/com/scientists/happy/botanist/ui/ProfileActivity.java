@@ -43,6 +43,7 @@ public class ProfileActivity extends AppCompatActivity {
         name = i.getExtras().getString(NAME_KEY);
         species = i.getExtras().getString(SPECIES_KEY);
 
+
         setTitle(name + "\'s Profile");
 
         TextView nameTextView = (TextView)findViewById(R.id.plant_name);
@@ -87,7 +88,7 @@ public class ProfileActivity extends AppCompatActivity {
         // Add the buttons
         builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                mDatabase.deletePlant(name, species);
+                mDatabase.deletePlant(ProfileActivity.this, name, species);
                 Intent resultIntent = new Intent();
                 setResult(RESULT_OK, resultIntent);
                 finish();
