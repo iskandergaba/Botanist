@@ -5,7 +5,7 @@ import android.app.ActivityOptions;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
+import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -30,6 +30,7 @@ import com.google.firebase.storage.StorageReference;
 import com.scientists.happy.botanist.R;
 import com.scientists.happy.botanist.ui.ProfileActivity;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -116,7 +117,7 @@ public class DatabaseManager {
         }
     }
 
-    public void addPlant(Context context, String name, String species, long birthday, final Uri photoUri) {
+    public void addPlant(Context context, String name, String species, long birthday, final Bitmap bmp) {
         showProgressDialog(context);
         final Plant plant = new Plant(name, species, birthday);
         final String plantId = plant.getId();
@@ -129,9 +130,12 @@ public class DatabaseManager {
                             if (!snapshot.exists()) {
                                 mDatabase.child("users").child(userId).child("plants").child(plantId).setValue(plant);
                                 setPlantsNumber(++mPlantsNumber);
-                                if (photoUri != null) {
+                                if (bmp != null) {
+                                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                                    bmp.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+                                    byte[] data = stream.toByteArray();
                                     StorageReference filepath = mStorage.child(userId).child(plant.getId() + ".jpg");
-                                    filepath.putFile(photoUri);
+                                    filepath.putBytes(data);
                                 }
                             }
                         }
