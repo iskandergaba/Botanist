@@ -1,3 +1,6 @@
+=======================JSON USDA Plant Database produced from Parser.java==============================
+https://console.firebase.google.com/project/botanist-95067/database/
+
 Plant data parser readme
 ========================Required .jar files======================================================
 Please ensure the following jar files exist within the ./src/lib/ directory:

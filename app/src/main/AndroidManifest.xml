@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.scientists.happy.botanist">
 
-    <uses-permission
-        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-        android:maxSdkVersion="18" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
         android:allowBackup="true"
@@ -12,18 +13,22 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
         <provider
             android:name="android.support.v4.content.FileProvider"
-            android:authorities="com.scientists.happy.botanist.fileprovider"
+            android:authorities="${applicationId}.com.vansuita.pickimage.provider"
             android:exported="false"
-            android:grantUriPermissions="true">
+            android:grantUriPermissions="true"
+            tools:replace="android:authorities">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths" />
+                android:resource="@xml/picker_provider_paths" />
         </provider>
 
+        <receiver android:name=".services.BirthdayReceiver" />
+
         <activity
-            android:name=".LoginActivity"
+            android:name=".ui.LoginActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoTitle">
 
@@ -35,44 +40,44 @@
         </activity>
 
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
         <activity
-            android:name=".ProfileActivity"
-            android:parentActivityName=".MainActivity">
+            android:name=".ui.ProfileActivity"
+            android:parentActivityName=".ui.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.scientists.happy.botanist.MainActivity" />
+                android:value="com.scientists.happy.botanist.ui.MainActivity" />
         </activity>
         <activity
-            android:name=".AddPlantActivity"
+            android:name=".ui.AddPlantActivity"
             android:label="@string/title_activity_add_plant"
             android:screenOrientation="portrait"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".ui.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.scientists.happy.botanist.MainActivity" />
+                android:value="com.scientists.happy.botanist.ui.MainActivity" />
         </activity>
 
         <activity
-            android:name=".AccountActivity"
+            android:name=".ui.AccountActivity"
             android:label="@string/title_activity_account"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".ui.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.scientists.happy.botanist.MainActivity" />
+                android:value="com.scientists.happy.botanist.ui.MainActivity" />
 
         </activity>
 
         <activity
-            android:name=".SettingsActivity"
+            android:name=".ui.SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".ui.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.scientists.happy.botanist.MainActivity" />
+                android:value="com.scientists.happy.botanist.ui.MainActivity" />
         </activity>
 
     </application>

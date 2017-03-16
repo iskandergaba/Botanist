@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".AccountActivity"
+    tools:context=".ui.AccountActivity"
     android:weightSum="20">
 
     <LinearLayout
@@ -41,6 +41,14 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
             android:text="@string/email_fmt"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/botanist_since"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:text="@string/botanist_since_fmt"
             android:textSize="16sp" />
 
         <TextView
