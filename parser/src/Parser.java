@@ -1,6 +1,6 @@
 /**
  * Parses input csv file from USDA plants database and converts it to JSON format for use with Firebase database.
- * @author Antonio Muscarella
+ * @author Antonio Muscarella and Christopher Besser
  */
 package PlantParser;
 import java.io.File;
@@ -14,14 +14,11 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
 import java.util.LinkedList;
-
 public class Parser
 {
     private static final char DELIMETER = ',';
     private static final String THREE_TABS = "\t\t\t";
-
     private static final int SPECIES_NAME_INDEX = 1;
-
     //column numbers of the different fields for the plants in the csv file, stored as constants in case the input file changes
     private static final int COMMON_NAME_INDEX = 0;
     private static final int GROUP_NAME_INDEX = 1;
@@ -65,24 +62,16 @@ public class Parser
     private static final int PALATABLE_GRAZE_ANIMAL_INDEX = 39;
     private static final int PALATABLE_HUMAN_INDEX = 40;
     private static final int FERTILITY_REQUIREMENT_INDEX = 41;
-
-    //the following String arrays are arrays of federal & state noxious symbols, for use in parsing USDA data
-    private static final String[] NOXIOUS_SYMBOLS = {"NW", "CAW", "CBW", "AW", "BW",
-            "CW", "NAW", "PN", "PRNW", "SNW",
-            "PP", "CAT1", "CAT2", "CAT3", "INB",
-            "PINB", "IAP", "NP", "NUW", "ADW", "BDW",
-            "ILAP", "NWSPQ"};
+    // the following String arrays are arrays of federal & state noxious symbols, for use in parsing USDA data
+    private static final String[] NOXIOUS_SYMBOLS = {"NW", "CAW", "CBW", "AW", "BW", "CW", "NAW", "PN", "PRNW", "SNW",
+        "PP", "CAT1", "CAT2", "CAT3", "INB", "PINB", "IAP", "NP", "NUW", "ADW", "BDW", "ILAP", "NWSPQ"};
     private static final String[] REGULATED_SYMBOLS = {"RGNW", "RNW", "PR", "RNPS", "SP"};
     private static final String[] QUARANTINE_SYMBOLS = {"Q", "QW", "NWSPQ", "WAWQ"};
     private static final String[] BANNED_SYMBOLS = {"PNW", "IB", "PIB", "PAP1", "PAP2", "P", "PIS"};
-
-    //the following String arrays are arrays of federal & state endangered symbols, for use in parsing USDA data
+    // the following String arrays are arrays of federal & state endangered symbols, for use in parsing USDA data
     private static final String[] RARE_SYMBOLS = {"R", "U", "RI", "WL"};
-    private static final String[] ENDANGERED_SYMBOLS = {"E", "T", "HS", "SA", "SR",
-            "SC", "CE", "H", "FP", "CV",
-            "EV", "V", "S"};
+    private static final String[] ENDANGERED_SYMBOLS = {"E", "T", "HS", "SA", "SR", "SC", "CE", "H", "FP", "CV", "EV", "V", "S"};
     private static final String[] CRITICALLY_ENDANGERED_SYMBOLS = {"X", "PX", "PREX", "PRX"};
-
     private File input;
     private File output;
     private BufferedReader br;
@@ -109,10 +98,12 @@ public class Parser
      */
     public void parseInputFile() throws IOException
     {
+    	br.readLine();
         String currPlant = br.readLine();
         while (currPlant != null)
         {
-            if (!currPlant.equals("")) {
+            if (!currPlant.equals(""))
+            {
                 Object[] objectArray = splitString(currPlant, DELIMETER).toArray();
                 String[] fields = Arrays.copyOf(objectArray, objectArray.length, String[].class);
                 String species = capitalize(fields[SPECIES_NAME_INDEX]);
@@ -141,7 +132,7 @@ public class Parser
     }
 
     /**
-     * writeToOutputFile() - generates output JSON file format
+     * Generates output JSON file format
      * @throws IOException if the file cannot be reached.
      */
     public void writeToOutputFile() throws IOException
@@ -163,18 +154,18 @@ public class Parser
             {
                 writeLine("\t\t},");
             }
-            //write species as a key
+            // write species as a key
             writeLine("\t\t\"" + s + "\": {");
-            //write other fields as values under the species name
+            // write other fields as values under the species name
             String[] otherFields = plantMap.get(s);
             writeLine(THREE_TABS + "\"common name\": \"" + capitalize(plantMap.get(s)[COMMON_NAME_INDEX]) + "\",");
             writeLine(THREE_TABS + "\"group\": \"" + plantMap.get(s)[GROUP_NAME_INDEX] + "\",");
             writeLine(THREE_TABS + "\"duration\": \"" + plantMap.get(s)[DURATION_INDEX] + "\",");
             writeLine(THREE_TABS + "\"growth habit\": \"" + plantMap.get(s)[GROWTH_HABIT_INDEX] + "\",");
             writeLine(THREE_TABS + "\"noxious status\": [" + consolidateNoxious(plantMap.get(s)[FEDERAL_NOXIOUS_INDEX],
-                    plantMap.get(s)[STATE_NOXIOUS_INDEX]) + "],");
+                plantMap.get(s)[STATE_NOXIOUS_INDEX]) + "],");
             writeLine(THREE_TABS + "\"endangered status\": " + consolidateEndangered(plantMap.get(s)[FEDERAL_T_E_INDEX],
-                    plantMap.get(s)[STATE_T_E_INDEX]) + ",");
+                plantMap.get(s)[STATE_T_E_INDEX]) + ",");
             writeLine(THREE_TABS + "\"active growth period\": \"" + plantMap.get(s)[ACTIVE_GROWTH_PERIOD_INDEX] + "\",");
             writeLine(THREE_TABS + "\"after harvest regrowth\": \"" + plantMap.get(s)[AFTER_HARVEST_REGROWTH_INDEX] + "\",");
             writeLine(THREE_TABS + "\"flower color\": \"" + plantMap.get(s)[FLOWER_COLOR_INDEX] + "\",");
@@ -228,13 +219,17 @@ public class Parser
         }
         writeLine("\t\t}");
         writeLine("\t},");
-        // SpeciesNames
-        writeLine("\t\"SpeciesNames\": [");
         int count = 0;
+        // SpeciesNames
+        writeLine("\t\"ScientificNames\": [");
         for (String s: plantMap.keySet())
         {
             //write species as a key
             count++;
+            if (s.equals(""))
+            {
+            	continue;
+            }
             if (count == plantMap.size())
             {
                 writeLine("\t\t\"" + s + "\"");
@@ -257,7 +252,7 @@ public class Parser
                 continue;
             }
             //write common name as key
-            if (count >= plantMap.size() - 1)
+            if (count >= plantMap.size())
             {
                 writeLine("\t\t\"" + capitalize(common) + "\"");
             }
@@ -266,7 +261,29 @@ public class Parser
                 writeLine("\t\t\"" + capitalize(common) + "\",");
             }
         }
-        writeLine("\t]");
+        writeLine("\t],");
+        // Lookup table
+        writeLine("\t\"Lookup\": {");
+        count = 0;
+        for (String s: plantMap.keySet())
+        {
+            count++;
+            String common = plantMap.get(s)[COMMON_NAME_INDEX];
+            if (common.equals("") || (common == null))
+            {
+                continue;
+            }
+            //write common name as key
+            if (count >= plantMap.size() - 1)
+            {
+            	writeLine("\t\t\"" + capitalize(common) + "\": \"" + s + "\"");
+            }
+            else
+            {
+            	writeLine("\t\t\"" + capitalize(common) + "\": \"" + s + "\",");
+            }
+        }
+        writeLine("\t}");
         bw.write("}");
         bw.flush();
         bw.close();
@@ -312,7 +329,7 @@ public class Parser
         boolean shouldQuarantine = false;
         boolean isRegulated = false;
         boolean isBanned = false;
-        for (String s : NOXIOUS_SYMBOLS)
+        for (String s: NOXIOUS_SYMBOLS)
         {
             isNoxious = isNoxious || federal.contains(s) || state.contains(s);
             if (isNoxious)
@@ -320,7 +337,7 @@ public class Parser
                 break;
             }
         }
-        for (String s : REGULATED_SYMBOLS)
+        for (String s: REGULATED_SYMBOLS)
         {
             isRegulated = isRegulated || state.contains(s);
             if (isRegulated)
@@ -328,7 +345,7 @@ public class Parser
                 break;
             }
         }
-        for (String s : QUARANTINE_SYMBOLS)
+        for (String s: QUARANTINE_SYMBOLS)
         {
             shouldQuarantine = shouldQuarantine || federal.contains(s) || state.contains(s);
             if (shouldQuarantine)
@@ -336,7 +353,7 @@ public class Parser
                 break;
             }
         }
-        for (String s : BANNED_SYMBOLS)
+        for (String s: BANNED_SYMBOLS)
         {
             isBanned = isBanned || federal.contains(s) || state.contains(s);
             if (isBanned)
@@ -344,9 +361,7 @@ public class Parser
                 break;
             }
         }
-
         StringBuilder out = new StringBuilder();
-
         if (isNoxious)
         {
             out.append("\"Noxious\"");
@@ -404,7 +419,7 @@ public class Parser
         boolean isEndangered = false;
         boolean isCriticallyEnangered = false;
 
-        for (String s : CRITICALLY_ENDANGERED_SYMBOLS)
+        for (String s: CRITICALLY_ENDANGERED_SYMBOLS)
         {
             isCriticallyEnangered = isCriticallyEnangered || federal.contains(s) || state.contains(s);
             if (isCriticallyEnangered)
@@ -412,7 +427,7 @@ public class Parser
                 return "\"Critically Endangered\"";
             }
         }
-        for (String s : ENDANGERED_SYMBOLS)
+        for (String s: ENDANGERED_SYMBOLS)
         {
             isEndangered = isEndangered || federal.contains(s) || state.contains(s);
             if (isEndangered)
@@ -420,7 +435,7 @@ public class Parser
                 return "\"Endangered\"";
             }
         }
-        for (String s : RARE_SYMBOLS)
+        for (String s: RARE_SYMBOLS)
         {
             isRare = isRare || federal.contains(s) || state.contains(s);
             if (isRare)
@@ -458,7 +473,7 @@ public class Parser
      * Run from command line
      * @param args - command line arguments
      */
-    public static void main (String[] args)
+    public static void main(String[] args)
     {
         try
         {
