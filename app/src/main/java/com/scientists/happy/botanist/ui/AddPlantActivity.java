@@ -70,7 +70,7 @@ public class AddPlantActivity extends AppCompatActivity {
             }
         });
         mHeightEditText = (EditText) findViewById(R.id.height_edit_text);
-        mWaterEditText = (EditText) findViewById(R.id.water_edit_text);
+        //mWaterEditText = (EditText) findViewById(R.id.water_edit_text);
         mAddPlantButton = (Button) findViewById(R.id.add_plant_button);
         mAddPlantButton.setOnClickListener(new View.OnClickListener() {
             @Override

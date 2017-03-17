@@ -3,10 +3,10 @@ package com.scientists.happy.botanist.data;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Plant {
+class Plant {
     private static final String DELIMETER = "\t";
 
-    private String name, species, id;
+    private String name, species, commonName, id;
 
     private List<Double> heights;
 
@@ -53,4 +53,7 @@ public class Plant {
         return name + DELIMETER + species + DELIMETER + "";
     }
 
+    public String getCommonName() {
+        return commonName;
+    }
 }

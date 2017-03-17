@@ -107,23 +107,19 @@ public class AccountActivity extends AppCompatActivity implements
             }
         };
 
-        // [START configure_signin]
         // Configure sign-in to request the user's ID, email address, and basic
         // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .build();
-        // [END configure_signin]
 
-        // [START build_client]
         // Build a GoogleApiClient with access to the Google Sign-In API and the
         // options specified by gso.
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
-        // [END build_client]
     }
 
     @Override
@@ -154,7 +150,6 @@ public class AccountActivity extends AppCompatActivity implements
         mAuth.addAuthStateListener(mAuthListener);
     }
 
-    // [START onActivityResult]
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -165,9 +160,7 @@ public class AccountActivity extends AppCompatActivity implements
             handleSignInResult(result);
         }
     }
-    // [END onActivityResult]
 
-    // [START handleSignInResult]
     private void handleSignInResult(GoogleSignInResult result) {
         Log.d(TAG, "handleSignInResult:" + result.isSuccess());
         if (result.isSuccess()) {
@@ -192,15 +185,10 @@ public class AccountActivity extends AppCompatActivity implements
             }
         }
     }
-    // [END handleSignInResult]
 
-
-    // [START auth_with_google]
     private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
         Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getId());
-        // [START_EXCLUDE silent]
         showProgressDialog();
-        // [END_EXCLUDE]
 
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
         mAuth.signInWithCredential(credential)
@@ -223,7 +211,6 @@ public class AccountActivity extends AppCompatActivity implements
                     }
                 });
     }
-// [END auth_with_google]
 
     private void signOut() {
         Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
@@ -241,7 +228,6 @@ public class AccountActivity extends AppCompatActivity implements
                 });
     }
 
-    // [START revokeAccess]
     private void revokeAccess() {
         Auth.GoogleSignInApi.revokeAccess(mGoogleApiClient).setResultCallback(
                 new ResultCallback<Status>() {
@@ -256,12 +242,13 @@ public class AccountActivity extends AppCompatActivity implements
                     }
                 });
     }
-    // [END revokeAccess]
 
     private void deleteUser() {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
         if (user != null) {
+            String userId = user.getUid();
+            mDatabase.deleteUserRecords(userId);
             user.delete()
                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
@@ -271,8 +258,6 @@ public class AccountActivity extends AppCompatActivity implements
                             }
                         }
                     });
-            String userId = user.getUid();
-            mDatabase.deleteUserRecords(userId);
             mDatabase.deleteAllBirthdayReminders(AccountActivity.this);
         }
     }
