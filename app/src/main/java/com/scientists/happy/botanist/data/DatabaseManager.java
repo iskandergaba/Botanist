@@ -35,22 +35,22 @@ import com.scientists.happy.botanist.services.BirthdayReceiver;
 import com.scientists.happy.botanist.ui.ProfileActivity;
 
 import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import static android.content.Context.ALARM_SERVICE;
 
 public class DatabaseManager {
 
-    private static final String TAG = "DatabaseManager";
+    //private static final String TAG = "DatabaseManager";
 
     private long mPlantsNumber;
     private long mBotanistSince;
 
     private ProgressDialog mProgressDialog;
 
-    private List<String> mAutoComplete;
+    private Map<String, String> mAutoCompleteCache;
     private StorageReference mStorage;
     private DatabaseReference mDatabase;
     private static DatabaseManager mDatabaseManager;
@@ -65,9 +65,10 @@ public class DatabaseManager {
                     //Basically, this says "For each DataSnapshot *Data* in dataSnapshot, do what's inside the method.
                     for (DataSnapshot suggestionSnapshot : dataSnapshot.getChildren()) {
                         //Get the suggestion by childing the key of the string you want to get.
-                        String suggestion = suggestionSnapshot.getValue(String.class);
+                        String commonName = suggestionSnapshot.getKey();
+                        String sciName = suggestionSnapshot.getValue(String.class);
                         //Add the retrieved string to the list
-                        mAutoComplete.add(suggestion);
+                        mAutoCompleteCache.put(commonName, sciName);
                     }
                 }
 
@@ -78,15 +79,14 @@ public class DatabaseManager {
             };
 
             //Child the root before all the push() keys are found and add a ValueEventListener()
-            //mDatabase.child("CommonNames").addValueEventListener(listener);
-            mDatabase.child("SpeciesNames").addValueEventListener(listener);
+            mDatabase.child("Lookup").addValueEventListener(listener);
             return null;
         }
     }
 
     private DatabaseManager() {
         FirebaseDatabase.getInstance().setPersistenceEnabled(true);
-        mAutoComplete = new ArrayList<>();
+        mAutoCompleteCache = new HashMap<>();
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mStorage = FirebaseStorage.getInstance().getReference();
         mPlantsNumber = getPlantsNumber();
@@ -120,13 +120,21 @@ public class DatabaseManager {
 
     public void deleteUserRecords(String userId) {
         if (userId != null) {
+            mStorage.child(userId).delete();
             mDatabase.child("users").child(userId).removeValue();
         }
     }
 
-    public void addPlant(Context context, String name, String species, long birthday, final Bitmap bmp) {
+    public void addPlant(Context context, String name, String species, long birthday, double height, final Bitmap bmp) {
         showProgressDialog(context);
-        final Plant plant = new Plant(name, species, birthday);
+        final Plant plant;
+        if (mAutoCompleteCache.containsKey(species)) {
+            // If the user typed a common name, fetch the scientific name
+            plant = new Plant(name, mAutoCompleteCache.get(species), birthday, height);
+        } else {
+            // The user must have entered either the correct scientific name or a random name, either way, add it
+            plant = new Plant(name, species, birthday, height);
+        }
         final String plantId = plant.getId();
         final String userId = getUserId();
         if (userId != null) {
@@ -183,7 +191,6 @@ public class DatabaseManager {
     public FirebaseListAdapter<Plant> getPlantsAdapter(final Activity activity) {
         final String userId = getUserId();
         if (userId != null) {
-            // TODO: clean a bit
             DatabaseReference databaseRef = mDatabase.child("users").child(userId).child("plants");
             return new FirebaseListAdapter<Plant>(activity, Plant.class, R.layout.grid_item_view, databaseRef) {
                 @Override
@@ -224,7 +231,8 @@ public class DatabaseManager {
 
     public void setSpeciesAutoComplete(Context context, AutoCompleteTextView autoCompleteTextView) {
         final ArrayAdapter<String> autoComplete = new ArrayAdapter<>(context, android.R.layout.simple_list_item_1);
-        autoComplete.addAll(mAutoComplete);
+        autoComplete.addAll(mAutoCompleteCache.keySet());
+        autoComplete.addAll(mAutoCompleteCache.values());
         autoCompleteTextView.setAdapter(autoComplete);
     }
 

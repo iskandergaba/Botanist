@@ -42,8 +42,10 @@
     <string name="plant_picture_desc">Plant picture</string>
     <string name="tap_to_take_a_picture">Choose a picture</string>
     <string name="name">Name</string>
-    <string name="birthday">Birthday</string>
+    <string name="birthday">Birthday (Today)</string>
     <string name="species">Species</string>
     <string name="add_plant">Add Plant</string>
+    <string name="last_watered">Last watered (Now)</string>
+    <string name="height_in_inches">Height in inches (0.0)</string>
 
 </resources>
