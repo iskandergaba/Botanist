@@ -17,6 +17,7 @@ import com.vansuita.pickimage.bundle.PickSetup;
 import com.vansuita.pickimage.dialog.PickImageDialog;
 import com.vansuita.pickimage.listeners.IPickResult;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
+import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -25,16 +26,20 @@ import java.util.Locale;
 
 public class AddPlantActivity extends AppCompatActivity {
 
-    protected ImageView picture;
-    protected TextView pictureHint;
-    protected EditText nameEditText;
+    protected ImageView mPicture;
+    protected TextView mPictureHint;
+    protected EditText mNameEditText;
     protected EditText mBirthdayEditText;
-    protected AutoCompleteTextView speciesAutoCompleteText;
-    protected Button addPlantButton;
+    protected AutoCompleteTextView mSpeciesAutoCompleteText;
+    protected EditText mHeightEditText;
+    protected EditText mWaterEditText;
+    protected Button mAddPlantButton;
 
     protected DatabaseManager mDatabase;
     protected Bitmap mBitmap;
     protected GregorianCalendar mBirthday;
+
+    int mWaterHour, mWaterMin;
 
     /**
      * Launch the add plant screen
@@ -47,10 +52,10 @@ public class AddPlantActivity extends AppCompatActivity {
 
         mDatabase = DatabaseManager.getInstance();
 
-        pictureHint = (TextView) findViewById(R.id.picture_hint);
-        speciesAutoCompleteText = (AutoCompleteTextView) findViewById(R.id.species_edit_text);
-        mDatabase.setSpeciesAutoComplete(this, speciesAutoCompleteText);
-        nameEditText = (EditText) findViewById(R.id.name_edit_text);
+        mPictureHint = (TextView) findViewById(R.id.picture_hint);
+        mSpeciesAutoCompleteText = (AutoCompleteTextView) findViewById(R.id.species_edit_text);
+        mDatabase.setSpeciesAutoComplete(this, mSpeciesAutoCompleteText);
+        mNameEditText = (EditText) findViewById(R.id.name_edit_text);
         mBirthdayEditText = (EditText) findViewById(R.id.birthday_edit_text);
         mBirthdayEditText.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -58,19 +63,31 @@ public class AddPlantActivity extends AppCompatActivity {
                 showDatePicker();
             }
         });
-        addPlantButton = (Button) findViewById(R.id.add_plant_button);
-        addPlantButton.setOnClickListener(new View.OnClickListener() {
+        mBirthdayEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) showDatePicker();
+            }
+        });
+        mHeightEditText = (EditText) findViewById(R.id.height_edit_text);
+        mWaterEditText = (EditText) findViewById(R.id.water_edit_text);
+        mAddPlantButton = (Button) findViewById(R.id.add_plant_button);
+        mAddPlantButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // TODO: changes here
-                mDatabase.addPlant(AddPlantActivity.this, nameEditText.getText().toString(), speciesAutoCompleteText.getText().toString(),
-                        mBirthday.getTimeInMillis(), mBitmap);
+                String height = mHeightEditText.getText().toString();
+                mDatabase.addPlant(AddPlantActivity.this,
+                        mNameEditText.getText().toString(),
+                        mSpeciesAutoCompleteText.getText().toString(),
+                        mBirthday.getTimeInMillis(),
+                        height.equals("") ? 0 : Double.parseDouble(height),
+                        mBitmap);
                 finish();
             }
         });
 
-        picture = (ImageView) findViewById(R.id.picture);
-        picture.setOnClickListener(new View.OnClickListener() {
+        mPicture = (ImageView) findViewById(R.id.picture);
+        mPicture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 final PickSetup setup = new PickSetup()
@@ -80,7 +97,7 @@ public class AddPlantActivity extends AppCompatActivity {
                             @Override
                             public void onPickResult(PickResult r) {
                                 mBitmap = r.getBitmap();
-                                picture.setImageBitmap(mBitmap);
+                                mPicture.setImageBitmap(mBitmap);
                             }
                         })
                         .show(getSupportFragmentManager());
@@ -88,6 +105,8 @@ public class AddPlantActivity extends AppCompatActivity {
         });
 
         mBirthday = new GregorianCalendar();
+        mWaterHour = mBirthday.get(Calendar.HOUR);
+        mWaterMin = mBirthday.get(Calendar.MINUTE);
     }
 
     /**
@@ -114,5 +133,35 @@ public class AddPlantActivity extends AppCompatActivity {
         datePickerDialog.dismissOnPause(true);
         datePickerDialog.setOnDateSetListener(listener);
         datePickerDialog.show(getFragmentManager(), "date_picker");
+    }
+
+    /**
+     * Show the clock
+     * later on will be implemented, ignore for now
+     */
+    private void showTimePicker() {
+
+        TimePickerDialog.OnTimeSetListener listener = new TimePickerDialog.OnTimeSetListener() {
+            /**
+             * Handle time set
+             * @param view - current app view
+             * @param hourOfDay - selected hour
+             * @param minute - selected minute
+             * @param second - selected second
+             */
+            @Override
+            public void onTimeSet(TimePickerDialog view, int hourOfDay, int minute, int second) {
+                mWaterHour = hourOfDay;
+                mWaterMin = minute;
+                mWaterEditText.setText(mWaterHour < 13 ? mWaterHour + "" : "");
+            }
+        };
+
+        TimePickerDialog timePickerDialog = TimePickerDialog.newInstance(listener, mWaterHour, mWaterMin, false);
+        timePickerDialog.setVersion(TimePickerDialog.Version.VERSION_2);
+        //timePickerDialog.setTitle(this.getString(R.string.set_time));
+        timePickerDialog.vibrate(false);
+        timePickerDialog.dismissOnPause(true);
+        timePickerDialog.show(getFragmentManager(), "time_picker");
     }
 }

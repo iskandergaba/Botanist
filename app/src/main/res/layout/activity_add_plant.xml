@@ -61,6 +61,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:inputType="textCapWords"
                 android:hint="@string/name"
                 android:maxLines="1"/>
 
@@ -68,8 +69,8 @@
                 android:id="@+id/birthday_edit_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:focusable="false"
                 android:hint="@string/birthday"
+                android:inputType="date"
                 android:maxLines="1"/>
         </LinearLayout>
 
@@ -88,8 +89,27 @@
             android:id="@+id/species_edit_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:inputType="textCapWords"
+            android:imeOptions="actionNext"
             android:hint="@string/species"
-            android:maxLines="3"/>
+            android:maxLines="2"/>
+
+        <EditText
+            android:id="@+id/height_edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/height_in_inches"
+            android:inputType="numberDecimal"
+            android:maxLines="1"/>
+
+        <!--Later on, probably on the 3rd iteration-->
+        <!--<EditText-->
+            <!--android:id="@+id/water_edit_text"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:hint="@string/last_watered"-->
+            <!--android:inputType="date"-->
+            <!--android:maxLines="1"/>-->
 
     </LinearLayout>
 

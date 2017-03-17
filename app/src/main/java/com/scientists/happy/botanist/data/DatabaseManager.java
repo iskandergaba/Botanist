@@ -65,9 +65,11 @@ public class DatabaseManager {
                     //Basically, this says "For each DataSnapshot *Data* in dataSnapshot, do what's inside the method.
                     for (DataSnapshot suggestionSnapshot : dataSnapshot.getChildren()) {
                         //Get the suggestion by childing the key of the string you want to get.
-                        String suggestion = suggestionSnapshot.getValue(String.class);
+                        String commonName = suggestionSnapshot.getKey();
+                        String sciName = suggestionSnapshot.getValue(String.class);
                         //Add the retrieved string to the list
-                        mAutoComplete.add(suggestion);
+                        mAutoComplete.add(commonName);
+                        mAutoComplete.add(sciName);
                     }
                 }
 
@@ -78,8 +80,7 @@ public class DatabaseManager {
             };
 
             //Child the root before all the push() keys are found and add a ValueEventListener()
-            //mDatabase.child("CommonNames").addValueEventListener(listener);
-            mDatabase.child("SpeciesNames").addValueEventListener(listener);
+            mDatabase.child("Lookup").addValueEventListener(listener);
             return null;
         }
     }
@@ -124,9 +125,9 @@ public class DatabaseManager {
         }
     }
 
-    public void addPlant(Context context, String name, String species, long birthday, final Bitmap bmp) {
+    public void addPlant(Context context, String name, String species, long birthday, double height, final Bitmap bmp) {
         showProgressDialog(context);
-        final Plant plant = new Plant(name, species, birthday);
+        final Plant plant = new Plant(name, species, birthday, height);
         final String plantId = plant.getId();
         final String userId = getUserId();
         if (userId != null) {
@@ -183,7 +184,6 @@ public class DatabaseManager {
     public FirebaseListAdapter<Plant> getPlantsAdapter(final Activity activity) {
         final String userId = getUserId();
         if (userId != null) {
-            // TODO: clean a bit
             DatabaseReference databaseRef = mDatabase.child("users").child(userId).child("plants");
             return new FirebaseListAdapter<Plant>(activity, Plant.class, R.layout.grid_item_view, databaseRef) {
                 @Override
