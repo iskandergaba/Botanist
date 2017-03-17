@@ -227,12 +227,12 @@ public class Parser
         {
             count++;
             String common = plantMap.get(s)[COMMON_NAME_INDEX];
-            if (common.equals("") || (common == null))
+            if ((common == null) || common.equals(""))
             {
                 continue;
             }
             //write common name as key
-            if (count >= plantMap.size() - 1)
+            if (count >= plantMap.size())
             {
             	writeLine("\t\t\"" + capitalize(common) + "\": \"" + s + "\"");
             }
