@@ -220,48 +220,6 @@ public class Parser
         writeLine("\t\t}");
         writeLine("\t},");
         int count = 0;
-        // SpeciesNames
-        writeLine("\t\"ScientificNames\": [");
-        for (String s: plantMap.keySet())
-        {
-            //write species as a key
-            count++;
-            if (s.equals(""))
-            {
-            	continue;
-            }
-            if (count == plantMap.size())
-            {
-                writeLine("\t\t\"" + s + "\"");
-            }
-            else
-            {
-                writeLine("\t\t\"" + s + "\",");
-            }
-        }
-        writeLine("\t],");
-        // CommonNames
-        writeLine("\t\"CommonNames\": [");
-        count = 0;
-        for (String s: plantMap.keySet())
-        {
-            count++;
-            String common = plantMap.get(s)[COMMON_NAME_INDEX];
-            if (common.equals("") || (common == null))
-            {
-                continue;
-            }
-            //write common name as key
-            if (count >= plantMap.size())
-            {
-                writeLine("\t\t\"" + capitalize(common) + "\"");
-            }
-            else
-            {
-                writeLine("\t\t\"" + capitalize(common) + "\",");
-            }
-        }
-        writeLine("\t],");
         // Lookup table
         writeLine("\t\"Lookup\": {");
         count = 0;
