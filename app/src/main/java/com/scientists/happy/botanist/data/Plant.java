@@ -10,13 +10,13 @@ class Plant {
     private String name, species, id;
     private Map<String, Double> heights;
     private long birthday, lastWatered, lastMeasureNotification;
+    private double height;
   
     /**
      * Required by Firebase, This useless constructor must remain
      */
     private Plant() {
     }
-
 
     /**
      * Create a new plant
@@ -30,6 +30,7 @@ class Plant {
         this.name = name;
         this.species = species;
         this.birthday = birthday;
+        this.height = height;
         this.heights = new LinkedHashMap<>();
         this.lastMeasureNotification = System.currentTimeMillis();
         this.lastWatered = lastMeasureNotification;
@@ -62,7 +63,7 @@ class Plant {
 
     /**
      * Get the plant's birthday
-     * @return Returns the plant's birthda
+     * @return Returns the plant's birthday
      */
     long getBirthday() {
         return birthday;
@@ -74,6 +75,14 @@ class Plant {
      */
     public Map<String, Double> getHeights() {
         return heights;
+    }
+
+    /**
+     * Get the current plant height
+     * @return Returns the latest plant height
+     */
+    public double getHeight() {
+        return height;
     }
 
     /**
@@ -97,5 +106,4 @@ class Plant {
     public String toString() {
         return name + DELIMITER + species + DELIMITER;
     }
-    
 }
