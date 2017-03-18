@@ -6,7 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 class Plant {
-    private static final String DELIMETER = "\t";
+    private static final String DELIMITER = "\t";
     private String name, species, id;
     private Map<String, Double> heights;
     private long birthday, lastWatered, lastMeasureNotification;
@@ -97,12 +97,5 @@ class Plant {
     public String toString() {
         return name + DELIMITER + species + DELIMITER;
     }
-
-    /**
-     * Get the plant's common name
-     * @return Returns the plant's common name
-     */
-    public String getCommonName() {
-        return commonName;
-    }
+    
 }
