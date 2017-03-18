@@ -46,10 +46,8 @@ public class DatabaseManager {
     private long mBotanistSince;
     private ProgressDialog mProgressDialog;
     private Map<String, String> mAutoCompleteCache;
-
     private StorageReference mStorage;
     private DatabaseReference mDatabase;
-
     private static DatabaseManager mDatabaseManager;
     private class PrepareAutocompleteTask extends AsyncTask<Void, Void, Void> {
         /**
@@ -430,6 +428,10 @@ public class DatabaseManager {
         }
     }
 
+    /**
+     * Remove the height measurement reminders
+     * @param context - current app context
+     */
     public void deleteAllHeightMeasurementReminders(Context context) {
         AlarmManager am = (AlarmManager)context.getSystemService(ALARM_SERVICE);
         for (int i = 0; i < mPlantsNumber; i++) {
@@ -442,7 +444,6 @@ public class DatabaseManager {
      * Update the number of plants
      * @param count - the new number of plants
      */
-
     private void setPlantsNumber(long count) {
         String userId = getUserId();
         if (userId != null) {
@@ -475,9 +476,13 @@ public class DatabaseManager {
         am.set(AlarmManager.RTC_WAKEUP, birthday.getTimeInMillis(), pendingIntent);
     }
 
-
+    /**
+     * Create reminders to user to measure their plants
+     * @param context - current app context
+     * @param plant - plant to remind user to measure
+     * @param id - id of the plant
+     */
     private void setHeightMeasureReminders(Context context, Plant plant, int id) {
-
         Intent intent = new Intent(context, HeightMeasureReceiver.class);
         intent.putExtra("name", plant.getName());
         intent.putExtra("plant_id", plant.getId());
@@ -487,10 +492,8 @@ public class DatabaseManager {
         int hour = preferences.getInt("water_hour", 9);
         int minute = preferences.getInt("water_minute", 0);
         int reminderSetting = Integer.parseInt(preferences.getString("height_reminder", "2"));
-
         Calendar lastMeasured = Calendar.getInstance();
         lastMeasured.setTimeInMillis(plant.getLastMeasureNotification());
-
         if (reminderSetting != 0) {
             Calendar nextMeasure = Calendar.getInstance();
             long interval = getHeightReminderIntervalInMillis(reminderSetting);
@@ -502,6 +505,11 @@ public class DatabaseManager {
         }
     }
 
+    /**
+     * Convert height reminder notification delay to milliseconds
+     * @param setting - user selected delay
+     * @return Returns the millisecond denomination of the delay
+     */
     private long getHeightReminderIntervalInMillis(int setting) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(0);
@@ -515,12 +523,15 @@ public class DatabaseManager {
         return calendar.getTimeInMillis();
     }
 
+    /**
+     * Update the last measured field
+     * @param plantId - plant that was just measured
+     */
     public void updateLastMeasureNotification(String plantId) {
         String userId = getUserId();
         mDatabase.child("users").child(userId).child("plants").child(plantId).child("lastMeasureNotification")
                 .setValue(System.currentTimeMillis());
     }
-
 
     /**
      * Show the loading progress
