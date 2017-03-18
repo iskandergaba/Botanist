@@ -14,14 +14,19 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import com.bumptech.glide.Glide;
 import com.firebase.ui.database.FirebaseListAdapter;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -250,6 +255,43 @@ public class DatabaseManager {
     }
 
     /**
+     * Remove plant from the database
+     * @param context - the current app context
+     * @param plantId - the id of the plant (species_name)
+     * @param heightInInches - the height of the plant
+     */
+    public void updatePlantHeight(final Context context, final String plantId, double heightInInches) {
+        showProgressDialog(context);
+        final String userId = getUserId();
+        String now = Long.toString(System.currentTimeMillis());
+        if (userId != null) {
+            mDatabase.child("users").child(userId).child("plants").child(plantId).child("heights")
+                    .child(now).setValue(heightInInches)
+                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if (!task.isSuccessful()) {
+                        Toast.makeText(context, "Height update failed, try again", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+
+            mDatabase.child("users").child(userId).child("plants").child(plantId).child("height").setValue(heightInInches)
+                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (!task.isSuccessful()) {
+                                Toast.makeText(context, "Height update failed, try again", Toast.LENGTH_SHORT).show();
+                            } else {
+                                updateLastMeasureNotification(plantId);
+                            }
+                            hideProgressDialog();
+                        }
+                    });
+        }
+    }
+
+    /**
      * Get a plant adapter
      * @param activity - the current activity
      * @return Returns an adapter for the plants
@@ -280,9 +322,10 @@ public class DatabaseManager {
                         @Override
                         public void onClick(View v) {
                             Intent i = new Intent(activity.getApplicationContext(), ProfileActivity.class);
-                            i.putExtra("id", position);
+                            i.putExtra("plant_id", plant.getId());
                             i.putExtra("name", plant.getName());
                             i.putExtra("species", plant.getSpecies());
+                            i.putExtra("height", plant.getHeight());
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                                 View sharedImageView = view.findViewById(R.id.grid_item_image_view);
                                 Bundle bundle = ActivityOptions.makeSceneTransitionAnimation(activity, sharedImageView, "image_main_to_profile_transition").toBundle();
