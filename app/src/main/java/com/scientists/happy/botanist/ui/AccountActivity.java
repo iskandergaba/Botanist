@@ -220,6 +220,7 @@ public class AccountActivity extends AppCompatActivity implements
                         showProgressDialog();
                         mAuth.signOut();
                         mDatabase.deleteAllBirthdayReminders(AccountActivity.this);
+                        mDatabase.deleteAllHeightMeasurementReminders(AccountActivity.this);
                         Intent resultIntent = new Intent();
                         setResult(RESULT_OK, resultIntent);
                         hideProgressDialog();
@@ -259,6 +260,7 @@ public class AccountActivity extends AppCompatActivity implements
                         }
                     });
             mDatabase.deleteAllBirthdayReminders(AccountActivity.this);
+            mDatabase.deleteAllHeightMeasurementReminders(AccountActivity.this);
         }
     }
 

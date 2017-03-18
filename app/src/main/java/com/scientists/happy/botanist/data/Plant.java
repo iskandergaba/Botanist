@@ -1,16 +1,16 @@
 package com.scientists.happy.botanist.data;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 class Plant {
     private static final String DELIMETER = "\t";
 
-    private String name, species, commonName, id;
+    private String name, species, id;
 
-    private List<Double> heights;
+    private Map<String, Double> heights;
 
-    private long birthday, lastWatered;
+    private long birthday, lastWatered, lastMeasureNotification;
 
     //Required by Firebase, This useless constructor must remain
     private Plant() {}
@@ -20,8 +20,10 @@ class Plant {
         this.name = name;
         this.species = species;
         this.birthday = birthday;
-        this.heights = new ArrayList<>();
-        this.heights.add(height);
+        this.heights = new LinkedHashMap<>();
+        this.lastMeasureNotification = System.currentTimeMillis();
+        this.lastWatered = lastMeasureNotification;
+        this.heights.put(Long.toString(lastMeasureNotification), height);
     }
 
     public String getName() {
@@ -40,7 +42,7 @@ class Plant {
         return birthday;
     }
 
-    public List<Double> getHeights() {
+    public Map<String, Double> getHeights() {
         return heights;
     }
 
@@ -48,12 +50,12 @@ class Plant {
         return lastWatered;
     }
 
+    public long getLastMeasureNotification() {
+        return lastMeasureNotification;
+    }
+
     @Override
     public String toString() {
         return name + DELIMETER + species + DELIMETER + "";
-    }
-
-    public String getCommonName() {
-        return commonName;
     }
 }
