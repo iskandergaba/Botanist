@@ -8,11 +8,12 @@ import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
+import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -32,6 +33,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.scientists.happy.botanist.R;
 import com.scientists.happy.botanist.services.BirthdayReceiver;
+import com.scientists.happy.botanist.services.HeightMeasureReceiver;
 import com.scientists.happy.botanist.ui.ProfileActivity;
 import java.io.ByteArrayOutputStream;
 import java.util.Calendar;
@@ -44,8 +46,10 @@ public class DatabaseManager {
     private long mBotanistSince;
     private ProgressDialog mProgressDialog;
     private Map<String, String> mAutoCompleteCache;
+
     private StorageReference mStorage;
     private DatabaseReference mDatabase;
+
     private static DatabaseManager mDatabaseManager;
     private class PrepareAutocompleteTask extends AsyncTask<Void, Void, Void> {
         /**
@@ -291,6 +295,7 @@ public class DatabaseManager {
                         }
                     });
                     setBirthdayReminder(activity, plant, position);
+                    setHeightMeasureReminders(activity, plant, position);
                 }
             };
         }
@@ -425,10 +430,19 @@ public class DatabaseManager {
         }
     }
 
+    public void deleteAllHeightMeasurementReminders(Context context) {
+        AlarmManager am = (AlarmManager)context.getSystemService(ALARM_SERVICE);
+        for (int i = 0; i < mPlantsNumber; i++) {
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(context, i, new Intent(context, HeightMeasureReceiver.class), 0);
+            am.cancel(pendingIntent);
+        }
+    }
+
     /**
      * Update the number of plants
      * @param count - the new number of plants
      */
+
     private void setPlantsNumber(long count) {
         String userId = getUserId();
         if (userId != null) {
@@ -457,10 +471,56 @@ public class DatabaseManager {
         if (birthday.getTimeInMillis() < now.getTimeInMillis()) {
             birthday.set(Calendar.YEAR, now.get((Calendar.YEAR)) + 1);
         }
-        Log.v("fuck", birthday.toString());
         AlarmManager am = (AlarmManager)context.getSystemService(ALARM_SERVICE);
         am.set(AlarmManager.RTC_WAKEUP, birthday.getTimeInMillis(), pendingIntent);
     }
+
+
+    private void setHeightMeasureReminders(Context context, Plant plant, int id) {
+
+        Intent intent = new Intent(context, HeightMeasureReceiver.class);
+        intent.putExtra("name", plant.getName());
+        intent.putExtra("plant_id", plant.getId());
+        intent.putExtra("id", id);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, id, intent, 0);
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        int hour = preferences.getInt("water_hour", 9);
+        int minute = preferences.getInt("water_minute", 0);
+        int reminderSetting = Integer.parseInt(preferences.getString("height_reminder", "2"));
+
+        Calendar lastMeasured = Calendar.getInstance();
+        lastMeasured.setTimeInMillis(plant.getLastMeasureNotification());
+
+        if (reminderSetting != 0) {
+            Calendar nextMeasure = Calendar.getInstance();
+            long interval = getHeightReminderIntervalInMillis(reminderSetting);
+            nextMeasure.setTimeInMillis(lastMeasured.getTimeInMillis() + interval);
+            nextMeasure.set(Calendar.HOUR, hour);
+            nextMeasure.set(Calendar.MINUTE, minute);
+            AlarmManager am = (AlarmManager)context.getSystemService(ALARM_SERVICE);
+            am.setRepeating(AlarmManager.RTC_WAKEUP, nextMeasure.getTimeInMillis(),interval, pendingIntent);
+        }
+    }
+
+    private long getHeightReminderIntervalInMillis(int setting) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(0);
+        if (setting == 1) {
+            calendar.add(Calendar.DAY_OF_YEAR, 1);
+        } else if (setting == 2) {
+            calendar.add(Calendar.DAY_OF_YEAR, 7);
+        } else if (setting == 3) {
+            calendar.add(Calendar.DAY_OF_YEAR, 30);
+        }
+        return calendar.getTimeInMillis();
+    }
+
+    public void updateLastMeasureNotification(String plantId) {
+        String userId = getUserId();
+        mDatabase.child("users").child(userId).child("plants").child(plantId).child("lastMeasureNotification")
+                .setValue(System.currentTimeMillis());
+    }
+
 
     /**
      * Show the loading progress

@@ -2,14 +2,17 @@
     xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <Preference
-        android:key="water_plants_time"
+        android:key="water_time"
         android:summary="Set when the app should remind you of watering your plants"
         android:title="Set watering time" />
 
-    <SwitchPreference
-        android:key="height_record_reminder"
-        android:summary="Disable height recording reminder notifications"
-        android:summaryOff="Enable height recording reminder notifications"
-        android:title="Height recording reminder" />
+    <ListPreference
+        android:key="height_reminder"
+        android:title="Height recording reminder"
+        android:entries="@array/height_pref_entries"
+        android:entryValues="@array/height_pref_values"
+        android:defaultValue="2">
+
+    </ListPreference>
 
 </PreferenceScreen>

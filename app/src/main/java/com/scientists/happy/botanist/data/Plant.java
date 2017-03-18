@@ -1,13 +1,13 @@
 // Plant object
 // @author: Antonio Muscarella and Iskander Gaba
 package com.scientists.happy.botanist.data;
-import java.util.ArrayList;
-import java.util.List;
-public class Plant {
+import java.util.LinkedHashMap;
+import java.util.Map;
+class Plant {
     private static final String DELIMITER = "\t";
     private String name, species, id;
-    private List<Double> heights;
-    private long birthday, lastWatered;
+    private Map<String, Double> heights;
+    private long birthday, lastWatered, lastMeasureNotification;
     /**
      * Required by Firebase, this useless constructor must remain
      */
@@ -26,8 +26,10 @@ public class Plant {
         this.name = name;
         this.species = species;
         this.birthday = birthday;
-        this.heights = new ArrayList<>();
-        this.heights.add(height);
+        this.heights = new LinkedHashMap<>();
+        this.lastMeasureNotification = System.currentTimeMillis();
+        this.lastWatered = lastMeasureNotification;
+        this.heights.put(Long.toString(lastMeasureNotification), height);
     }
 
     /**
@@ -56,7 +58,7 @@ public class Plant {
 
     /**
      * Get the plant's birthday
-     * @return Returns the plant's birthday
+     * @return Returns the plant's birthda
      */
     long getBirthday() {
         return birthday;
@@ -66,7 +68,7 @@ public class Plant {
      * Get the plant heights
      * @return Returns all of the plant's recorded heights
      */
-    public List<Double> getHeights() {
+    public Map<String, Double> getHeights() {
         return heights;
     }
 
@@ -76,6 +78,11 @@ public class Plant {
      */
     public long getLastWatered() {
         return lastWatered;
+    }
+
+
+    public long getLastMeasureNotification() {
+        return lastMeasureNotification;
     }
 
     /**
