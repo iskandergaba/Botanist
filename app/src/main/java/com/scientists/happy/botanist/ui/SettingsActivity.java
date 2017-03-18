@@ -1,6 +1,6 @@
 /**
  * Copyright 2016 Iskander Gaba
-
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 package com.scientists.happy.botanist.ui;
-
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
@@ -23,13 +22,9 @@ import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
-
-import android.util.Log;
-
 import com.scientists.happy.botanist.R;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 public class SettingsActivity extends AppCompatActivity {
-
     public static SharedPreferences mPreferences;
     public static final String WATER_HOUR_KEY = "water_hour";
     public static final String WATER_MINUTE_KEY = "water_minute";

@@ -1,5 +1,5 @@
 // Plant profile
-// @author: Cactus
+// @author: Antonio Muscarella and Christopher Besser
 package com.scientists.happy.botanist.ui;
 
 import android.content.DialogInterface;
@@ -45,11 +45,13 @@ public class ProfileActivity extends AppCompatActivity {
         species = i.getExtras().getString(SPECIES_KEY);
         height = i.getExtras().getDouble(HEIGHT_KEY);
         setTitle(name + "\'s Profile");
+
         ImageView picture = (ImageView) findViewById(R.id.plant_picture);
         StorageReference storageReference = FirebaseStorage.getInstance().getReference()
                 // TODO: clean a bit
                 .child(mDatabase.getUserId()).child(species + "_" + name + ".jpg");
         Glide.with(this).using(new FirebaseImageLoader()).load(storageReference).placeholder(R.drawable.flowey).into(picture);
+
         TextView nameTextView = (TextView)findViewById(R.id.plant_name);
         nameTextView.setText(getString(R.string.name_fmt, name));
         TextView speciesTextView = (TextView)findViewById(R.id.plant_species);
@@ -63,6 +65,7 @@ public class ProfileActivity extends AppCompatActivity {
                 buildHeightInputDialog().show();
             }
         });
+        mDatabase.editProfile(this.findViewById(android.R.id.content), species);
     }
 
     /**

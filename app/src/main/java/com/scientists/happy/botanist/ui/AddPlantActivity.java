@@ -1,5 +1,5 @@
 // Add a plant
-// @author: Christopher Besser
+// @author: Christopher Besser and Iskander Gaba
 package com.scientists.happy.botanist.ui;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -120,7 +120,6 @@ public class AddPlantActivity extends AppCompatActivity {
      * Show the date picker
      */
     private void showDatePicker() {
-
         DatePickerDialog.OnDateSetListener listener = new DatePickerDialog.OnDateSetListener() {
             /**
              * Handle selected time for birthday
@@ -166,7 +165,6 @@ public class AddPlantActivity extends AppCompatActivity {
                 mWaterEditText.setText(mWaterHour < 13 ? mWaterHour + "" : "");
             }
         };
-
         TimePickerDialog timePickerDialog = TimePickerDialog.newInstance(listener, mWaterHour, mWaterMin, false);
         timePickerDialog.setVersion(TimePickerDialog.Version.VERSION_2);
         timePickerDialog.vibrate(false);

@@ -1,16 +1,14 @@
 // User object
 // @author: Iskander Gaba
 package com.scientists.happy.botanist.data;
-
-
-class User {
+public class User {
     private String userName, email, userId;
     private long botanistSince;
     private int plantsNumber;
     /**
      * Create a new user
      */
-    User() {
+    protected User() {
     }
 
     /**
@@ -20,7 +18,7 @@ class User {
      * @param email - the user's email
      * @param plantsNumber - the number of plants the user has
      */
-    User(String userId, String userName, String email, int plantsNumber) {
+    protected User(String userId, String userName, String email, int plantsNumber) {
         this.userId = userId;
         this.userName = userName;
         this.email = email;

@@ -1,19 +1,16 @@
 // Plant object
-// @author: Antonio Muscarella
+// @author: Antonio Muscarella and Iskander Gaba
 package com.scientists.happy.botanist.data;
-
 import java.util.LinkedHashMap;
 import java.util.Map;
-
 class Plant {
     private static final String DELIMITER = "\t";
     private String name, species, id;
     private Map<String, Double> heights;
     private long birthday, lastWatered, lastMeasureNotification;
     private double height;
-  
     /**
-     * Required by Firebase, This useless constructor must remain
+     * Required by Firebase, this useless constructor must remain
      */
     private Plant() {
     }
@@ -25,7 +22,7 @@ class Plant {
      * @param birthday - the plant's birthday
      * @param height - the plant's height
      */
-    Plant(String name, String species, long birthday, double height) {
+    protected Plant(String name, String species, long birthday, double height) {
         this.id = species + "_" + name;
         this.name = name;
         this.species = species;
@@ -93,7 +90,10 @@ class Plant {
         return lastWatered;
     }
 
-
+    /**
+     * retrieve the last time the user measured the plant
+     * @return Returns when the plant was last measured
+     */
     public long getLastMeasureNotification() {
         return lastMeasureNotification;
     }

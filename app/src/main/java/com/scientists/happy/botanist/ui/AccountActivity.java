@@ -234,24 +234,23 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
      * Sign the user out
      */
     private void signOut() {
-
         Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(new ResultCallback<Status>() {
             /**
              * Result of signout attempt
              * @param status - the status of the signout
              */
-              @Override
-               public void onResult(@NonNull Status status) {
-                   showProgressDialog();
-                   mAuth.signOut();
-                   mDatabase.deleteAllBirthdayReminders(AccountActivity.this);
-                   mDatabase.deleteAllHeightMeasurementReminders(AccountActivity.this);
-                   Intent resultIntent = new Intent();
-                   setResult(RESULT_OK, resultIntent);
-                   hideProgressDialog();
-                   finish();
-               }
-         });
+            @Override
+            public void onResult(@NonNull Status status) {
+                showProgressDialog();
+                mAuth.signOut();
+                mDatabase.deleteAllBirthdayReminders(AccountActivity.this);
+                mDatabase.deleteAllHeightMeasurementReminders(AccountActivity.this);
+                Intent resultIntent = new Intent();
+                setResult(RESULT_OK, resultIntent);
+                hideProgressDialog();
+                finish();
+            }
+        });
     }
 
     /**

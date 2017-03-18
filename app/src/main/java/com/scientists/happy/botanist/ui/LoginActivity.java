@@ -1,5 +1,5 @@
 // Log in user activity
-// @author: Christopher Besser
+// @author: Iskander Gaba
 package com.scientists.happy.botanist.ui;
 import android.content.Intent;
 import android.os.Bundle;

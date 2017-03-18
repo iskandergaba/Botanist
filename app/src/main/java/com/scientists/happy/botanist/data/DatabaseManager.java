@@ -1,5 +1,5 @@
 // Singleton Database manager for Firebase
-// @author: Christopher Besser (He means the comments author!)
+// @author: Iskander Gaba
 package com.scientists.happy.botanist.data;
 import android.app.Activity;
 import android.app.ActivityOptions;
@@ -51,10 +51,8 @@ public class DatabaseManager {
     private long mBotanistSince;
     private ProgressDialog mProgressDialog;
     private Map<String, String> mAutoCompleteCache;
-
     private StorageReference mStorage;
     private DatabaseReference mDatabase;
-
     private static DatabaseManager mDatabaseManager;
     private class PrepareAutocompleteTask extends AsyncTask<Void, Void, Void> {
         /**
@@ -64,7 +62,8 @@ public class DatabaseManager {
          */
         @Override
         protected Void doInBackground(Void... params) {
-            ValueEventListener listener = new ValueEventListener() {
+            // Child the root before all the push() keys are found and add a ValueEventListener()
+            mDatabase.child("Lookup").addValueEventListener(new ValueEventListener() {
                 /**
                  * Handle a change in the database contents
                  * @param dataSnapshot - the database state
@@ -72,7 +71,7 @@ public class DatabaseManager {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     // Basically, this says "For each DataSnapshot *Data* in dataSnapshot, do what's inside the method.
-                    for (DataSnapshot suggestionSnapshot : dataSnapshot.getChildren()) {
+                    for (DataSnapshot suggestionSnapshot: dataSnapshot.getChildren()) {
                         // Get the suggestion by childing the key of the string you want to get.
                         String commonName = suggestionSnapshot.getKey();
                         String sciName = suggestionSnapshot.getValue(String.class);
@@ -88,9 +87,7 @@ public class DatabaseManager {
                 @Override
                 public void onCancelled(DatabaseError databaseError) {
                 }
-            };
-            // Child the root before all the push() keys are found and add a ValueEventListener()
-            mDatabase.child("Lookup").addValueEventListener(listener);
+            });
             return null;
         }
     }
@@ -172,12 +169,19 @@ public class DatabaseManager {
     public void addPlant(Context context, String name, String species, long birthday, double height, final Bitmap bmp) {
         showProgressDialog(context);
         final Plant plant;
-        if (mAutoCompleteCache.containsKey(species)) {
+        // reject plant addition if species is null
+        if ((species == null) || species.equals("")) {
+            return;
+        }
+        else if (mAutoCompleteCache.containsKey(species)) {
             // If the user typed a common name, fetch the scientific name
             plant = new Plant(name, mAutoCompleteCache.get(species), birthday, height);
-        } else {
-            // The user must have entered either the correct scientific name or a random name, either way, add it
+        } else if (mAutoCompleteCache.containsValue(species)) {
+            // The user must have entered the correct scientific name
             plant = new Plant(name, species, birthday, height);
+        }
+        else {
+            return;
         }
         final String plantId = plant.getId();
         final String userId = getUserId();
@@ -340,6 +344,37 @@ public class DatabaseManager {
     }
 
     /**
+     * Get a plant adapter
+     * @param view - the current activity
+     * @param name of the plant to fetch
+     * @return Returns an adapter for the plants
+     */
+    public void editProfile(final View view, String name) {
+        if (name != null) {
+            DatabaseReference ref = mDatabase.child("PlantsData").child(name);
+            ref.addValueEventListener(new ValueEventListener() {
+                /**
+                 * Read the data from the plant entry
+                 * @param dataSnapshot - the entry contents
+                 */
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    PlantEntry post = dataSnapshot.getValue(PlantEntry.class);
+                    ((TextView) view.findViewById(R.id.care_tips)).setText(post.getCommonName());
+                }
+
+                /**
+                 * Do nothing when cancelled
+                 * @param databaseError - ignored error
+                 */
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                }
+            });
+        }
+    }
+
+    /**
      * Show the autocomplete for AddPlantActivity add species
      * @param context - the current app context
      * @param autoCompleteTextView - the autocomplete view
@@ -436,6 +471,10 @@ public class DatabaseManager {
         }
     }
 
+    /**
+     * Remove the height measurement reminders
+     * @param context - current app context
+     */
     public void deleteAllHeightMeasurementReminders(Context context) {
         AlarmManager am = (AlarmManager)context.getSystemService(ALARM_SERVICE);
         for (int i = 0; i < mPlantsNumber; i++) {
@@ -448,7 +487,6 @@ public class DatabaseManager {
      * Update the number of plants
      * @param count - the new number of plants
      */
-
     private void setPlantsNumber(long count) {
         String userId = getUserId();
         if (userId != null) {
@@ -481,9 +519,13 @@ public class DatabaseManager {
         am.set(AlarmManager.RTC_WAKEUP, birthday.getTimeInMillis(), pendingIntent);
     }
 
-
+    /**
+     * Create reminders to user to measure their plants
+     * @param context - current app context
+     * @param plant - plant to remind user to measure
+     * @param id - id of the plant
+     */
     private void setHeightMeasureReminders(Context context, Plant plant, int id) {
-
         Intent intent = new Intent(context, HeightMeasureReceiver.class);
         intent.putExtra("name", plant.getName());
         intent.putExtra("plant_id", plant.getId());
@@ -493,10 +535,8 @@ public class DatabaseManager {
         int hour = preferences.getInt("water_hour", 9);
         int minute = preferences.getInt("water_minute", 0);
         int reminderSetting = Integer.parseInt(preferences.getString("height_reminder", "2"));
-
         Calendar lastMeasured = Calendar.getInstance();
         lastMeasured.setTimeInMillis(plant.getLastMeasureNotification());
-
         if (reminderSetting != 0) {
             Calendar nextMeasure = Calendar.getInstance();
             long interval = getHeightReminderIntervalInMillis(reminderSetting);
@@ -508,6 +548,11 @@ public class DatabaseManager {
         }
     }
 
+    /**
+     * Convert height reminder notification delay to milliseconds
+     * @param setting - user selected delay
+     * @return Returns the millisecond denomination of the delay
+     */
     private long getHeightReminderIntervalInMillis(int setting) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(0);
@@ -521,6 +566,10 @@ public class DatabaseManager {
         return calendar.getTimeInMillis();
     }
 
+    /**
+     * Update the last measured field
+     * @param plantId - plant that was just measured
+     */
     public void updateLastMeasureNotification(String plantId) {
         String userId = getUserId();
         mDatabase.child("users").child(userId).child("plants").child(plantId).child("lastMeasureNotification")
