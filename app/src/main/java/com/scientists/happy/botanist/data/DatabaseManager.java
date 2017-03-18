@@ -51,8 +51,10 @@ public class DatabaseManager {
     private ProgressDialog mProgressDialog;
 
     private Map<String, String> mAutoCompleteCache;
+
     private StorageReference mStorage;
     private DatabaseReference mDatabase;
+
     private static DatabaseManager mDatabaseManager;
 
     private class PrepareAutocompleteTask extends AsyncTask<Void, Void, Void> {
