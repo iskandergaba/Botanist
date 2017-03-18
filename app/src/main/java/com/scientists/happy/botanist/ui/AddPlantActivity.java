@@ -1,5 +1,5 @@
 // Add a plant
-// @author: Christopher Besser
+// @author: Christopher Besser and Iskander Gaba
 package com.scientists.happy.botanist.ui;
 import android.graphics.Bitmap;
 import android.os.Bundle;
