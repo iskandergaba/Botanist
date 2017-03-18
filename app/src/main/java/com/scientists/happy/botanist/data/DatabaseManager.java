@@ -1,5 +1,6 @@
+// Singleton Database manager for Firebase
+// @author: Christopher Besser
 package com.scientists.happy.botanist.data;
-
 import android.app.Activity;
 import android.app.ActivityOptions;
 import android.app.AlarmManager;
@@ -18,7 +19,6 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import com.bumptech.glide.Glide;
 import com.firebase.ui.database.FirebaseListAdapter;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
@@ -35,59 +35,64 @@ import com.scientists.happy.botanist.R;
 import com.scientists.happy.botanist.services.BirthdayReceiver;
 import com.scientists.happy.botanist.services.HeightMeasureReceiver;
 import com.scientists.happy.botanist.ui.ProfileActivity;
-
 import java.io.ByteArrayOutputStream;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
-
 import static android.content.Context.ALARM_SERVICE;
-
 public class DatabaseManager {
-
     //private static final String TAG = "DatabaseManager";
-
     private long mPlantsNumber;
     private long mBotanistSince;
-
     private ProgressDialog mProgressDialog;
-
     private Map<String, String> mAutoCompleteCache;
 
     private StorageReference mStorage;
     private DatabaseReference mDatabase;
 
     private static DatabaseManager mDatabaseManager;
-
     private class PrepareAutocompleteTask extends AsyncTask<Void, Void, Void> {
-
+        /**
+         * Background asynchronous update
+         * @param params - process parameters
+         * @return Returns nothing
+         */
         @Override
         protected Void doInBackground(Void... params) {
             ValueEventListener listener = new ValueEventListener() {
+                /**
+                 * Handle a change in the database contents
+                 * @param dataSnapshot - the database state
+                 */
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
-                    //Basically, this says "For each DataSnapshot *Data* in dataSnapshot, do what's inside the method.
+                    // Basically, this says "For each DataSnapshot *Data* in dataSnapshot, do what's inside the method.
                     for (DataSnapshot suggestionSnapshot : dataSnapshot.getChildren()) {
-                        //Get the suggestion by childing the key of the string you want to get.
+                        // Get the suggestion by childing the key of the string you want to get.
                         String commonName = suggestionSnapshot.getKey();
                         String sciName = suggestionSnapshot.getValue(String.class);
-                        //Add the retrieved string to the list
+                        // Add the retrieved string to the list
                         mAutoCompleteCache.put(commonName, sciName);
                     }
                 }
 
+                /**
+                 * Do nothing when the process is cancelled
+                 * @param databaseError - Ignored error
+                 */
                 @Override
                 public void onCancelled(DatabaseError databaseError) {
-
                 }
             };
-
-            //Child the root before all the push() keys are found and add a ValueEventListener()
+            // Child the root before all the push() keys are found and add a ValueEventListener()
             mDatabase.child("Lookup").addValueEventListener(listener);
             return null;
         }
     }
 
+    /**
+     * Singleton DatabaseManager constructor
+     */
     private DatabaseManager() {
         FirebaseDatabase.getInstance().setPersistenceEnabled(true);
         mAutoCompleteCache = new HashMap<>();
@@ -98,6 +103,10 @@ public class DatabaseManager {
         new PrepareAutocompleteTask().execute();
     }
 
+    /**
+     * Singleton DatabaseManager instance retrieval
+     * @return Returns a pointer to the singleton
+     */
     public static DatabaseManager getInstance() {
         if (mDatabaseManager == null) {
             mDatabaseManager = new DatabaseManager();
@@ -105,8 +114,18 @@ public class DatabaseManager {
         return mDatabaseManager;
     }
 
+    /**
+     * Add a new user
+     * @param userId - the user's ID
+     * @param name - the user's name
+     * @param email - the user's email
+     */
     public void addUserRecords(final String userId, final String name, final String email) {
         mDatabase.child("users").child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
+            /**
+             * Handle data change event
+             * @param snapshot - current database contents
+             */
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 if (!snapshot.exists()) {
@@ -115,13 +134,20 @@ public class DatabaseManager {
                 }
             }
 
+            /**
+             * Do nothing when the process is cancelled
+             * @param databaseError - Ignored error
+             */
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
             }
         });
     }
 
+    /**
+     * Delete a user from the database
+     * @param userId - The user id
+     */
     public void deleteUserRecords(String userId) {
         if (userId != null) {
             mStorage.child(userId).delete();
@@ -129,6 +155,15 @@ public class DatabaseManager {
         }
     }
 
+    /**
+     * Add a new plant to a user's plant list in the database
+     * @param context - current app context
+     * @param name - name of the plant
+     * @param species - the plant's species
+     * @param birthday - the plant's birthday
+     * @param height - the plant's height
+     * @param bmp - the plant's picture
+     */
     public void addPlant(Context context, String name, String species, long birthday, double height, final Bitmap bmp) {
         showProgressDialog(context);
         final Plant plant;
@@ -142,73 +177,102 @@ public class DatabaseManager {
         final String plantId = plant.getId();
         final String userId = getUserId();
         if (userId != null) {
-            mDatabase.child("users").child(userId).child("plants").child(plantId)
-                    .addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot snapshot) {
-                            if (!snapshot.exists()) {
-                                mDatabase.child("users").child(userId).child("plants").child(plantId).setValue(plant);
-                                setPlantsNumber(++mPlantsNumber);
-                                if (bmp != null) {
-                                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                                    bmp.compress(Bitmap.CompressFormat.JPEG, 100, stream);
-                                    byte[] data = stream.toByteArray();
-                                    StorageReference filepath = mStorage.child(userId).child(plant.getId() + ".jpg");
-                                    filepath.putBytes(data);
-                                }
-                            }
+            mDatabase.child("users").child(userId).child("plants").child(plantId).addListenerForSingleValueEvent(new ValueEventListener() {
+                /**
+                 * Handle a change to the data asynchronously
+                 * @param snapshot - the current database state
+                 */
+                @Override
+                public void onDataChange(DataSnapshot snapshot) {
+                    if (!snapshot.exists()) {
+                        mDatabase.child("users").child(userId).child("plants").child(plantId).setValue(plant);
+                        setPlantsNumber(++mPlantsNumber);
+                        if (bmp != null) {
+                            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                            bmp.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+                            byte[] data = stream.toByteArray();
+                            StorageReference filepath = mStorage.child(userId).child(plant.getId() + ".jpg");
+                            filepath.putBytes(data);
                         }
+                    }
+                }
 
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-
-                        }
-                    });
+                /**
+                 * Do nothing when update is cancelled
+                 * @param databaseError - ignored error
+                 */
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                }
+            });
         }
         hideProgressDialog();
     }
 
+    /**
+     * Remove plant from the database
+     * @param context - the current app context
+     * @param name - the name of the plant
+     * @param species - the species of the plant
+     */
     public void deletePlant(Context context, String name, String species) {
         final String userId = getUserId();
         final String plantId = species + "_" + name;
         deleteAllBirthdayReminders(context);
         if (userId != null) {
-            mDatabase.child("users").child(userId).child("plants").child(plantId)
-                    .addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot snapshot) {
-                            if (snapshot.exists()) {
-                                mDatabase.child("users").child(userId).child("plants").child(plantId).removeValue();
-                                setPlantsNumber(--mPlantsNumber);
-                                mStorage.child(userId).child(plantId + ".jpg").delete();
-                            }
-                        }
+            mDatabase.child("users").child(userId).child("plants").child(plantId).addListenerForSingleValueEvent(new ValueEventListener() {
+                /**
+                 * Handle asynchronous change to database
+                 * @param snapshot - the current database contents
+                 */
+                @Override
+                public void onDataChange(DataSnapshot snapshot) {
+                    if (snapshot.exists()) {
+                        mDatabase.child("users").child(userId).child("plants").child(plantId).removeValue();
+                        setPlantsNumber(--mPlantsNumber);
+                        mStorage.child(userId).child(plantId + ".jpg").delete();
+                    }
+                }
 
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-
-                        }
-                    });
+                /**
+                 * Do nothing when the event is cancelled.
+                 * @param databaseError - ignored error
+                 */
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                }
+            });
         }
     }
 
+    /**
+     * Get a plant adapter
+     * @param activity - the current activity
+     * @return Returns an adapter for the plants
+     */
     public FirebaseListAdapter<Plant> getPlantsAdapter(final Activity activity) {
         final String userId = getUserId();
         if (userId != null) {
             DatabaseReference databaseRef = mDatabase.child("users").child(userId).child("plants");
             return new FirebaseListAdapter<Plant>(activity, Plant.class, R.layout.grid_item_view, databaseRef) {
+                /**
+                 * Show images in glide
+                 * @param view - the current view
+                 * @param plant - the plant to display
+                 * @param position - the position in the menu
+                 */
                 @Override
                 protected void populateView(final View view, final Plant plant, final int position) {
                     StorageReference storageReference = mStorage.child(userId).child(plant.getId() + ".jpg");
-                    ((TextView)view.findViewById(R.id.grid_item_nickname)).setText(plant.getName());
-                    ((TextView)view.findViewById(R.id.grid_item_species)).setText(plant.getSpecies());
+                    ((TextView) view.findViewById(R.id.grid_item_nickname)).setText(plant.getName());
+                    ((TextView) view.findViewById(R.id.grid_item_species)).setText(plant.getSpecies());
                     ImageView picture = (ImageView) view.findViewById(R.id.grid_item_image_view);
-                    Glide.with(activity)
-                            .using(new FirebaseImageLoader())
-                            .load(storageReference)
-                            .placeholder(R.drawable.flowey)
-                            .into(picture);
+                    Glide.with(activity).using(new FirebaseImageLoader()).load(storageReference).placeholder(R.drawable.flowey).into(picture);
                     view.setOnClickListener(new View.OnClickListener() {
+                        /**
+                         * User clicked a plant
+                         * @param v - the current view
+                         */
                         @Override
                         public void onClick(View v) {
                             Intent i = new Intent(activity.getApplicationContext(), ProfileActivity.class);
@@ -217,9 +281,7 @@ public class DatabaseManager {
                             i.putExtra("species", plant.getSpecies());
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                                 View sharedImageView = view.findViewById(R.id.grid_item_image_view);
-                                Bundle bundle = ActivityOptions
-                                        .makeSceneTransitionAnimation(activity, sharedImageView, "image_main_to_profile_transition")
-                                        .toBundle();
+                                Bundle bundle = ActivityOptions.makeSceneTransitionAnimation(activity, sharedImageView, "image_main_to_profile_transition").toBundle();
                                 activity.startActivity(i, bundle);
                             } else {
                                 activity.startActivity(i);
@@ -234,6 +296,11 @@ public class DatabaseManager {
         return null;
     }
 
+    /**
+     * Show the autocomplete for AddPlantActivity add species
+     * @param context - the current app context
+     * @param autoCompleteTextView - the autocomplete view
+     */
     public void setSpeciesAutoComplete(Context context, AutoCompleteTextView autoCompleteTextView) {
         final ArrayAdapter<String> autoComplete = new ArrayAdapter<>(context, android.R.layout.simple_list_item_1);
         autoComplete.addAll(mAutoCompleteCache.keySet());
@@ -241,19 +308,31 @@ public class DatabaseManager {
         autoCompleteTextView.setAdapter(autoComplete);
     }
 
+    /**
+     * Get the number of plants a user owns
+     * @return Returns the number of plants the user owns
+     */
     public long getPlantsNumber() {
         final String userId = getUserId();
         if (userId != null) {
             mDatabase.child("users").child(userId).child("plantsNumber").addListenerForSingleValueEvent(new ValueEventListener() {
+                /**
+                 * Handle a change in the user data
+                 * @param snapshot - the current database contents
+                 */
                 @Override
                 public void onDataChange(DataSnapshot snapshot) {
                     if (snapshot.exists()) {
                         mPlantsNumber = (long) snapshot.getValue();
                     }
                 }
+
+                /**
+                 * Do nothing when the process cancels
+                 * @param databaseError - Ignored error
+                 */
                 @Override
                 public void onCancelled(DatabaseError databaseError) {
-
                 }
             });
             return mPlantsNumber;
@@ -261,24 +340,40 @@ public class DatabaseManager {
         return -1;
     }
 
+    /**
+     * Get the user's id number
+     * @return Returns the user's id number
+     */
     public String getUserId() {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        return user != null ? user.getUid() : null;
+        return (user != null) ? user.getUid() : null;
     }
 
+    /**
+     * Get how long the user has been a botanist
+     * @return Returns how long the user has been a botanist
+     */
     public long getBotanistSince() {
         final String userId = getUserId();
         if (userId != null) {
             mDatabase.child("users").child(userId).child("botanistSince").addListenerForSingleValueEvent(new ValueEventListener() {
+                /**
+                 * Handle a change in the database contents
+                 * @param snapshot - current database contents
+                 */
                 @Override
                 public void onDataChange(DataSnapshot snapshot) {
                     if (snapshot.exists()) {
                         mBotanistSince = (long) snapshot.getValue();
                     }
                 }
+
+                /**
+                 * Do nothing when the process is cancelled
+                 * @param databaseError - Ignored error
+                 */
                 @Override
                 public void onCancelled(DatabaseError databaseError) {
-
                 }
             });
             return mBotanistSince;
@@ -286,8 +381,12 @@ public class DatabaseManager {
         return -1;
     }
 
+    /**
+     * Delete the birthday reminders
+     * @param context - the current app context
+     */
     public void deleteAllBirthdayReminders(Context context) {
-        AlarmManager am = (AlarmManager)context.getSystemService(ALARM_SERVICE);
+        AlarmManager am = (AlarmManager) context.getSystemService(ALARM_SERVICE);
         for (int i = 0; i < mPlantsNumber; i++) {
             PendingIntent pendingIntent = PendingIntent.getBroadcast(context, i, new Intent(context, BirthdayReceiver.class), 0);
             am.cancel(pendingIntent);
@@ -302,6 +401,11 @@ public class DatabaseManager {
         }
     }
 
+    /**
+     * Update the number of plants
+     * @param count - the new number of plants
+     */
+
     private void setPlantsNumber(long count) {
         String userId = getUserId();
         if (userId != null) {
@@ -309,6 +413,12 @@ public class DatabaseManager {
         }
     }
 
+    /**
+     * Set when to remind about birthdays
+     * @param context - the current app context
+     * @param plant - the plant whose birthday is reminded of
+     * @param id - the id of the plant
+     */
     private void setBirthdayReminder(Context context, Plant plant, int id) {
         Intent intent = new Intent(context, BirthdayReceiver.class);
         intent.putExtra("name", plant.getName());
@@ -316,13 +426,10 @@ public class DatabaseManager {
         intent.putExtra("birthday", plant.getBirthday());
         intent.putExtra("id", id);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, id, intent, 0);
-
         Calendar now = Calendar.getInstance();
         now.setTimeInMillis(System.currentTimeMillis());
-
         Calendar birthday = Calendar.getInstance();
         birthday.setTimeInMillis(plant.getBirthday());
-
         birthday.set(Calendar.YEAR, now.get((Calendar.YEAR)));
         if (birthday.getTimeInMillis() < now.getTimeInMillis()) {
             birthday.set(Calendar.YEAR, now.get((Calendar.YEAR)) + 1);
@@ -330,6 +437,7 @@ public class DatabaseManager {
         AlarmManager am = (AlarmManager)context.getSystemService(ALARM_SERVICE);
         am.set(AlarmManager.RTC_WAKEUP, birthday.getTimeInMillis(), pendingIntent);
     }
+
 
     private void setHeightMeasureReminders(Context context, Plant plant, int id) {
 
@@ -376,6 +484,11 @@ public class DatabaseManager {
                 .setValue(System.currentTimeMillis());
     }
 
+
+    /**
+     * Show the loading progress
+     * @param context - the current app context
+     */
     private void showProgressDialog(Context context) {
         if (mProgressDialog == null) {
             mProgressDialog = new ProgressDialog(context);
@@ -383,12 +496,14 @@ public class DatabaseManager {
             mProgressDialog.setIndeterminate(true);
             mProgressDialog.setCancelable(false);
         }
-
         mProgressDialog.show();
     }
 
+    /**
+     * Hide the loading progress
+     */
     private void hideProgressDialog() {
-        if (mProgressDialog != null && mProgressDialog.isShowing()) {
+        if ((mProgressDialog != null) && mProgressDialog.isShowing()) {
             mProgressDialog.hide();
         }
     }

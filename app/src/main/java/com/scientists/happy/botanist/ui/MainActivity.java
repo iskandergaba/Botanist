@@ -1,5 +1,6 @@
+// Main page
+// @author: Christopher Besser, Iskander Gaba, Antonio Muscarella, and Wendy Zhang
 package com.scientists.happy.botanist.ui;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -10,18 +11,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.GridView;
 import android.widget.ListAdapter;
-
 import com.scientists.happy.botanist.R;
 import com.scientists.happy.botanist.data.DatabaseManager;
-
 public class MainActivity extends AppCompatActivity {
-
     private static final int VIEW_ACCOUNT = 1;
-
     private DatabaseManager mDatabase;
-
 //    private ProgressDialog mProgressDialog;
-
     /**
      * Launch app
      * @param savedInstanceState - app state
@@ -45,9 +40,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(MainActivity.this, AddPlantActivity.class));
             }
         });
-
         mDatabase = DatabaseManager.getInstance();
-
         GridView gridView = (GridView) findViewById(R.id.gridview);
         gridView.setEmptyView(findViewById(R.id.empty_grid_view));
         ListAdapter adapter = mDatabase.getPlantsAdapter(this);
@@ -60,7 +53,6 @@ public class MainActivity extends AppCompatActivity {
 //
 //        });
         gridView.setAdapter(adapter);
-
     }
 
     /**
@@ -98,9 +90,15 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Launched activity ended
+     * @param requestCode - activity launch request code
+     * @param resultCode - activity launch result
+     * @param data - activity result data
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == VIEW_ACCOUNT && resultCode == RESULT_OK) {
+        if ((requestCode == VIEW_ACCOUNT) && (resultCode == RESULT_OK)) {
             startActivity(new Intent(MainActivity.this, LoginActivity.class));
             finish();
         }
