@@ -1,15 +1,15 @@
 // Plant object
-// @author: Antonio Muscarella
+// @author: Antonio Muscarella and Iskander Gaba
 package com.scientists.happy.botanist.data;
 import java.util.ArrayList;
 import java.util.List;
-class Plant {
+public class Plant {
     private static final String DELIMITER = "\t";
-    private String name, species, commonName, id;
+    private String name, species, id;
     private List<Double> heights;
     private long birthday, lastWatered;
     /**
-     * Required by Firebase, This useless constructor must remain
+     * Required by Firebase, this useless constructor must remain
      */
     private Plant() {
     }
@@ -85,13 +85,5 @@ class Plant {
     @Override
     public String toString() {
         return name + DELIMITER + species + DELIMITER;
-    }
-
-    /**
-     * Get the plant's common name
-     * @return Returns the plant's common name
-     */
-    public String getCommonName() {
-        return commonName;
     }
 }

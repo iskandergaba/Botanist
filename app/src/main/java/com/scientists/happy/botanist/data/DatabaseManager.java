@@ -1,5 +1,5 @@
 // Singleton Database manager for Firebase
-// @author: Christopher Besser
+// @author: Iskander Gaba
 package com.scientists.happy.botanist.data;
 import android.app.Activity;
 import android.app.ActivityOptions;
@@ -55,7 +55,8 @@ public class DatabaseManager {
          */
         @Override
         protected Void doInBackground(Void... params) {
-            ValueEventListener listener = new ValueEventListener() {
+            // Child the root before all the push() keys are found and add a ValueEventListener()
+            mDatabase.child("Lookup").addValueEventListener(new ValueEventListener() {
                 /**
                  * Handle a change in the database contents
                  * @param dataSnapshot - the database state
@@ -63,7 +64,7 @@ public class DatabaseManager {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     // Basically, this says "For each DataSnapshot *Data* in dataSnapshot, do what's inside the method.
-                    for (DataSnapshot suggestionSnapshot : dataSnapshot.getChildren()) {
+                    for (DataSnapshot suggestionSnapshot: dataSnapshot.getChildren()) {
                         // Get the suggestion by childing the key of the string you want to get.
                         String commonName = suggestionSnapshot.getKey();
                         String sciName = suggestionSnapshot.getValue(String.class);
@@ -79,9 +80,7 @@ public class DatabaseManager {
                 @Override
                 public void onCancelled(DatabaseError databaseError) {
                 }
-            };
-            // Child the root before all the push() keys are found and add a ValueEventListener()
-            mDatabase.child("Lookup").addValueEventListener(listener);
+            });
             return null;
         }
     }
@@ -163,12 +162,19 @@ public class DatabaseManager {
     public void addPlant(Context context, String name, String species, long birthday, double height, final Bitmap bmp) {
         showProgressDialog(context);
         final Plant plant;
-        if (mAutoCompleteCache.containsKey(species)) {
+        // reject plant addition if species is null
+        if ((species == null) || species.equals("")) {
+            return;
+        }
+        else if (mAutoCompleteCache.containsKey(species)) {
             // If the user typed a common name, fetch the scientific name
             plant = new Plant(name, mAutoCompleteCache.get(species), birthday, height);
-        } else {
-            // The user must have entered either the correct scientific name or a random name, either way, add it
+        } else if (mAutoCompleteCache.containsValue(species)) {
+            // The user must have entered the correct scientific name
             plant = new Plant(name, species, birthday, height);
+        }
+        else {
+            return;
         }
         final String plantId = plant.getId();
         final String userId = getUserId();
@@ -289,6 +295,37 @@ public class DatabaseManager {
             };
         }
         return null;
+    }
+
+    /**
+     * Get a plant adapter
+     * @param view - the current activity
+     * @param name of the plant to fetch
+     * @return Returns an adapter for the plants
+     */
+    public void editProfile(final View view, String name) {
+        if (name != null) {
+            DatabaseReference ref = mDatabase.child("PlantsData").child(name);
+            ref.addValueEventListener(new ValueEventListener() {
+                /**
+                 * Read the data from the plant entry
+                 * @param dataSnapshot - the entry contents
+                 */
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    PlantEntry post = dataSnapshot.getValue(PlantEntry.class);
+                    ((TextView) view.findViewById(R.id.care_tips)).setText(post.getCommonName());
+                }
+
+                /**
+                 * Do nothing when cancelled
+                 * @param databaseError - ignored error
+                 */
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                }
+            });
+        }
     }
 
     /**

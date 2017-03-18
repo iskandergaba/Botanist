@@ -16,6 +16,7 @@ import com.scientists.happy.botanist.data.DatabaseManager;
 public class MainActivity extends AppCompatActivity {
     private static final int VIEW_ACCOUNT = 1;
     private DatabaseManager mDatabase;
+    private ListAdapter myPlants;
 //    private ProgressDialog mProgressDialog;
     /**
      * Launch app
@@ -29,8 +30,7 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener()
-        {
+        fab.setOnClickListener(new View.OnClickListener() {
             /**
              * Handle action button click
              * @param view - current view
@@ -50,7 +50,6 @@ public class MainActivity extends AppCompatActivity {
 //                super.onChanged();
 //                hideProgressDialog();
 //            }
-//
 //        });
         gridView.setAdapter(adapter);
     }

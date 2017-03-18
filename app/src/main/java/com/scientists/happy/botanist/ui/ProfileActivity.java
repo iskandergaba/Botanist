@@ -1,5 +1,5 @@
 // Plant profile
-// @author: Cactus
+// @author: Antonio Muscarella and Christopher Besser
 package com.scientists.happy.botanist.ui;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -8,6 +8,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.ListAdapter;
 import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
@@ -35,15 +36,16 @@ public class ProfileActivity extends AppCompatActivity {
         name = i.getExtras().getString(NAME_KEY);
         species = i.getExtras().getString(SPECIES_KEY);
         setTitle(name + "\'s Profile");
-        TextView nameTextView = (TextView)findViewById(R.id.plant_name);
+        TextView nameTextView = (TextView) findViewById(R.id.plant_name);
         nameTextView.setText(getString(R.string.name_fmt, name));
-        TextView speciesTextView = (TextView)findViewById(R.id.plant_species);
+        TextView speciesTextView = (TextView) findViewById(R.id.plant_species);
         speciesTextView.setText(getString(R.string.species_fmt, species));
         ImageView picture = (ImageView) findViewById(R.id.plant_picture);
         StorageReference storageReference = FirebaseStorage.getInstance().getReference()
                 // TODO: clean a bit
                 .child(mDatabase.getUserId()).child(species + "_" + name + ".jpg");
         Glide.with(this).using(new FirebaseImageLoader()).load(storageReference).placeholder(R.drawable.flowey).into(picture);
+        mDatabase.editProfile(this.findViewById(android.R.id.content), species);
     }
 
     /**
