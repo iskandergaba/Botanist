@@ -26,6 +26,7 @@
         </provider>
 
         <receiver android:name=".services.BirthdayReceiver" />
+        <receiver android:name=".services.HeightMeasureReceiver" />
 
         <activity
             android:name=".ui.LoginActivity"
