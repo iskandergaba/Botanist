@@ -1,22 +1,18 @@
 // Plant object
-// @author: Antonio Muscarella
+// @author: Antonio Muscarella and Iskander Gaba
 package com.scientists.happy.botanist.data;
-
 import java.util.LinkedHashMap;
 import java.util.Map;
-
 class Plant {
     private static final String DELIMITER = "\t";
     private String name, species, id;
     private Map<String, Double> heights;
     private long birthday, lastWatered, lastMeasureNotification;
-  
     /**
-     * Required by Firebase, This useless constructor must remain
+     * Required by Firebase, this useless constructor must remain
      */
     private Plant() {
     }
-
 
     /**
      * Create a new plant
@@ -97,5 +93,4 @@ class Plant {
     public String toString() {
         return name + DELIMITER + species + DELIMITER;
     }
-    
 }

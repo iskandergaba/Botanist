@@ -158,23 +158,23 @@ public class Parser
             writeLine("\t\t\"" + s + "\": {");
             // write other fields as values under the species name
             String[] otherFields = plantMap.get(s);
-            writeLine(THREE_TABS + "\"common name\": \"" + capitalize(plantMap.get(s)[COMMON_NAME_INDEX]) + "\",");
+            writeLine(THREE_TABS + "\"commonName\": \"" + capitalize(plantMap.get(s)[COMMON_NAME_INDEX]) + "\",");
             writeLine(THREE_TABS + "\"group\": \"" + plantMap.get(s)[GROUP_NAME_INDEX] + "\",");
             writeLine(THREE_TABS + "\"duration\": \"" + plantMap.get(s)[DURATION_INDEX] + "\",");
-            writeLine(THREE_TABS + "\"growth habit\": \"" + plantMap.get(s)[GROWTH_HABIT_INDEX] + "\",");
-            writeLine(THREE_TABS + "\"noxious status\": [" + consolidateNoxious(plantMap.get(s)[FEDERAL_NOXIOUS_INDEX],
+            writeLine(THREE_TABS + "\"growthHabit\": \"" + plantMap.get(s)[GROWTH_HABIT_INDEX] + "\",");
+            writeLine(THREE_TABS + "\"noxious\": [" + consolidateNoxious(plantMap.get(s)[FEDERAL_NOXIOUS_INDEX],
                 plantMap.get(s)[STATE_NOXIOUS_INDEX]) + "],");
-            writeLine(THREE_TABS + "\"endangered status\": " + consolidateEndangered(plantMap.get(s)[FEDERAL_T_E_INDEX],
+            writeLine(THREE_TABS + "\"endangered\": " + consolidateEndangered(plantMap.get(s)[FEDERAL_T_E_INDEX],
                 plantMap.get(s)[STATE_T_E_INDEX]) + ",");
-            writeLine(THREE_TABS + "\"active growth period\": \"" + plantMap.get(s)[ACTIVE_GROWTH_PERIOD_INDEX] + "\",");
-            writeLine(THREE_TABS + "\"after harvest regrowth\": \"" + plantMap.get(s)[AFTER_HARVEST_REGROWTH_INDEX] + "\",");
-            writeLine(THREE_TABS + "\"flower color\": \"" + plantMap.get(s)[FLOWER_COLOR_INDEX] + "\",");
-            writeLine(THREE_TABS + "\"foliage color\": \"" + plantMap.get(s)[FOLIAGE_COLOR_INDEX] + "\",");
-            writeLine(THREE_TABS + "\"fruit color\": \"" + plantMap.get(s)[FRUIT_COLOR_INDEX] + "\",");
-            writeLine(THREE_TABS + "\"growth rate\": \"" + plantMap.get(s)[GROWTH_RATE_INDEX] + "\",");
-            writeLine(THREE_TABS + "\"base height\": \"" + plantMap.get(s)[BASE_HEIGHT_INDEX] + "\",");
-            writeLine(THREE_TABS + "\"mature height\": \"" + plantMap.get(s)[MATURE_HEIGHT_INDEX] + "\",");
-            writeLine(THREE_TABS + "\"lifespan\": \"" + plantMap.get(s)[LIFESPAN_INDEX] + "\",");
+            writeLine(THREE_TABS + "\"active\": \"" + plantMap.get(s)[ACTIVE_GROWTH_PERIOD_INDEX] + "\",");
+            writeLine(THREE_TABS + "\"afterHarvest\": \"" + plantMap.get(s)[AFTER_HARVEST_REGROWTH_INDEX] + "\",");
+            writeLine(THREE_TABS + "\"flowerColor\": \"" + plantMap.get(s)[FLOWER_COLOR_INDEX] + "\",");
+            writeLine(THREE_TABS + "\"foliageColor\": \"" + plantMap.get(s)[FOLIAGE_COLOR_INDEX] + "\",");
+            writeLine(THREE_TABS + "\"fruitColor\": \"" + plantMap.get(s)[FRUIT_COLOR_INDEX] + "\",");
+            writeLine(THREE_TABS + "\"growthRate\": \"" + plantMap.get(s)[GROWTH_RATE_INDEX] + "\",");
+            writeLine(THREE_TABS + "\"baseHeight\": \"" + plantMap.get(s)[BASE_HEIGHT_INDEX] + "\",");
+            writeLine(THREE_TABS + "\"matureHeight\": \"" + plantMap.get(s)[MATURE_HEIGHT_INDEX] + "\",");
+            writeLine(THREE_TABS + "\"life\": \"" + plantMap.get(s)[LIFESPAN_INDEX] + "\",");
             //for toxicity, insert a default "unknown" if field is blank
             if (plantMap.get(s)[TOXICITY_INDEX].equals(""))
             {
@@ -184,38 +184,38 @@ public class Parser
             {
                 writeLine(THREE_TABS + "\"toxicity\": \"" + plantMap.get(s)[TOXICITY_INDEX] + "\",");
             }
-            writeLine(THREE_TABS + "\"adapted coarse soils\": \"" + plantMap.get(s)[COARSE_SOILS_INDEX] + "\",");
-            writeLine(THREE_TABS + "\"adapted medium soils\": \"" + plantMap.get(s)[MEDIUM_SOILS_INDEX] + "\",");
-            writeLine(THREE_TABS + "\"adapted fine soils\": \"" + plantMap.get(s)[FINE_SOILS_INDEX] + "\",");
-            writeLine(THREE_TABS + "\"anaerobic tolerance\": \"" + plantMap.get(s)[ANAEROBIC_TOLERANCE_INDEX] + "\",");
-            writeLine(THREE_TABS + "\"moisture use\": \"" + plantMap.get(s)[MOISTURE_USE_INDEX] + "\",");
+            writeLine(THREE_TABS + "\"coarseSoil\": \"" + plantMap.get(s)[COARSE_SOILS_INDEX] + "\",");
+            writeLine(THREE_TABS + "\"mediumSoil\": \"" + plantMap.get(s)[MEDIUM_SOILS_INDEX] + "\",");
+            writeLine(THREE_TABS + "\"fineSoil\": \"" + plantMap.get(s)[FINE_SOILS_INDEX] + "\",");
+            writeLine(THREE_TABS + "\"anaerobic\": \"" + plantMap.get(s)[ANAEROBIC_TOLERANCE_INDEX] + "\",");
+            writeLine(THREE_TABS + "\"moisture\": \"" + plantMap.get(s)[MOISTURE_USE_INDEX] + "\",");
             //for pH range, check if fields are missing or are both zero, if so put N/A
             if (plantMap.get(s)[SOIL_PH_MIN_INDEX].equals("0") || plantMap.get(s)[SOIL_PH_MAX_INDEX].equals("0") ||
                     plantMap.get(s)[SOIL_PH_MIN_INDEX].equals("NA") || plantMap.get(s)[SOIL_PH_MAX_INDEX].equals("NA"))
             {
-                writeLine(THREE_TABS + "\"soil pH range\": \"NA\",");
+                writeLine(THREE_TABS + "\"pHRange\": \"NA\",");
             }
             else
             {
-                writeLine(THREE_TABS + "\"soil pH range\": \"" + plantMap.get(s)[SOIL_PH_MIN_INDEX] + "-" + plantMap.get(s)[SOIL_PH_MAX_INDEX] + "\",");
+                writeLine(THREE_TABS + "\"pHRange\": \"" + plantMap.get(s)[SOIL_PH_MIN_INDEX] + "-" + plantMap.get(s)[SOIL_PH_MAX_INDEX] + "\",");
             }
-            writeLine(THREE_TABS + "\"minimum precipitation\": \"" + plantMap.get(s)[PRECIPITATION_MIN_INDEX] + "\",");
-            writeLine(THREE_TABS + "\"maximum precipitation\": \"" + plantMap.get(s)[PRECIPITATION_MAX_INDEX] + "\",");
-            writeLine(THREE_TABS + "\"minimum root depth\": \"" + plantMap.get(s)[ROOT_DEPTH_MIN_INDEX] + "\",");
-            writeLine(THREE_TABS + "\"salinity tolerance\": \"" + plantMap.get(s)[SALINITY_TOLERANCE_INDEX] + "\",");
-            writeLine(THREE_TABS + "\"shade tolerance\": \"" + plantMap.get(s)[SHADE_TOLERANCE_INDEX] + "\",");
-            writeLine(THREE_TABS + "\"temperature minimum\": \"" + plantMap.get(s)[TEMPERATURE_MIN_INDEX] + "\",");
-            writeLine(THREE_TABS + "\"bloom period\": \"" + plantMap.get(s)[BLOOM_PERIOD_INDEX] + "\",");
-            writeLine(THREE_TABS + "\"commercial availability\": \"" + plantMap.get(s)[COMMERCIAL_AVAILABILITY_INDEX] + "\",");
-            writeLine(THREE_TABS + "\"fruit seed period begin\": \"" + plantMap.get(s)[FRUIT_SEED_PERIOD_BEGIN_INDEX] + "\",");
-            writeLine(THREE_TABS + "\"fruit seed period end\": \"" + plantMap.get(s)[FRUIT_SEED_PERIOD_END_INDEX] + "\",");
-            writeLine(THREE_TABS + "\"fruit seed persistence\": \"" + plantMap.get(s)[FRUIT_SEED_PERSISTENCE_INDEX] + "\",");
-            writeLine(THREE_TABS + "\"seedling vigor\": \"" + plantMap.get(s)[SEEDLING_VIGOR_INDEX] + "\",");
-            writeLine(THREE_TABS + "\"pruning requirements\": \"" + plantMap.get(s)[PRUNING_REQUIREMENTS_INDEX] + "\",");
-            writeLine(THREE_TABS + "\"palatable browse animal\": \"" + plantMap.get(s)[PALATABLE_BROWSE_ANIMAL_INDEX] + "\",");
-            writeLine(THREE_TABS + "\"palatable graze animal\": \"" + plantMap.get(s)[PALATABLE_GRAZE_ANIMAL_INDEX] + "\",");
-            writeLine(THREE_TABS + "\"palatable human\": \"" + plantMap.get(s)[PALATABLE_HUMAN_INDEX] + "\",");
-            writeLine(THREE_TABS + "\"fertility requirement\": \"" + plantMap.get(s)[FERTILITY_REQUIREMENT_INDEX] + "\"");
+            writeLine(THREE_TABS + "\"minRain\": \"" + plantMap.get(s)[PRECIPITATION_MIN_INDEX] + "\",");
+            writeLine(THREE_TABS + "\"maxRain\": \"" + plantMap.get(s)[PRECIPITATION_MAX_INDEX] + "\",");
+            writeLine(THREE_TABS + "\"minDepth\": \"" + plantMap.get(s)[ROOT_DEPTH_MIN_INDEX] + "\",");
+            writeLine(THREE_TABS + "\"salinity\": \"" + plantMap.get(s)[SALINITY_TOLERANCE_INDEX] + "\",");
+            writeLine(THREE_TABS + "\"shade\": \"" + plantMap.get(s)[SHADE_TOLERANCE_INDEX] + "\",");
+            writeLine(THREE_TABS + "\"minTemp\": \"" + plantMap.get(s)[TEMPERATURE_MIN_INDEX] + "\",");
+            writeLine(THREE_TABS + "\"bloomPeriod\": \"" + plantMap.get(s)[BLOOM_PERIOD_INDEX] + "\",");
+            writeLine(THREE_TABS + "\"availability\": \"" + plantMap.get(s)[COMMERCIAL_AVAILABILITY_INDEX] + "\",");
+            writeLine(THREE_TABS + "\"seedBegin\": \"" + plantMap.get(s)[FRUIT_SEED_PERIOD_BEGIN_INDEX] + "\",");
+            writeLine(THREE_TABS + "\"seedEnd\": \"" + plantMap.get(s)[FRUIT_SEED_PERIOD_END_INDEX] + "\",");
+            writeLine(THREE_TABS + "\"seedPersistence\": \"" + plantMap.get(s)[FRUIT_SEED_PERSISTENCE_INDEX] + "\",");
+            writeLine(THREE_TABS + "\"vigor\": \"" + plantMap.get(s)[SEEDLING_VIGOR_INDEX] + "\",");
+            writeLine(THREE_TABS + "\"pruningReq\": \"" + plantMap.get(s)[PRUNING_REQUIREMENTS_INDEX] + "\",");
+            writeLine(THREE_TABS + "\"wildAnimalPalate\": \"" + plantMap.get(s)[PALATABLE_BROWSE_ANIMAL_INDEX] + "\",");
+            writeLine(THREE_TABS + "\"grazeAnimalPalate\": \"" + plantMap.get(s)[PALATABLE_GRAZE_ANIMAL_INDEX] + "\",");
+            writeLine(THREE_TABS + "\"humanPalate\": \"" + plantMap.get(s)[PALATABLE_HUMAN_INDEX] + "\",");
+            writeLine(THREE_TABS + "\"fertility\": \"" + plantMap.get(s)[FERTILITY_REQUIREMENT_INDEX] + "\"");
         }
         writeLine("\t\t}");
         writeLine("\t},");
