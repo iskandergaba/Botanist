@@ -7,7 +7,7 @@ class Plant {
     private static final String DELIMITER = "\t";
     private String name, species, id;
     private Map<String, Double> heights;
-    private long birthday, lastWatered, lastMeasureNotification, lastFertilized;
+    private long birthday, lastWatered, lastMeasureNotification, lastFertilizerNotification;
     private double height;
     /**
      * Required by Firebase, this useless constructor must remain
@@ -30,7 +30,7 @@ class Plant {
         this.height = height;
         this.heights = new LinkedHashMap<>();
         this.lastMeasureNotification = System.currentTimeMillis();
-        this.lastFertilized = lastMeasureNotification;
+        this.lastFertilizerNotification = lastMeasureNotification;
         this.lastWatered = lastMeasureNotification;
         this.heights.put(Long.toString(lastMeasureNotification), height);
     }
@@ -103,8 +103,8 @@ class Plant {
      * Get last time plant was fertilized
      * @return Returns last time plant was fertilized
      */
-    public long getLastFertilized() {
-        return lastFertilized;
+    public long getLastFertilizerNotification() {
+        return lastFertilizerNotification;
     }
 
     /**

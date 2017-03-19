@@ -244,6 +244,7 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
                 mAuth.signOut();
                 mDatabase.deleteAllBirthdayReminders(AccountActivity.this);
                 mDatabase.deleteAllHeightMeasurementReminders(AccountActivity.this);
+                mDatabase.deleteAllFertilizerReminders(AccountActivity.this);
                 Intent resultIntent = new Intent();
                 setResult(RESULT_OK, resultIntent);
                 hideProgressDialog();
@@ -295,6 +296,7 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
             });
             mDatabase.deleteAllBirthdayReminders(AccountActivity.this);
             mDatabase.deleteAllHeightMeasurementReminders(AccountActivity.this);
+            mDatabase.deleteAllFertilizerReminders(AccountActivity.this);
         }
     }
 

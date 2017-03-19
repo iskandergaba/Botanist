@@ -301,15 +301,14 @@ public class DatabaseManager {
     }
 
     /**
-     * Update last fertilized
+     * Update last fertilizer notification date
      * @param context - the current app context
      * @param plantId - the id of the plant (species_name)
      */
-    public void updateLastFertilized(final Context context, final String plantId) {
-        showProgressDialog(context);
+    public void updateLastFertilizerNotification(final Context context, final String plantId) {
         final String userId = getUserId();
         if (userId != null) {
-            mDatabase.child("users").child(userId).child("plants").child(plantId).child("lastFertilized")
+            mDatabase.child("users").child(userId).child("plants").child(plantId).child("lastFertilizerNotification")
                     .setValue(System.currentTimeMillis()).addOnCompleteListener(new OnCompleteListener<Void>() {
                 /**
                  * Update last fertilized time
@@ -382,7 +381,6 @@ public class DatabaseManager {
      * Get a plant adapter
      * @param view - the current activity
      * @param name of the plant to fetch
-     * @return Returns an adapter for the plants
      */
     public void editProfile(final View view, String name) {
         if (name != null) {
@@ -620,7 +618,7 @@ public class DatabaseManager {
         int minute = preferences.getInt("water_minute", 0);
         int reminderSetting = Integer.parseInt(preferences.getString("fertilizer_reminder", "2"));
         Calendar lastMeasured = Calendar.getInstance();
-        lastMeasured.setTimeInMillis(plant.getLastFertilized());
+        lastMeasured.setTimeInMillis(plant.getLastFertilizerNotification());
         if (reminderSetting != 0) {
             Calendar nextMeasure = Calendar.getInstance();
             long interval = getReminderIntervalInMillis(reminderSetting);
