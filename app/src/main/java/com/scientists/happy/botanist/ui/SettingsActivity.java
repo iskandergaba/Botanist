@@ -29,6 +29,7 @@ public class SettingsActivity extends AppCompatActivity {
     public static final String WATER_HOUR_KEY = "water_hour";
     public static final String WATER_MINUTE_KEY = "water_minute";
     public static final String HEIGHT_REMINDER_KEY = "height_reminder";
+    public static final String FERTILIZER_REMINDER_KEY = "fertilizer_reminder";
     /**
      * Upon launching the activity
      * @param savedInstanceState - current app state
@@ -62,39 +63,52 @@ public class SettingsActivity extends AppCompatActivity {
                     return false;
                 }
             });
-
-            updateHeightListPref();
+            updatePref(HEIGHT_REMINDER_KEY);
+            updatePref(FERTILIZER_REMINDER_KEY);
         }
 
+        /**
+         * Preference changer resumed
+         */
         @Override
         public void onResume() {
             super.onResume();
-            getPreferenceScreen().getSharedPreferences()
-                    .registerOnSharedPreferenceChangeListener(this);
+            getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
         }
 
+        /**
+         * Preference changer paused
+         */
         @Override
         public void onPause() {
             super.onPause();
-            getPreferenceScreen().getSharedPreferences()
-                    .unregisterOnSharedPreferenceChangeListener(this);
+            getPreferenceScreen().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
         }
 
+        /**
+         * Shared preference changed
+         * @param sharedPreferences - all shared preferences
+         * @param key - which one changed
+         */
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-            if (key.equals(HEIGHT_REMINDER_KEY)) {
-                updateHeightListPref();
+            if (key.equals(HEIGHT_REMINDER_KEY) || key.equals(FERTILIZER_REMINDER_KEY)) {
+                updatePref(key);
             }
         }
 
-        private void updateHeightListPref(){
-            ListPreference preference = (ListPreference)findPreference(HEIGHT_REMINDER_KEY);
+        /**
+         * Update a preference
+         * @param key - which preference
+         */
+        private void updatePref(String key){
+            ListPreference preference = (ListPreference)findPreference(key);
             CharSequence entry = preference.getEntry();
             String value = preference.getValue();
             preference.setSummary(entry);
             SharedPreferences.Editor editor = mPreferences.edit();
             // Fucking strangely, a string cannot be parsed to an integer
-            editor.putString(HEIGHT_REMINDER_KEY, value);
+            editor.putString(key, value);
             editor.apply();
         }
 
@@ -102,11 +116,9 @@ public class SettingsActivity extends AppCompatActivity {
          * Show the clock
          */
         private void showTimePicker() {
-          
             // By default, it is 9:00 am
             int hour = mPreferences.getInt(WATER_HOUR_KEY, 9);
             int minute = mPreferences.getInt(WATER_MINUTE_KEY, 0);
-
             TimePickerDialog.OnTimeSetListener listener = new TimePickerDialog.OnTimeSetListener() {
                 /**
                  * Handle time set

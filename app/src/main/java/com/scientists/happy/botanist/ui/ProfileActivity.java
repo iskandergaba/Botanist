@@ -1,7 +1,6 @@
 // Plant profile
 // @author: Antonio Muscarella and Christopher Besser
 package com.scientists.happy.botanist.ui;
-
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,7 +11,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import com.bumptech.glide.Glide;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
 import com.google.firebase.storage.FirebaseStorage;
@@ -27,7 +25,6 @@ public class ProfileActivity extends AppCompatActivity {
     private String name, species, plantId;
     private double height;
     private DatabaseManager mDatabase;
-
     private TextView mHeightTextView;
     /**
      * Launch the activity
@@ -45,13 +42,11 @@ public class ProfileActivity extends AppCompatActivity {
         species = i.getExtras().getString(SPECIES_KEY);
         height = i.getExtras().getDouble(HEIGHT_KEY);
         setTitle(name + "\'s Profile");
-
         ImageView picture = (ImageView) findViewById(R.id.plant_picture);
         StorageReference storageReference = FirebaseStorage.getInstance().getReference()
                 // TODO: clean a bit
                 .child(mDatabase.getUserId()).child(species + "_" + name + ".jpg");
         Glide.with(this).using(new FirebaseImageLoader()).load(storageReference).placeholder(R.drawable.flowey).into(picture);
-
         TextView nameTextView = (TextView)findViewById(R.id.plant_name);
         nameTextView.setText(getString(R.string.name_fmt, name));
         TextView speciesTextView = (TextView)findViewById(R.id.plant_species);
@@ -60,9 +55,24 @@ public class ProfileActivity extends AppCompatActivity {
         mHeightTextView.setText(getString(R.string.height_fmt, height));
         Button heightButton = (Button) findViewById(R.id.height_button);
         heightButton.setOnClickListener(new View.OnClickListener() {
+            /**
+             * User clicked update height
+             * @param v - current view
+             */
             @Override
             public void onClick(View v) {
                 buildHeightInputDialog().show();
+            }
+        });
+        Button poopButton = (Button) findViewById(R.id.poop_button);
+        poopButton.setOnClickListener(new View.OnClickListener() {
+            /**
+             * User clicked update height
+             * @param v - current view
+             */
+            @Override
+            public void onClick(View v) {
+                buildFertilizedDialog().show();
             }
         });
         mDatabase.editProfile(this.findViewById(android.R.id.content), species);
@@ -87,10 +97,53 @@ public class ProfileActivity extends AppCompatActivity {
         dialog.show();
     }
 
+    /**
+     * User fertilized plant
+     * @return Returns new height
+     */
+    private AlertDialog buildFertilizedDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(R.string.confirm_message).setTitle(R.string.confirm_message);
+        // Add the buttons
+        builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+            /**
+             * User clicked confirm
+             * @param dialog - the warning window
+             * @param id - the user id
+             */
+            public void onClick(DialogInterface dialog, int id) {
+                mDatabase.updateLastFertilized(ProfileActivity.this, plantId);
+                Intent resultIntent = new Intent();
+                setResult(RESULT_OK, resultIntent);
+                finish();
+            }
+        });
+        builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+            /**
+             * User clicked cancel
+             * @param dialog - the warning window
+             * @param id - the user id
+             */
+            public void onClick(DialogInterface dialog, int id) {
+                // User cancelled the dialog
+            }
+        });
+        // Get the AlertDialog from create()
+        return builder.create();
+    }
+
+    /**
+     * Input height window
+     * @return Returns new height dialog
+     */
     private AlertDialog buildHeightInputDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setView(R.layout.height_input_dialog).setTitle("Record new height")
-        .setPositiveButton(R.string.mdtp_ok, new DialogInterface.OnClickListener() {
+        builder.setView(R.layout.height_input_dialog).setTitle("Record new height").setPositiveButton(R.string.mdtp_ok, new DialogInterface.OnClickListener() {
+            /**
+             * User clicked submit
+             * @param dialog - current dialog
+             * @param which - selected option
+             */
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 EditText inputEditText = (EditText) ((AlertDialog) dialog).findViewById(R.id.height_edit_text);
@@ -101,8 +154,12 @@ public class ProfileActivity extends AppCompatActivity {
                     mHeightTextView.setText(getString(R.string.height_fmt, height));
                 }
             }
-        })
-        .setNegativeButton(R.string.mdtp_cancel, new DialogInterface.OnClickListener() {
+        }).setNegativeButton(R.string.mdtp_cancel, new DialogInterface.OnClickListener() {
+            /**
+             * User clicked cancel
+             * @param dialog - current dialog
+             * @param which - selected option
+             */
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 // Do nothing on cancel

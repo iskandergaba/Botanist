@@ -1,5 +1,5 @@
 // Entry in PlantsData database child
-// @author: Christopher Besser
+// @author: Christopher Besser and Antonio Muscarella
 package com.scientists.happy.botanist.data;
 import java.util.List;
 public class PlantEntry {
@@ -748,6 +748,10 @@ public class PlantEntry {
         }
     }
 
+    /**
+     * Describe shade tolerance
+     * @return Returns the description
+     */
     private String inferSunRequirements() {
         if (!hasMeaningfulData(shade)) {
             return "NA";
@@ -760,7 +764,10 @@ public class PlantEntry {
         }
     }
 
-
+    /**
+     * Describe soil requirements
+     * @return Returns the description
+     */
     private String inferSoilRequirements() {
         if (!hasMeaningfulData(fineSoil) && !hasMeaningfulData(mediumSoil) && !hasMeaningfulData(coarseSoil)) {
             return "NA";
@@ -782,7 +789,6 @@ public class PlantEntry {
                 output.append(", and");
             }
         }
-
         if (coarseSoil.equals("Yes")) {
             output.append(" coarse");
         }
@@ -791,6 +797,8 @@ public class PlantEntry {
 
     /**
      * check if plant data entry is meaningful (not NA, empty, or null)
+     * @param s - string to check
+     * @return Returns whether s is useful
      */
     private boolean hasMeaningfulData(String s) {
         if (s == null || s.equals("NA") || s.isEmpty()) {
@@ -801,10 +809,10 @@ public class PlantEntry {
 
     /**
      * generate care-tips
+     * @return Returns caretips
      */
     public String generateCareTips() {
         StringBuilder careTips = new StringBuilder(new String());
-
         if (hasMeaningfulData(commonName)) {
             careTips.append("• This plant's common name is " + commonName + ".\n");
         }
