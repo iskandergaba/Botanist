@@ -114,6 +114,12 @@
                 android:text="@string/loading_care_tips" />
 
             <Button
+                android:id="@+id/water_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/watered" />
+
+            <Button
                 android:id="@+id/poop_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
