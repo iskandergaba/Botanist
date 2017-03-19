@@ -47,11 +47,11 @@ public class ProfileActivity extends AppCompatActivity {
                 // TODO: clean a bit
                 .child(mDatabase.getUserId()).child(plantId+ ".jpg");
         Glide.with(this).using(new FirebaseImageLoader()).load(storageReference).placeholder(R.drawable.flowey).into(picture);
-        TextView nameTextView = (TextView)findViewById(R.id.plant_name);
+        TextView nameTextView = (TextView) findViewById(R.id.plant_name);
         nameTextView.setText(getString(R.string.name_fmt, name));
-        TextView speciesTextView = (TextView)findViewById(R.id.plant_species);
+        TextView speciesTextView = (TextView) findViewById(R.id.plant_species);
         speciesTextView.setText(getString(R.string.species_fmt, species));
-        mHeightTextView = (TextView)findViewById(R.id.plant_height);
+        mHeightTextView = (TextView) findViewById(R.id.plant_height);
         mHeightTextView.setText(getString(R.string.height_fmt, height));
         Button heightButton = (Button) findViewById(R.id.height_button);
         heightButton.setOnClickListener(new View.OnClickListener() {
@@ -73,6 +73,17 @@ public class ProfileActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 buildFertilizedDialog().show();
+            }
+        });
+        Button waterButton = (Button) findViewById(R.id.water_button);
+        waterButton.setOnClickListener(new View.OnClickListener() {
+            /**
+             * User clicked update height
+             * @param v - current view
+             */
+            @Override
+            public void onClick(View v) {
+                buildWateredDialog().show();
             }
         });
         mDatabase.editProfile(this.findViewById(android.R.id.content), species);
@@ -99,12 +110,11 @@ public class ProfileActivity extends AppCompatActivity {
 
     /**
      * User fertilized plant
-     * @return Returns new height
+     * @return Returns alert window
      */
     private AlertDialog buildFertilizedDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(R.string.confirm_message).setTitle(R.string.confirm_message);
-        // Add the buttons
         builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
             /**
              * User clicked confirm
@@ -125,16 +135,46 @@ public class ProfileActivity extends AppCompatActivity {
              * @param id - the user id
              */
             public void onClick(DialogInterface dialog, int id) {
-                // User cancelled the dialog
             }
         });
-        // Get the AlertDialog from create()
+        return builder.create();
+    }
+
+    /**
+     * User watered plant
+     * @return Returns warning screen
+     */
+    private AlertDialog buildWateredDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(R.string.confirm_message).setTitle(R.string.confirm_message);
+        builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+            /**
+             * User clicked confirm
+             * @param dialog - the warning window
+             * @param id - the user id
+             */
+            public void onClick(DialogInterface dialog, int id) {
+                mDatabase.updateLastWatered(ProfileActivity.this, plantId);
+                Intent resultIntent = new Intent();
+                setResult(RESULT_OK, resultIntent);
+                finish();
+            }
+        });
+        builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+            /**
+             * User clicked cancel
+             * @param dialog - the warning window
+             * @param id - the user id
+             */
+            public void onClick(DialogInterface dialog, int id) {
+            }
+        });
         return builder.create();
     }
 
     /**
      * Input height window
-     * @return Returns new height dialog
+     * @return Returns warning screen
      */
     private AlertDialog buildHeightInputDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);

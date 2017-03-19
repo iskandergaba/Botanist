@@ -1,4 +1,4 @@
-// Handle notifications to fertilize plants
+// Handle notifications to water
 // @author: Christopher Besser
 package com.scientists.happy.botanist.services;
 import android.app.Notification;
@@ -12,7 +12,7 @@ import com.scientists.happy.botanist.R;
 import com.scientists.happy.botanist.data.DatabaseManager;
 import com.scientists.happy.botanist.ui.LoginActivity;
 import static android.content.Context.NOTIFICATION_SERVICE;
-public class FertilizerReceiver extends BroadcastReceiver {
+public class WaterReceiver extends BroadcastReceiver {
     /**
      * Receiver received an update
      * @param context - current app context
@@ -27,8 +27,8 @@ public class FertilizerReceiver extends BroadcastReceiver {
         PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(context).setSmallIcon(R.mipmap.ic_launcher)
-                        .setDefaults(Notification.DEFAULT_SOUND).setContentTitle(name + " may need fertilizer.")
-                        .setContentText("Tap \"I fertilized this plant\" once you fertilize " + name).setContentIntent(resultPendingIntent);
+                        .setDefaults(Notification.DEFAULT_SOUND).setContentTitle(name + " needs watering.")
+                        .setContentText("Tap \"I watered this plant\" once you water " + name).setContentIntent(resultPendingIntent);
         NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
         mNotifyMgr.notify(notificationId, mBuilder.build());
         DatabaseManager database = DatabaseManager.getInstance();
