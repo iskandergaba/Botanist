@@ -21,7 +21,6 @@ import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.bumptech.glide.Glide;
 import com.firebase.ui.database.FirebaseListAdapter;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
@@ -38,6 +37,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.scientists.happy.botanist.R;
 import com.scientists.happy.botanist.services.BirthdayReceiver;
+import com.scientists.happy.botanist.services.FertilizerReceiver;
 import com.scientists.happy.botanist.services.HeightMeasureReceiver;
 import com.scientists.happy.botanist.ui.ProfileActivity;
 import java.io.ByteArrayOutputStream;
@@ -46,9 +46,7 @@ import java.util.HashMap;
 import java.util.Map;
 import static android.content.Context.ALARM_SERVICE;
 public class DatabaseManager {
-
     private static final int TOXIC_WARNING_LABEL_COLOR = 0xffff4444;
-
     //private static final String TAG = "DatabaseManager";
     private long mPlantsNumber;
     private long mBotanistSince;
@@ -231,6 +229,8 @@ public class DatabaseManager {
         final String userId = getUserId();
         final String plantId = species + "_" + name;
         deleteAllBirthdayReminders(context);
+        deleteAllHeightMeasurementReminders(context);
+        deleteAllFertilizerReminders(context);
         if (userId != null) {
             mDatabase.child("users").child(userId).child("plants").child(plantId).addListenerForSingleValueEvent(new ValueEventListener() {
                 /**
@@ -258,7 +258,7 @@ public class DatabaseManager {
     }
 
     /**
-     * Remove plant from the database
+     * Update plant's height
      * @param context - the current app context
      * @param plantId - the id of the plant (species_name)
      * @param heightInInches - the height of the plant
@@ -269,8 +269,11 @@ public class DatabaseManager {
         String now = Long.toString(System.currentTimeMillis());
         if (userId != null) {
             mDatabase.child("users").child(userId).child("plants").child(plantId).child("heights")
-                    .child(now).setValue(heightInInches)
-                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    .child(now).setValue(heightInInches).addOnCompleteListener(new OnCompleteListener<Void>() {
+                /**
+                 * Update plant heights list
+                 * @param task - update task
+                 */
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
                     if (!task.isSuccessful()) {
@@ -278,19 +281,47 @@ public class DatabaseManager {
                     }
                 }
             });
-
             mDatabase.child("users").child(userId).child("plants").child(plantId).child("height").setValue(heightInInches)
                     .addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            if (!task.isSuccessful()) {
-                                Toast.makeText(context, "Height update failed, try again", Toast.LENGTH_SHORT).show();
-                            } else {
-                                updateLastMeasureNotification(plantId);
-                            }
-                            hideProgressDialog();
-                        }
-                    });
+                /**
+                 * Update current plant height
+                 * @param task - update task
+                 */
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if (!task.isSuccessful()) {
+                        Toast.makeText(context, "Height update failed, try again", Toast.LENGTH_SHORT).show();
+                    } else {
+                        updateLastMeasureNotification(plantId);
+                    }
+                    hideProgressDialog();
+                }
+            });
+        }
+    }
+
+    /**
+     * Update last fertilized
+     * @param context - the current app context
+     * @param plantId - the id of the plant (species_name)
+     */
+    public void updateLastFertilized(final Context context, final String plantId) {
+        showProgressDialog(context);
+        final String userId = getUserId();
+        if (userId != null) {
+            mDatabase.child("users").child(userId).child("plants").child(plantId).child("lastFertilized")
+                    .setValue(System.currentTimeMillis()).addOnCompleteListener(new OnCompleteListener<Void>() {
+                /**
+                 * Update last fertilized time
+                 * @param task - update task
+                 */
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if (!task.isSuccessful()) {
+                        Toast.makeText(context, "Fertilizer time update failed, try again", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
         }
     }
 
@@ -340,6 +371,7 @@ public class DatabaseManager {
                     });
                     setBirthdayReminder(activity, plant, position);
                     setHeightMeasureReminders(activity, plant, position);
+                    setFertilizeReminders(activity, plant, position);
                 }
             };
         }
@@ -362,10 +394,10 @@ public class DatabaseManager {
                  */
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
-                    PlantEntry post = dataSnapshot.getValue(PlantEntry.class);
-                    ((TextView) view.findViewById(R.id.care_tips)).setText(post.generateCareTips());
+                    PlantEntry entry = dataSnapshot.getValue(PlantEntry.class);
+                    ((TextView) view.findViewById(R.id.care_tips)).setText(entry.generateCareTips());
                     TextView toxicWarningTextView = (TextView) view.findViewById(R.id.toxic_warning);
-                    if (post.isToxic()) {
+                    if (entry.isToxic()) {
                         toxicWarningTextView.setVisibility(View.VISIBLE);
                         toxicWarningTextView.setBackgroundColor(TOXIC_WARNING_LABEL_COLOR);
                     } else {
@@ -494,6 +526,18 @@ public class DatabaseManager {
     }
 
     /**
+     * Remove the fertilizer reminders
+     * @param context - current app context
+     */
+    public void deleteAllFertilizerReminders(Context context) {
+        AlarmManager am = (AlarmManager) context.getSystemService(ALARM_SERVICE);
+        for (int i = 0; i < mPlantsNumber; i++) {
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(context, i, new Intent(context, FertilizerReceiver.class), 0);
+            am.cancel(pendingIntent);
+        }
+    }
+
+    /**
      * Update the number of plants
      * @param count - the new number of plants
      */
@@ -549,7 +593,7 @@ public class DatabaseManager {
         lastMeasured.setTimeInMillis(plant.getLastMeasureNotification());
         if (reminderSetting != 0) {
             Calendar nextMeasure = Calendar.getInstance();
-            long interval = getHeightReminderIntervalInMillis(reminderSetting);
+            long interval = getReminderIntervalInMillis(reminderSetting);
             nextMeasure.setTimeInMillis(lastMeasured.getTimeInMillis() + interval);
             nextMeasure.set(Calendar.HOUR, hour);
             nextMeasure.set(Calendar.MINUTE, minute);
@@ -559,11 +603,41 @@ public class DatabaseManager {
     }
 
     /**
-     * Convert height reminder notification delay to milliseconds
+     * Create reminders to user to fertilize their plants
+     * @param context - current app context
+     * @param plant - plant to remind user to measure
+     * @param id - id
+     */
+    private void setFertilizeReminders(Context context, Plant plant, int id) {
+        Intent intent = new Intent(context, FertilizerReceiver.class);
+        intent.putExtra("name", plant.getName());
+        intent.putExtra("plant_id", plant.getId());
+        //intent.putExtra("fertilizer", plant.getFertilizer());
+        intent.putExtra("id", id);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, id, intent, 0);
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        int hour = preferences.getInt("water_hour", 9);
+        int minute = preferences.getInt("water_minute", 0);
+        int reminderSetting = Integer.parseInt(preferences.getString("fertilizer_reminder", "2"));
+        Calendar lastMeasured = Calendar.getInstance();
+        lastMeasured.setTimeInMillis(plant.getLastFertilized());
+        if (reminderSetting != 0) {
+            Calendar nextMeasure = Calendar.getInstance();
+            long interval = getReminderIntervalInMillis(reminderSetting);
+            nextMeasure.setTimeInMillis(lastMeasured.getTimeInMillis() + interval);
+            nextMeasure.set(Calendar.HOUR, hour);
+            nextMeasure.set(Calendar.MINUTE, minute);
+            AlarmManager am = (AlarmManager) context.getSystemService(ALARM_SERVICE);
+            am.setRepeating(AlarmManager.RTC_WAKEUP, nextMeasure.getTimeInMillis(), interval, pendingIntent);
+        }
+    }
+
+    /**
+     * Convert reminder notification delay to milliseconds
      * @param setting - user selected delay
      * @return Returns the millisecond denomination of the delay
      */
-    private long getHeightReminderIntervalInMillis(int setting) {
+    private long getReminderIntervalInMillis(int setting) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(0);
         if (setting == 1) {
@@ -582,8 +656,7 @@ public class DatabaseManager {
      */
     public void updateLastMeasureNotification(String plantId) {
         String userId = getUserId();
-        mDatabase.child("users").child(userId).child("plants").child(plantId).child("lastMeasureNotification")
-                .setValue(System.currentTimeMillis());
+        mDatabase.child("users").child(userId).child("plants").child(plantId).child("lastMeasureNotification").setValue(System.currentTimeMillis());
     }
 
     /**

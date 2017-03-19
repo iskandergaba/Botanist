@@ -51,7 +51,6 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
     private DatabaseManager mDatabase;
-
     /**
      * The app was stopped
      */

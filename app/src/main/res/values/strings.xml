@@ -24,7 +24,7 @@
     <!-- Server Client ID.  This should be a valid Web OAuth 2.0 Client ID obtained
          from https://console.developers.google.com/ -->
     <string name="server_client_id" translatable="false">993462563911-9h2lig8m0klrfst5ob8lu2lprnqgf2nf.apps.googleusercontent.com</string>
-
+    <string name="fertilized">I fertilized this plant</string>
     <string name="set_time">Set Time</string>
     <string name="revoke_access_message">All your data will be permanently deleted. Are you sure you want to delete your account?</string>
     <string name="revoke_access_title">Delete Account</string>
@@ -32,6 +32,7 @@
     <string name="sign_out_title">Sign out</string>
     <string name="delete_message">Are you sure you want to delete this plant?</string>
     <string name="delete_dialog_title">Delete Plant</string>
+    <string name="confirm_message">Are you sure?</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="account">Account</string>
