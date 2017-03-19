@@ -27,6 +27,7 @@
 
         <receiver android:name=".services.BirthdayReceiver" />
         <receiver android:name=".services.HeightMeasureReceiver" />
+        <receiver android:name=".services.FertilizerReceiver" />
 
         <activity
             android:name=".ui.LoginActivity"

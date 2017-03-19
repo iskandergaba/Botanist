@@ -45,7 +45,7 @@ public class ProfileActivity extends AppCompatActivity {
         ImageView picture = (ImageView) findViewById(R.id.plant_picture);
         StorageReference storageReference = FirebaseStorage.getInstance().getReference()
                 // TODO: clean a bit
-                .child(mDatabase.getUserId()).child(species + "_" + name + ".jpg");
+                .child(mDatabase.getUserId()).child(plantId+ ".jpg");
         Glide.with(this).using(new FirebaseImageLoader()).load(storageReference).placeholder(R.drawable.flowey).into(picture);
         TextView nameTextView = (TextView)findViewById(R.id.plant_name);
         nameTextView.setText(getString(R.string.name_fmt, name));
@@ -112,7 +112,7 @@ public class ProfileActivity extends AppCompatActivity {
              * @param id - the user id
              */
             public void onClick(DialogInterface dialog, int id) {
-                mDatabase.updateLastFertilized(ProfileActivity.this, plantId);
+                mDatabase.updateLastFertilizerNotification(ProfileActivity.this, plantId);
                 Intent resultIntent = new Intent();
                 setResult(RESULT_OK, resultIntent);
                 finish();

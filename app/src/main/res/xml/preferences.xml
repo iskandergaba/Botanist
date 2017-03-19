@@ -15,4 +15,13 @@
 
     </ListPreference>
 
+    <ListPreference
+        android:key="fertilizer_reminder"
+        android:title="Fertilizer reminder"
+        android:entries="@array/height_pref_entries"
+        android:entryValues="@array/height_pref_values"
+        android:defaultValue="2">
+
+    </ListPreference>
+
 </PreferenceScreen>

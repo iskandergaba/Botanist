@@ -31,12 +31,12 @@ public class FertilizerReceiver extends BroadcastReceiver {
         PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(context).setSmallIcon(R.mipmap.ic_launcher)
-                        .setDefaults(Notification.DEFAULT_SOUND).setContentTitle(name + " may need fertilized. See " + name + "\'s profile for details.")
-                        .setContentText("Tap \"I fertilized " + name + "\"").setContentIntent(resultPendingIntent);
+                        .setDefaults(Notification.DEFAULT_SOUND).setContentTitle(name + " may need fertilizer.")
+                        .setContentText("Tap \"I fertilized this plant\" once you fertilize " + name).setContentIntent(resultPendingIntent);
         NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
         // Builds the notification and issues it.
         mNotifyMgr.notify(notificationId, mBuilder.build());
         DatabaseManager database = DatabaseManager.getInstance();
-        database.updateLastMeasureNotification(plantId);
+        database.updateLastFertilizerNotification(context, plantId);
     }
 }
