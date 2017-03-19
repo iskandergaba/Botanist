@@ -733,4 +733,214 @@ public class PlantEntry {
     public void setMinTemp(String temp) {
         minTemp = temp;
     }
+
+    /**
+     * check if toxic
+     * @retun true if toxic, false otherwise
+     */
+    public boolean isToxic() {
+        if (toxicity == null) {
+            return false;
+        } else if (toxicity.equals("Slight") || toxicity.equals("Moderate") || toxicity.equals("Severe")) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private String inferSunRequirements() {
+        if (!hasMeaningfulData(shade)) {
+            return "NA";
+        } else if (shade.equals("Intolerant")) {
+            return "• This plant has a low shade tolerance and should receive full sunlight.\n";
+        } else if (shade.equals("Intermediate")) {
+            return "• This plant has a moderate shade tolerance and should receive moderate sunlight.\n";
+        } else {
+            return "• This plant has high shade tolerance and may be placed in partially shaded areas.\n";
+        }
+    }
+
+
+    private String inferSoilRequirements() {
+        if (!hasMeaningfulData(fineSoil) && !hasMeaningfulData(mediumSoil) && !hasMeaningfulData(coarseSoil)) {
+            return "NA";
+        }
+        StringBuilder output = new StringBuilder(new String());
+        if (fineSoil.equals("Yes")) {
+            output.append("fine");
+            if ((coarseSoil.equals("No") || !hasMeaningfulData(coarseSoil)) ^
+                    (mediumSoil.equals("No") || !hasMeaningfulData(mediumSoil))) {
+                output.append(" and ");
+            }
+        }
+        if (mediumSoil.equals("Yes")) {
+            if (fineSoil.equals("Yes") && coarseSoil.equals("Yes")) {
+                output.append(",");
+            }
+            output.append(" medium");
+            if ((coarseSoil.equals("Yes"))) {
+                output.append(", and");
+            }
+        }
+
+        if (coarseSoil.equals("Yes")) {
+            output.append(" coarse");
+        }
+        return output.toString();
+    }
+
+    /**
+     * check if plant data entry is meaningful (not NA, empty, or null)
+     */
+    private boolean hasMeaningfulData(String s) {
+        if (s == null || s.equals("NA") || s.isEmpty()) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * generate care-tips
+     */
+    public String generateCareTips() {
+        StringBuilder careTips = new StringBuilder(new String());
+
+        if (hasMeaningfulData(commonName)) {
+            careTips.append("• This plant's common name is " + commonName + ".\n");
+        }
+        if (hasMeaningfulData(group)) {
+            careTips.append("• This plant belongs to the " + group + ".\n");
+        }
+        if (!inferSunRequirements().equals("NA")) {
+            careTips.append(inferSunRequirements());
+        }
+        if (hasMeaningfulData(moisture)) {
+            careTips.append("• This plant has " + moisture + " use.\n");
+        }
+        if (hasMeaningfulData(minTemp)) {
+            careTips.append("• This plant will not survive at temperatures below " + minTemp + "°F.\n");
+        }
+        if (hasMeaningfulData(pruningReq)) {
+            careTips.append("• " + pruningReq + " for this plant\n");
+        }
+        if (!inferSoilRequirements().equals("NA")) {
+            careTips.append("• This plant is adapted to grow in " + inferSoilRequirements() + "soil(s).\n");
+        }
+        if (hasMeaningfulData(minDepth)) {
+            careTips.append("• Be sure that this plant has at least " + minDepth + " inches of soil to spread its roots.\n");
+        }
+        if (hasMeaningfulData(duration)) {
+            careTips.append("• This plant's duration class is " + duration + ".\n");
+        }
+        if (hasMeaningfulData(growthHabit)) {
+            careTips.append("• This plant's growth habit is " + growthHabit + ".\n");
+        }
+        if (hasMeaningfulData(active)) {
+            careTips.append("• This plant grows actively during " + active + ".\n");
+        }
+        if (hasMeaningfulData(life)) {
+            careTips.append("• This plant has a " + life + " lifespan.\n");
+        }
+        if (hasMeaningfulData(afterHarvest)) {
+            careTips.append("• After harvesting, this plant grows back at a " + afterHarvest + " rate.\n");
+        }
+        if (hasMeaningfulData(flowerColor)) {
+            careTips.append("• This plant has " + flowerColor + " flowers.\n");
+        }
+        if (hasMeaningfulData(foliageColor)) {
+            careTips.append("• This plant has " + foliageColor + " foliage.\n");
+        }
+        if (hasMeaningfulData(fruitColor)) {
+            careTips.append("• This plant bears " + fruitColor + " fruit.\n");
+        }
+        if (hasMeaningfulData(growthRate)) {
+            careTips.append("• This plant's growth rate is " + growthRate + ".\n");
+        }
+        if (hasMeaningfulData(matureHeight)) {
+            careTips.append("• This plant's mature height is " + matureHeight + " feet.\n");
+        }
+        if (isToxic()) {
+            careTips.append("• This plant is considered TOXIC. Handle with care.\n");
+        }
+        if (hasMeaningfulData(anaerobic)) {
+            careTips.append("• This plant has " + anaerobic + " tolerance to low-oxygen environments.\n");
+        }
+        if (hasMeaningfulData(pHRange)) {
+            careTips.append("• This plant's soil pH should be " + pHRange + ".\n");
+        }
+        if (hasMeaningfulData(pHRange)) {
+            careTips.append("• This plant's has a " + salinity + "tolerance for salty soil.\n");
+        }
+        if (hasMeaningfulData(bloomPeriod)) {
+            careTips.append("• This plant blooms in " + bloomPeriod + ".\n");
+        }
+        if (hasMeaningfulData(availability)) {
+            careTips.append("• This plant's commercial availability is " + availability + ".\n");
+        }
+        if (hasMeaningfulData(bloomPeriod)) {
+            careTips.append("• This plant blooms in " + bloomPeriod + ".\n");
+        }
+        if (hasMeaningfulData(seedBegin) && hasMeaningfulData(seedEnd)) {
+            careTips.append("• This plant produces seeds starting in " + seedBegin +
+                            " and ending in " + seedEnd + ".\n");
+        }
+        if (hasMeaningfulData(seedPersistence)) {
+            careTips.append("• This plant's seeds are ");
+            if (seedPersistence.equals("Yes")) {
+                careTips.append("persistent.\n");
+            } else {
+                careTips.append("not persistent.\n");
+            }
+        }
+        if (hasMeaningfulData(bloomPeriod)) {
+            careTips.append("• This plant blooms in " + bloomPeriod + ".\n");
+        }
+        if (hasMeaningfulData(vigor)) {
+            careTips.append("• Seeds of this plant have a " + vigor + " probability of survival.\n");
+        }
+        if (hasMeaningfulData(wildAnimalPalate)) {
+            careTips.append("• Wild animals find this plant " + wildAnimalPalate + "ly palatable to eat.\n");
+        }
+        if (hasMeaningfulData(grazeAnimalPalate)) {
+            careTips.append("• Domestic (grazing) animals find this plant " + grazeAnimalPalate + "ly palatable to eat.\n");
+        }
+        if (hasMeaningfulData(humanPalate)) {
+            if (humanPalate.equals("Yes")) {
+                careTips.append("• Edible to humans\n");
+            } else {
+                careTips.append("• Not edible to humans\n");
+            }
+        }
+        if (hasMeaningfulData(fertility)) {
+            if (fertility.equals("High") || fertility.equals("Medium")) {
+                careTips.append("• This plant must be grown in fertilized soil\n");
+            } else {
+                careTips.append("• This plant does not need to be grown in fertilized soil\n");
+            }
+        }
+        if (hasMeaningfulData(endangered)) {
+            careTips.append("• U.S. Law lists this plant as " + endangered + "\n");
+        }
+        if (noxious != null && !noxious.isEmpty()) {
+            careTips.append("• By U.S. Law, this plant is listed as ");
+            for (int i = 0; i < noxious.size(); i++) {
+                if (i == noxious.size() - 1) {
+                    if (noxious.size() > 1) {
+                        careTips.append(" and " + noxious.get(i) + ".\n");
+                    } else {
+                        careTips.append(noxious.get(i) + ".\n");
+                    }
+                } else {
+                    careTips.append(noxious.get(i) + ",");
+                }
+            }
+        }
+        if (hasMeaningfulData(baseHeight)) {
+            careTips.append("• This plant's height at base age is " + baseHeight + " feet.\n");
+        }
+        if (hasMeaningfulData(minRain) && hasMeaningfulData(maxRain)) {
+            careTips.append("• In the wild, this plant receives " + minRain + " to " + maxRain + " inches of precipitation per year.\n");
+        }
+        return careTips.toString();
+    }
 }

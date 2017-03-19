@@ -2,6 +2,7 @@
 
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -18,6 +19,17 @@
             android:src="@drawable/flowey"
             android:id="@+id/plant_picture"
             android:contentDescription="@string/plant_picture_desc" />
+
+        <TextView
+            android:id="@+id/toxic_warning"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/holo_red_light"
+            android:text="@string/toxic_warning"
+            android:textColor="@color/cardview_light_background"
+            android:textSize="18sp"
+            android:visibility="gone"
+            tools:background="@android:color/holo_red_light" />
 
         <LinearLayout
             android:id="@+id/plantinfo"
@@ -90,7 +102,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingTop="8dp"
-                android:text="PLANTING Grow in full sun. Soil should be moderately fertile, not overly rich, moist but well-drained. Sow seeds in containers in a cold frame in autumn or spring. Divide perennials in early spring or late summer. If you seed directly, expect bloom the following spring after one season’s growth. If purchasing a plant in a container, plant in spring. Loosen the soil to a depth of 12 to 15 inches, then mix in a 2- to 4-inch layer of compost. Space plants 1 to 2 feet apart. Dig a hole twice the diameter of the container. When placing plant in the hole, make sure the top of the root ball is level with the soil surface. Fill around the root ball and firm the soil. Water thoroughly. Many of the taller plants need support/staking. CARE Water during the summer only if rainfall is less than 1 inch per week. After the first killing frost, cut stems back to an inch or two above the soil line. Every spring, apply some compost and mulch to help control weeds. Every 3 to 4 years, divide perennials again in early spring or late summer." />
+                android:text="@string/loading_care_tips" />
 
         </LinearLayout>
 

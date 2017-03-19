@@ -47,8 +47,9 @@
     <string name="add_plant">Add Plant</string>
     <string name="last_watered">Last watered (Now)</string>
     <string name="height_in_inches">Height in inches (0.0)</string>
+    <string name="loading_care_tips">Loading care tips...</string>
+    <string name="toxic_warning">WARNING: This plant or parts of it are considered toxic. Do not ingest, handle with care, and keep out of reach of pets and small children.</string>
     <string name="height_fmt">Height: %.1f inches</string>
     <string name="update_height">Update height</string>
     <string name="dialog_height_in_inches">Height in inches</string>
-
 </resources>

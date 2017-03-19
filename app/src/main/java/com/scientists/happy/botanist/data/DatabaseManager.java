@@ -46,6 +46,9 @@ import java.util.HashMap;
 import java.util.Map;
 import static android.content.Context.ALARM_SERVICE;
 public class DatabaseManager {
+
+    private static final int TOXIC_WARNING_LABEL_COLOR = 0xffff4444;
+
     //private static final String TAG = "DatabaseManager";
     private long mPlantsNumber;
     private long mBotanistSince;
@@ -360,7 +363,14 @@ public class DatabaseManager {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     PlantEntry post = dataSnapshot.getValue(PlantEntry.class);
-                    ((TextView) view.findViewById(R.id.care_tips)).setText(post.getCommonName());
+                    ((TextView) view.findViewById(R.id.care_tips)).setText(post.generateCareTips());
+                    TextView toxicWarningTextView = (TextView) view.findViewById(R.id.toxic_warning);
+                    if (post.isToxic()) {
+                        toxicWarningTextView.setVisibility(View.VISIBLE);
+                        toxicWarningTextView.setBackgroundColor(TOXIC_WARNING_LABEL_COLOR);
+                    } else {
+                        toxicWarningTextView.setVisibility(View.GONE);
+                    }
                 }
 
                 /**
