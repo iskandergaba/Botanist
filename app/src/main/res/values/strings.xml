@@ -7,6 +7,7 @@
     <string name="title_activity_add_plant">Add New Plant</string>
     <string name="plant_nickname">Flowey</string>
     <string name="title_activity_settings">Settings</string>
+    <string name="title_activity_similar_plants">Similar Plants</string>
 
     <string name="loading" tools:override="true">Loading…</string>
 
@@ -37,10 +38,12 @@
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="account">Account</string>
+    <string name="similar">Similar</string>
     <string name="signed_out">Signed out</string>
     <string name="account_picture">Account Picture</string>
     <string name="no_plants">No plants added</string>
     <string name="set_birthday">Set birthday</string>
+    <string name="loading_similar">Loading similar plants...</string>
     <string name="plant_picture_desc">Plant picture</string>
     <string name="tap_to_take_a_picture">Choose a picture</string>
     <string name="name">Name</string>

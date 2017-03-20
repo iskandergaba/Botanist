@@ -14,12 +14,13 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
 import java.util.LinkedList;
+import java.util.HashSet;
 public class Parser
 {
     private static final char DELIMETER = ',';
     private static final String THREE_TABS = "\t\t\t";
     private static final int SPECIES_NAME_INDEX = 1;
-    //column numbers of the different fields for the plants in the csv file, stored as constants in case the input file changes
+    // column numbers of the different fields for the plants in the csv file, stored as constants in case the input file changes
     private static final int COMMON_NAME_INDEX = 0;
     private static final int GROUP_NAME_INDEX = 1;
     private static final int DURATION_INDEX = 2;
@@ -77,6 +78,7 @@ public class Parser
     private BufferedReader br;
     private BufferedWriter bw;
     private Map<String, String[]> plantMap;
+    private HashMap<String, HashSet<String>> groupMap = new HashMap<String, HashSet<String>>();
     /**
      * Create a parser
      * @param inputFileName - plant csv
@@ -113,7 +115,21 @@ public class Parser
                 {
                     otherFields[i] = l.get(i);
                 }
-                plantMap.put(species, otherFields);
+                if ((species != null) && !species.equals(""))
+                {
+                    plantMap.put(species, otherFields);
+                    String group = otherFields[GROUP_NAME_INDEX];
+                    if ((group != null) && !group.equals(""))
+                    {
+                        HashSet<String> similar = groupMap.get(group);
+                        if (similar == null)
+                        {
+                            similar = new HashSet<String>();
+                        }
+                        similar.add(species);
+                        groupMap.put(group, similar);
+                    }
+                }
             }
             currPlant = br.readLine();
         }
@@ -162,10 +178,8 @@ public class Parser
             writeLine(THREE_TABS + "\"group\": \"" + plantMap.get(s)[GROUP_NAME_INDEX] + "\",");
             writeLine(THREE_TABS + "\"duration\": \"" + plantMap.get(s)[DURATION_INDEX] + "\",");
             writeLine(THREE_TABS + "\"growthHabit\": \"" + plantMap.get(s)[GROWTH_HABIT_INDEX] + "\",");
-            writeLine(THREE_TABS + "\"noxious\": [" + consolidateNoxious(plantMap.get(s)[FEDERAL_NOXIOUS_INDEX],
-                plantMap.get(s)[STATE_NOXIOUS_INDEX]) + "],");
-            writeLine(THREE_TABS + "\"endangered\": " + consolidateEndangered(plantMap.get(s)[FEDERAL_T_E_INDEX],
-                plantMap.get(s)[STATE_T_E_INDEX]) + ",");
+            writeLine(THREE_TABS + "\"noxious\": [" + consolidateNoxious(plantMap.get(s)[FEDERAL_NOXIOUS_INDEX], plantMap.get(s)[STATE_NOXIOUS_INDEX]) + "],");
+            writeLine(THREE_TABS + "\"endangered\": " + consolidateEndangered(plantMap.get(s)[FEDERAL_T_E_INDEX], plantMap.get(s)[STATE_T_E_INDEX]) + ",");
             writeLine(THREE_TABS + "\"active\": \"" + plantMap.get(s)[ACTIVE_GROWTH_PERIOD_INDEX] + "\",");
             writeLine(THREE_TABS + "\"afterHarvest\": \"" + plantMap.get(s)[AFTER_HARVEST_REGROWTH_INDEX] + "\",");
             writeLine(THREE_TABS + "\"flowerColor\": \"" + plantMap.get(s)[FLOWER_COLOR_INDEX] + "\",");
@@ -240,6 +254,17 @@ public class Parser
             {
             	writeLine("\t\t\"" + capitalize(common) + "\": \"" + s + "\",");
             }
+        }
+        writeLine("\t},");
+        writeLine("\t\"Groups\": {");
+        for (String s: groupMap.keySet())
+        {
+            String toWrite = "";
+            for (String species: groupMap.get(s))
+            {
+                toWrite = toWrite + "\"" + species + "\",";
+            }
+            writeLine("\t\t\"" + s + "\": [" + toWrite.substring(0, toWrite.length() - 1) + "],");
         }
         writeLine("\t}");
         bw.write("}");

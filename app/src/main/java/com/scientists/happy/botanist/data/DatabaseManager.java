@@ -19,6 +19,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.bumptech.glide.Glide;
@@ -406,6 +407,57 @@ public class DatabaseManager {
 
     /**
      * Get a plant adapter
+     * @param activity - the current activity
+     * @param group - group the plant belongs to
+     * @param species - plant's species
+     * @return Returns an adapter for the plants
+     */
+    public FirebaseListAdapter<String> getSimilarPlants(final Activity activity, String group, final String species) {
+        final String userId = getUserId();
+        if (userId != null) {
+            DatabaseReference databaseRef = mDatabase.child("Groups").child(group);
+            return new FirebaseListAdapter<String>(activity, String.class, R.layout.list_item_view, databaseRef) {
+                /**
+                 * Show images in glide
+                 * @param view - the current view
+                 * @param plant - the plant to display
+                 * @param position - the position in the menu
+                 */
+                @Override
+                protected void populateView(final View view, final String plant, final int position) {
+                    if (!plant.equals(species)) {
+                        ((TextView) view.findViewById(R.id.list_item_species)).setText(plant);
+                        //view.findViewById(R.id.empty_list_view).setVisibility(view.GONE);
+                        //view.setOnClickListener(new View.OnClickListener() {
+                        /**
+                         * User clicked a plant
+                         * @param v - the current view
+                         */
+                        /*@Override
+                        public void onClick(View v) {
+                            Intent i = new Intent(activity.getApplicationContext(), ProfileActivity.class);
+                            i.putExtra("plant_id", plant.getId());
+                            i.putExtra("name", plant.getName());
+                            i.putExtra("species", plant.getSpecies());
+                            i.putExtra("height", plant.getHeight());
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                View sharedImageView = view.findViewById(R.id.grid_item_image_view);
+                                Bundle bundle = ActivityOptions.makeSceneTransitionAnimation(activity, sharedImageView, "image_main_to_profile_transition").toBundle();
+                                activity.startActivity(i, bundle);
+                            } else {
+                                activity.startActivity(i);
+                            }
+                        }
+                    });*/
+                    }
+                }
+            };
+        }
+        return null;
+    }
+
+    /**
+     * Get a plant adapter
      * @param view - the current activity
      * @param name of the plant to fetch
      */
@@ -420,6 +472,7 @@ public class DatabaseManager {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     PlantEntry entry = dataSnapshot.getValue(PlantEntry.class);
+                    ((TextView) view.findViewById(R.id.invisible_man)).setText(entry.getGroup());
                     ((TextView) view.findViewById(R.id.care_tips)).setText(entry.generateCareTips());
                     TextView toxicWarningTextView = (TextView) view.findViewById(R.id.toxic_warning);
                     if (entry.isToxic()) {

@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -25,7 +27,7 @@ public class ProfileActivity extends AppCompatActivity {
     private String name, species, plantId;
     private double height;
     private DatabaseManager mDatabase;
-    private TextView mHeightTextView;
+    private TextView mHeightTextView, mGroup;
     /**
      * Launch the activity
      * @param savedInstanceState - current view state
@@ -54,6 +56,7 @@ public class ProfileActivity extends AppCompatActivity {
         mHeightTextView = (TextView) findViewById(R.id.plant_height);
         mHeightTextView.setText(getString(R.string.height_fmt, height));
         Button heightButton = (Button) findViewById(R.id.height_button);
+        mGroup = (TextView) findViewById(R.id.invisible_man);
         heightButton.setOnClickListener(new View.OnClickListener() {
             /**
              * User clicked update height
@@ -87,6 +90,37 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
         mDatabase.editProfile(this.findViewById(android.R.id.content), species);
+    }
+
+    /**
+     * Create Action Overflow menu
+     * @param menu - actions
+     * @return Returns success code
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        getMenuInflater().inflate(R.menu.menu_profile, menu);
+        return true;
+    }
+
+    /**
+     * Action overflow menu
+     * @param item - selected item
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_similar_plants) {
+            Intent i = new Intent(this, SimilarPlantsActivity.class);
+            i.putExtra("species", plantId);
+            System.out.println("Species: " + species);
+            i.putExtra("group", mGroup.getText().toString());
+            System.out.println("Group: " + mGroup.getText().toString());
+            startActivity(i);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     /**
