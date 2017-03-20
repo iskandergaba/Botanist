@@ -125,6 +125,13 @@
                 android:layout_height="wrap_content"
                 android:text="@string/fertilized" />
 
+            <TextView
+                android:id="@+id/invisible_man"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="TextView"
+                android:visibility="gone" />
+
         </LinearLayout>
     </LinearLayout>
 

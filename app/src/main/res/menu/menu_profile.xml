@@ -1,0 +1,11 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.scientists.happy.botanist.ui.ProfileActivity">
+
+    <item
+        android:id="@+id/action_similar_plants"
+        android:orderInCategory="100"
+        android:title="@string/similar"
+        app:showAsAction="never" />
+</menu>
