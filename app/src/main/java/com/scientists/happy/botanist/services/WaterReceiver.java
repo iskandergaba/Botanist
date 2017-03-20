@@ -32,6 +32,6 @@ public class WaterReceiver extends BroadcastReceiver {
         NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
         mNotifyMgr.notify(notificationId, mBuilder.build());
         DatabaseManager database = DatabaseManager.getInstance();
-        database.updateLastFertilizerNotification(context, plantId);
+        database.updateLastWatered(context, plantId);
     }
 }
