@@ -22,7 +22,7 @@ class Plant {
      * @param birthday - the plant's birthday
      * @param height - the plant's height
      */
-    protected Plant(String name, String species, long birthday, double height) {
+    Plant(String name, String species, long birthday, double height) {
         this.id = species + "_" + name;
         this.name = name;
         this.species = species;

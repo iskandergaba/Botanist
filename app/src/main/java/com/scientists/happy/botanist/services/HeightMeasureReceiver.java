@@ -1,3 +1,5 @@
+// Handle notifications to measure height
+// @author: Iskander Gaba
 package com.scientists.happy.botanist.services;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -23,13 +25,13 @@ public class HeightMeasureReceiver extends BroadcastReceiver {
         int notificationId = intent.getExtras().getInt("id");
         Intent resultIntent = new Intent(context, LoginActivity.class);
         PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context).setSmallIcon(R.mipmap.ic_launcher)
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(context).setSmallIcon(R.mipmap.ic_launcher)
                         .setDefaults(Notification.DEFAULT_SOUND).setContentTitle("Keep track of " + name + "'s height record!")
                         .setContentText("Tap update " + name + "'s height record").setContentIntent(resultPendingIntent);
         NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
         // Builds the notification and issues it.
         mNotifyMgr.notify(notificationId, mBuilder.build());
-        DatabaseManager database = DatabaseManager.getInstance();
-        database.updateNotificationTime(context, plantId, "lastMeasureNotification");
+        DatabaseManager.getInstance().updateNotificationTime(plantId, "lastMeasureNotification");
     }
 }

@@ -3,24 +3,42 @@
 
     <Preference
         android:key="water_time"
-        android:summary="Set when the app should remind you of watering your plants"
-        android:title="Set watering time" />
+        android:title="Watering time"
+        android:summary="Set when to receive watering and plant care reminders" />
 
     <ListPreference
-        android:key="height_reminder"
-        android:title="Height recording reminder"
-        android:entries="@array/height_pref_entries"
-        android:entryValues="@array/height_pref_values"
+        android:key="water_reminder"
+        android:title="Watering Reminder"
+        android:entries="@array/reminder_pref_entries"
+        android:entryValues="@array/reminder_pref_values"
+        android:defaultValue="1">
+
+    </ListPreference>
+
+    <ListPreference
+        android:key="height_record_reminder"
+        android:title="Height Recording Reminder"
+        android:entries="@array/reminder_pref_entries"
+        android:entryValues="@array/reminder_pref_values"
         android:defaultValue="2">
 
     </ListPreference>
 
     <ListPreference
-        android:key="fertilizer_reminder"
-        android:title="Fertilizer reminder"
-        android:entries="@array/height_pref_entries"
-        android:entryValues="@array/height_pref_values"
+        android:key="photo_reminder"
+        android:title="Photo Update Reminder"
+        android:entries="@array/reminder_pref_entries"
+        android:entryValues="@array/reminder_pref_values"
         android:defaultValue="2">
+
+    </ListPreference>
+
+    <ListPreference
+        android:key="fertilize_reminder"
+        android:title="Fertilizer Reminder"
+        android:entries="@array/reminder_pref_entries"
+        android:entryValues="@array/reminder_pref_values"
+        android:defaultValue="3">
 
     </ListPreference>
 

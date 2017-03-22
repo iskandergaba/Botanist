@@ -52,7 +52,7 @@ public class ProfileActivity extends AppCompatActivity {
              */
             @Override
             public void onClick(View v) {
-                buildHeightInputDialog().show();
+                //TODO: stuff, definitely not showing the height dialog
             }
         });
         StorageReference storageReference = FirebaseStorage.getInstance().getReference()
@@ -166,7 +166,7 @@ public class ProfileActivity extends AppCompatActivity {
              * @param id - the user id
              */
             public void onClick(DialogInterface dialog, int id) {
-                mDatabase.updateNotificationTime(ProfileActivity.this, plantId, "lastFertilizerNotification");
+                mDatabase.updateNotificationTime(plantId, "lastFertilizerNotification");
                 Intent resultIntent = new Intent();
                 setResult(RESULT_OK, resultIntent);
                 finish();
@@ -198,7 +198,7 @@ public class ProfileActivity extends AppCompatActivity {
              * @param id - the user id
              */
             public void onClick(DialogInterface dialog, int id) {
-                mDatabase.updateNotificationTime(ProfileActivity.this, plantId, "lastWaterNotification");
+                mDatabase.updateNotificationTime(plantId, "lastWaterNotification");
                 Intent resultIntent = new Intent();
                 setResult(RESULT_OK, resultIntent);
                 finish();

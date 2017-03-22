@@ -22,15 +22,17 @@ import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
+
 import com.scientists.happy.botanist.R;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 public class SettingsActivity extends AppCompatActivity {
     public static SharedPreferences mPreferences;
     public static final String WATER_HOUR_KEY = "water_hour";
     public static final String WATER_MINUTE_KEY = "water_minute";
-    public static final String HEIGHT_REMINDER_KEY = "height_reminder";
-    public static final String FERTILIZER_REMINDER_KEY = "fertilizer_reminder";
+    public static final String WATER_REMINDER_KEY = "water_reminder";
+    public static final String HEIGHT_REMINDER_KEY = "height_record_reminder";
     public static final String PHOTO_REMINDER_KEY = "photo_reminder";
+    public static final String FERTILIZER_REMINDER_KEY = "fertilize_reminder";
     /**
      * Upon launching the activity
      * @param savedInstanceState - current app state
@@ -38,8 +40,8 @@ public class SettingsActivity extends AppCompatActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         getFragmentManager().beginTransaction().replace(android.R.id.content, new SettingsFragment()).commit();
+        mPreferences = PreferenceManager.getDefaultSharedPreferences(this);
     }
 
     public static class SettingsFragment extends PreferenceFragment implements OnSharedPreferenceChangeListener{
@@ -64,14 +66,14 @@ public class SettingsActivity extends AppCompatActivity {
                     return false;
                 }
             });
-            updatePref(HEIGHT_REMINDER_KEY);
-            updatePref(FERTILIZER_REMINDER_KEY);
             updatePref(WATER_REMINDER_KEY);
+            updatePref(HEIGHT_REMINDER_KEY);
             updatePref(PHOTO_REMINDER_KEY);
+            updatePref(FERTILIZER_REMINDER_KEY);
         }
 
         /**
-         * Preference changer resumed
+         * Activity resumed
          */
         @Override
         public void onResume() {
@@ -80,7 +82,7 @@ public class SettingsActivity extends AppCompatActivity {
         }
 
         /**
-         * Preference changer paused
+         * Activity paused
          */
         @Override
         public void onPause() {
@@ -95,7 +97,8 @@ public class SettingsActivity extends AppCompatActivity {
          */
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-            if (key.equals(HEIGHT_REMINDER_KEY) || key.equals(FERTILIZER_REMINDER_KEY)) {
+            if (key.equals(WATER_REMINDER_KEY) || key.equals(HEIGHT_REMINDER_KEY)
+                    || key.equals(FERTILIZER_REMINDER_KEY)|| key.equals(PHOTO_REMINDER_KEY)) {
                 updatePref(key);
             }
         }

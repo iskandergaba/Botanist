@@ -44,6 +44,7 @@ import com.scientists.happy.botanist.services.HeightMeasureReceiver;
 import com.scientists.happy.botanist.services.UpdatePhotoReceiver;
 import com.scientists.happy.botanist.services.WaterReceiver;
 import com.scientists.happy.botanist.ui.ProfileActivity;
+import com.scientists.happy.botanist.ui.SettingsActivity;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Calendar;
@@ -53,10 +54,10 @@ import java.util.Map;
 import static android.content.Context.ALARM_SERVICE;
 public class DatabaseManager {
     private static final int TOXIC_WARNING_LABEL_COLOR = 0xffff4444;
-    private static final int FERTILIZER_RECEIVER_ID_OFFSET = 1000;
-    private static final int HEIGHT_MEASURE_RECEIVER_ID_OFFSET = 2000;
+    private static final int HEIGHT_MEASURE_RECEIVER_ID_OFFSET = 1000;
+    private static final int FERTILIZER_RECEIVER_ID_OFFSET = 2000;
     private static final int UPDATE_PHOTO_RECEIVER_ID_OFFSET = 3000;
-    private static final int WATER_RECEIVER_ID_OFFSET = 3000;
+    private static final int BIRTHDAY_RECEIVER_ID_OFFSET = 4000;
     //private static final String TAG = "DatabaseManager";
     private long mPlantsNumber;
     private long mBotanistSince;
@@ -300,7 +301,7 @@ public class DatabaseManager {
                     if (!task.isSuccessful()) {
                         Toast.makeText(context, "Height update failed, try again", Toast.LENGTH_SHORT).show();
                     } else {
-                        updateNotificationTime(context, plantId, "lastMeasureNotification");
+                        updateNotificationTime(plantId, "lastMeasureNotification");
                     }
                     hideProgressDialog();
                 }
@@ -310,11 +311,10 @@ public class DatabaseManager {
 
     /**
      * Update last watered
-     * @param context - the current app context
      * @param plantId - the id of the plant (species_name)
      * @param field - the field to update
      */
-    public void updateNotificationTime(final Context context, final String plantId, final String field) {
+    public void updateNotificationTime(final String plantId, final String field) {
         final String userId = getUserId();
         if ((userId != null) && (plantId != null)) {
             mDatabase.child("users").child(userId).child("plants").child(plantId).child(field)
@@ -325,9 +325,7 @@ public class DatabaseManager {
                  */
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
-                    if (!task.isSuccessful()) {
-                        Toast.makeText(context, field + " time update failed, try again", Toast.LENGTH_SHORT).show();
-                    }
+                    // nothing, yet
                 }
             });
         }
@@ -377,11 +375,11 @@ public class DatabaseManager {
                             }
                         }
                     });
-                    setBirthdayReminder(activity, plant, position);
+                    setReminders(activity, plant, position, new WaterReceiver());
                     setReminders(activity, plant, position + HEIGHT_MEASURE_RECEIVER_ID_OFFSET, new HeightMeasureReceiver());
                     setReminders(activity, plant, position + FERTILIZER_RECEIVER_ID_OFFSET, new FertilizerReceiver());
-                    setReminders(activity, plant, position + WATER_RECEIVER_ID_OFFSET, new WaterReceiver());
                     setReminders(activity, plant, position + UPDATE_PHOTO_RECEIVER_ID_OFFSET, new UpdatePhotoReceiver());
+                    setBirthdayReminder(activity, plant, position + BIRTHDAY_RECEIVER_ID_OFFSET);
                 }
             };
         }
@@ -615,20 +613,20 @@ public class DatabaseManager {
         int reminderSetting = 0;
         Calendar calendar = Calendar.getInstance();
         if (receiver instanceof WaterReceiver) {
-            reminderSetting = Integer.parseInt(preferences.getString("water_reminder", "2"));
+            reminderSetting = Integer.parseInt(preferences.getString(SettingsActivity.WATER_REMINDER_KEY, "1"));
             calendar.setTimeInMillis(plant.getLastWaterNotification());
         }
         else if (receiver instanceof HeightMeasureReceiver) {
-            reminderSetting = Integer.parseInt(preferences.getString("height_reminder", "2"));
+            reminderSetting = Integer.parseInt(preferences.getString(SettingsActivity.HEIGHT_REMINDER_KEY, "2"));
             calendar.setTimeInMillis(plant.getLastMeasureNotification());
         }
-        else if (receiver instanceof FertilizerReceiver) {
-            reminderSetting = Integer.parseInt(preferences.getString("fertilizer_reminder", "2"));
-            calendar.setTimeInMillis(plant.getLastFertilizerNotification());
-        }
         else if (receiver instanceof UpdatePhotoReceiver) {
-            reminderSetting = Integer.parseInt(preferences.getString("photo_reminder", "2"));
+            reminderSetting = Integer.parseInt(preferences.getString(SettingsActivity.PHOTO_REMINDER_KEY, "2"));
             calendar.setTimeInMillis(plant.getLastPhotoNotification());
+        }
+        else if (receiver instanceof FertilizerReceiver) {
+            reminderSetting = Integer.parseInt(preferences.getString(SettingsActivity.FERTILIZER_REMINDER_KEY, "3"));
+            calendar.setTimeInMillis(plant.getLastFertilizerNotification());
         }
         if (reminderSetting != 0) {
             Calendar nextMeasure = Calendar.getInstance();

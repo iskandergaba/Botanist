@@ -32,6 +32,6 @@ public class UpdatePhotoReceiver extends BroadcastReceiver {
         NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
         mNotifyMgr.notify(notificationId, mBuilder.build());
         DatabaseManager database = DatabaseManager.getInstance();
-        database.updateNotificationTime(context, plantId, "lastPhotoNotification");
+        database.updateNotificationTime(plantId, "lastPhotoNotification");
     }
 }
