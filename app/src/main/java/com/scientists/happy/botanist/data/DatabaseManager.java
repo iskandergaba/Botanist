@@ -20,9 +20,9 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.bumptech.glide.Glide;
 import com.firebase.ui.database.FirebaseListAdapter;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
@@ -44,10 +44,12 @@ import com.scientists.happy.botanist.services.HeightMeasureReceiver;
 import com.scientists.happy.botanist.services.UpdatePhotoReceiver;
 import com.scientists.happy.botanist.services.WaterReceiver;
 import com.scientists.happy.botanist.ui.ProfileActivity;
+
 import java.io.ByteArrayOutputStream;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
+
 import static android.content.Context.ALARM_SERVICE;
 public class DatabaseManager {
     private static final int TOXIC_WARNING_LABEL_COLOR = 0xffff4444;
@@ -397,7 +399,7 @@ public class DatabaseManager {
         final String userId = getUserId();
         if (userId != null) {
             DatabaseReference databaseRef = mDatabase.child("Groups").child(group);
-            return new FirebaseListAdapter<String>(activity, String.class, R.layout.list_item_view, databaseRef) {
+            return new FirebaseListAdapter<String>(activity, String.class, android.R.layout.simple_list_item_1, databaseRef) {
                 /**
                  * Show images in glide
                  * @param view - the current view
@@ -407,29 +409,7 @@ public class DatabaseManager {
                 @Override
                 protected void populateView(final View view, final String plant, final int position) {
                     if (!plant.equals(species)) {
-                        ((TextView) view.findViewById(R.id.list_item_species)).setText(plant);
-                        //view.findViewById(R.id.empty_list_view).setVisibility(view.GONE);
-                        //view.setOnClickListener(new View.OnClickListener() {
-                        /**
-                         * User clicked a plant
-                         * @param v - the current view
-                         */
-                        /*@Override
-                        public void onClick(View v) {
-                            Intent i = new Intent(activity.getApplicationContext(), ProfileActivity.class);
-                            i.putExtra("plant_id", plant.getId());
-                            i.putExtra("name", plant.getName());
-                            i.putExtra("species", plant.getSpecies());
-                            i.putExtra("height", plant.getHeight());
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                View sharedImageView = view.findViewById(R.id.grid_item_image_view);
-                                Bundle bundle = ActivityOptions.makeSceneTransitionAnimation(activity, sharedImageView, "image_main_to_profile_transition").toBundle();
-                                activity.startActivity(i, bundle);
-                            } else {
-                                activity.startActivity(i);
-                            }
-                        }
-                    });*/
+                        ((TextView) view.findViewById(android.R.id.text1)).setText(plant);
                     }
                 }
             };

@@ -29,7 +29,6 @@ public class SettingsActivity extends AppCompatActivity {
     public static final String WATER_HOUR_KEY = "water_hour";
     public static final String WATER_MINUTE_KEY = "water_minute";
     public static final String HEIGHT_REMINDER_KEY = "height_reminder";
-    public static final String WATER_REMINDER_KEY = "water_reminder";
     public static final String FERTILIZER_REMINDER_KEY = "fertilizer_reminder";
     public static final String PHOTO_REMINDER_KEY = "photo_reminder";
     /**
@@ -96,7 +95,7 @@ public class SettingsActivity extends AppCompatActivity {
          */
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-            if (key.equals(HEIGHT_REMINDER_KEY) || key.equals(FERTILIZER_REMINDER_KEY) || key.equals(WATER_REMINDER_KEY)) {
+            if (key.equals(HEIGHT_REMINDER_KEY) || key.equals(FERTILIZER_REMINDER_KEY)) {
                 updatePref(key);
             }
         }
