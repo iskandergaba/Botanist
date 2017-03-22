@@ -1,3 +1,5 @@
+// Handle notifications to water
+// @author: Christopher Besser
 package com.scientists.happy.botanist.services;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -10,11 +12,11 @@ import com.scientists.happy.botanist.R;
 import com.scientists.happy.botanist.data.DatabaseManager;
 import com.scientists.happy.botanist.ui.LoginActivity;
 import static android.content.Context.NOTIFICATION_SERVICE;
-public class HeightMeasureReceiver extends BroadcastReceiver {
+public class UpdatePhotoReceiver extends BroadcastReceiver {
     /**
-     * Notification request received
-     * @param context - calling context
-     * @param intent - calling intent
+     * Receiver received an update
+     * @param context - current app context
+     * @param intent - intent that updated photo
      */
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -23,13 +25,13 @@ public class HeightMeasureReceiver extends BroadcastReceiver {
         int notificationId = intent.getExtras().getInt("id");
         Intent resultIntent = new Intent(context, LoginActivity.class);
         PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context).setSmallIcon(R.mipmap.ic_launcher)
-                        .setDefaults(Notification.DEFAULT_SOUND).setContentTitle("Keep track of " + name + "'s height record!")
-                        .setContentText("Tap update " + name + "'s height record").setContentIntent(resultPendingIntent);
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(context).setSmallIcon(R.mipmap.ic_launcher)
+                        .setDefaults(Notification.DEFAULT_SOUND).setContentTitle("Update " + name + "'s Picture")
+                        .setContentText("Tap " + name + "'s picture on its profile").setContentIntent(resultPendingIntent);
         NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
-        // Builds the notification and issues it.
         mNotifyMgr.notify(notificationId, mBuilder.build());
         DatabaseManager database = DatabaseManager.getInstance();
-        database.updateNotificationTime(context, plantId, "lastMeasureNotification");
+        database.updateNotificationTime(context, plantId, "lastPhotoNotification");
     }
 }

@@ -27,6 +27,7 @@
         <receiver android:name=".services.HeightMeasureReceiver" />
         <receiver android:name=".services.FertilizerReceiver" />
         <receiver android:name=".services.WaterReceiver" />
+        <receiver android:name=".services.UpdatePhotoReceiver"/>
 
         <activity
             android:name=".ui.LoginActivity"
@@ -77,11 +78,11 @@
         <activity
             android:name=".ui.SimilarPlantsActivity"
             android:label="@string/title_activity_similar_plants"
-            android:parentActivityName=".ProfileActivity"
+            android:parentActivityName=".ui.ProfileActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="ProfileActivity" />
+                android:value="com.scientists.happy.botanist.ui.ProfileActivity" />
         </activity>
     </application>
 
