@@ -27,6 +27,7 @@
         <receiver android:name=".services.HeightMeasureReceiver" />
         <receiver android:name=".services.FertilizerReceiver" />
         <receiver android:name=".services.WaterReceiver" />
+        <receiver android:name=".services.UpdatePhotoReceiver"/>
 
         <activity
             android:name=".ui.LoginActivity"

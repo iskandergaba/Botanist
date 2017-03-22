@@ -6,6 +6,7 @@ import android.app.ActivityOptions;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -40,6 +41,7 @@ import com.scientists.happy.botanist.R;
 import com.scientists.happy.botanist.services.BirthdayReceiver;
 import com.scientists.happy.botanist.services.FertilizerReceiver;
 import com.scientists.happy.botanist.services.HeightMeasureReceiver;
+import com.scientists.happy.botanist.services.UpdatePhotoReceiver;
 import com.scientists.happy.botanist.services.WaterReceiver;
 import com.scientists.happy.botanist.ui.ProfileActivity;
 
@@ -51,6 +53,10 @@ import java.util.Map;
 import static android.content.Context.ALARM_SERVICE;
 public class DatabaseManager {
     private static final int TOXIC_WARNING_LABEL_COLOR = 0xffff4444;
+    private static final int FERTILIZER_RECEIVER_ID_OFFSET = 1000;
+    private static final int HEIGHT_MEASURE_RECEIVER_ID_OFFSET = 2000;
+    private static final int UPDATE_PHOTO_RECEIVER_ID_OFFSET = 3000;
+    private static final int WATER_RECEIVER_ID_OFFSET = 3000;
     //private static final String TAG = "DatabaseManager";
     private long mPlantsNumber;
     private long mBotanistSince;
@@ -232,10 +238,7 @@ public class DatabaseManager {
     public void deletePlant(Context context, String name, String species) {
         final String userId = getUserId();
         final String plantId = species + "_" + name;
-        deleteAllBirthdayReminders(context);
-        deleteAllHeightMeasurementReminders(context);
-        deleteAllFertilizerReminders(context);
-        deleteAllWaterReminders(context);
+        deleteAllReminders(context);
         if (userId != null) {
             mDatabase.child("users").child(userId).child("plants").child(plantId).addListenerForSingleValueEvent(new ValueEventListener() {
                 /**
@@ -297,33 +300,9 @@ public class DatabaseManager {
                     if (!task.isSuccessful()) {
                         Toast.makeText(context, "Height update failed, try again", Toast.LENGTH_SHORT).show();
                     } else {
-                        updateLastMeasureNotification(plantId);
+                        updateNotificationTime(context, plantId, "lastMeasureNotification");
                     }
                     hideProgressDialog();
-                }
-            });
-        }
-    }
-
-    /**
-     * Update last fertilizer notification date
-     * @param context - the current app context
-     * @param plantId - the id of the plant (species_name)
-     */
-    public void updateLastFertilizerNotification(final Context context, final String plantId) {
-        final String userId = getUserId();
-        if ((userId != null) && (plantId != null)) {
-            mDatabase.child("users").child(userId).child("plants").child(plantId).child("lastFertilizerNotification")
-                    .setValue(System.currentTimeMillis()).addOnCompleteListener(new OnCompleteListener<Void>() {
-                /**
-                 * Update last fertilized time
-                 * @param task - update task
-                 */
-                @Override
-                public void onComplete(@NonNull Task<Void> task) {
-                    if (!task.isSuccessful()) {
-                        Toast.makeText(context, "Fertilizer time update failed, try again", Toast.LENGTH_SHORT).show();
-                    }
                 }
             });
         }
@@ -333,11 +312,12 @@ public class DatabaseManager {
      * Update last watered
      * @param context - the current app context
      * @param plantId - the id of the plant (species_name)
+     * @param field - the field to update
      */
-    public void updateLastWatered(final Context context, final String plantId) {
+    public void updateNotificationTime(final Context context, final String plantId, final String field) {
         final String userId = getUserId();
         if ((userId != null) && (plantId != null)) {
-            mDatabase.child("users").child(userId).child("plants").child(plantId).child("lastWatered")
+            mDatabase.child("users").child(userId).child("plants").child(plantId).child(field)
                     .setValue(System.currentTimeMillis()).addOnCompleteListener(new OnCompleteListener<Void>() {
                 /**
                  * Update last fertilized time
@@ -346,7 +326,7 @@ public class DatabaseManager {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
                     if (!task.isSuccessful()) {
-                        Toast.makeText(context, "Watered time update failed, try again", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, field + " time update failed, try again", Toast.LENGTH_SHORT).show();
                     }
                 }
             });
@@ -398,9 +378,10 @@ public class DatabaseManager {
                         }
                     });
                     setBirthdayReminder(activity, plant, position);
-                    setHeightMeasureReminders(activity, plant, position);
-                    setFertilizeReminders(activity, plant, position);
-                    setWaterReminders(activity, plant, position);
+                    setReminders(activity, plant, position + HEIGHT_MEASURE_RECEIVER_ID_OFFSET, new HeightMeasureReceiver());
+                    setReminders(activity, plant, position + FERTILIZER_RECEIVER_ID_OFFSET, new FertilizerReceiver());
+                    setReminders(activity, plant, position + WATER_RECEIVER_ID_OFFSET, new WaterReceiver());
+                    setReminders(activity, plant, position + UPDATE_PHOTO_RECEIVER_ID_OFFSET, new UpdatePhotoReceiver());
                 }
             };
         }
@@ -563,46 +544,18 @@ public class DatabaseManager {
      * Delete the birthday reminders
      * @param context - the current app context
      */
-    public void deleteAllBirthdayReminders(Context context) {
+    public void deleteAllReminders(Context context) {
         AlarmManager am = (AlarmManager) context.getSystemService(ALARM_SERVICE);
         for (int i = 0; i < mPlantsNumber; i++) {
             PendingIntent pendingIntent = PendingIntent.getBroadcast(context, i, new Intent(context, BirthdayReceiver.class), 0);
             am.cancel(pendingIntent);
-        }
-    }
-
-    /**
-     * Remove the height measurement reminders
-     * @param context - current app context
-     */
-    public void deleteAllHeightMeasurementReminders(Context context) {
-        AlarmManager am = (AlarmManager)context.getSystemService(ALARM_SERVICE);
-        for (int i = 0; i < mPlantsNumber; i++) {
-            PendingIntent pendingIntent = PendingIntent.getBroadcast(context, i, new Intent(context, HeightMeasureReceiver.class), 0);
+            pendingIntent = PendingIntent.getBroadcast(context, i, new Intent(context, FertilizerReceiver.class), 0);
             am.cancel(pendingIntent);
-        }
-    }
-
-    /**
-     * Remove the fertilizer reminders
-     * @param context - current app context
-     */
-    public void deleteAllFertilizerReminders(Context context) {
-        AlarmManager am = (AlarmManager) context.getSystemService(ALARM_SERVICE);
-        for (int i = 0; i < mPlantsNumber; i++) {
-            PendingIntent pendingIntent = PendingIntent.getBroadcast(context, i, new Intent(context, FertilizerReceiver.class), 0);
+            pendingIntent = PendingIntent.getBroadcast(context, i, new Intent(context, HeightMeasureReceiver.class), 0);
             am.cancel(pendingIntent);
-        }
-    }
-
-    /**
-     * Remove the water reminders
-     * @param context - current app context
-     */
-    public void deleteAllWaterReminders(Context context) {
-        AlarmManager am = (AlarmManager) context.getSystemService(ALARM_SERVICE);
-        for (int i = 0; i < mPlantsNumber; i++) {
-            PendingIntent pendingIntent = PendingIntent.getBroadcast(context, i, new Intent(context, WaterReceiver.class), 0);
+            pendingIntent = PendingIntent.getBroadcast(context, i, new Intent(context, UpdatePhotoReceiver.class), 0);
+            am.cancel(pendingIntent);
+            pendingIntent = PendingIntent.getBroadcast(context, i, new Intent(context, WaterReceiver.class), 0);
             am.cancel(pendingIntent);
         }
     }
@@ -644,13 +597,14 @@ public class DatabaseManager {
     }
 
     /**
-     * Create reminders to user to measure their plants
+     * Create non-birthday push notifications
      * @param context - current app context
-     * @param plant - plant to remind user to measure
-     * @param id - id of the plant
+     * @param plant - plant to remind about
+     * @param id - notification id
+     * @param receiver - the type of reminder to set
      */
-    private void setHeightMeasureReminders(Context context, Plant plant, int id) {
-        Intent intent = new Intent(context, HeightMeasureReceiver.class);
+    private void setReminders(Context context, Plant plant, int id, BroadcastReceiver receiver) {
+        Intent intent = new Intent(context, receiver.getClass());
         intent.putExtra("name", plant.getName());
         intent.putExtra("plant_id", plant.getId());
         intent.putExtra("id", id);
@@ -658,71 +612,28 @@ public class DatabaseManager {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         int hour = preferences.getInt("water_hour", 9);
         int minute = preferences.getInt("water_minute", 0);
-        int reminderSetting = Integer.parseInt(preferences.getString("height_reminder", "2"));
-        Calendar lastMeasured = Calendar.getInstance();
-        lastMeasured.setTimeInMillis(plant.getLastMeasureNotification());
-        if (reminderSetting != 0) {
-            Calendar nextMeasure = Calendar.getInstance();
-            long interval = getReminderIntervalInMillis(reminderSetting);
-            nextMeasure.setTimeInMillis(lastMeasured.getTimeInMillis() + interval);
-            nextMeasure.set(Calendar.HOUR, hour);
-            nextMeasure.set(Calendar.MINUTE, minute);
-            AlarmManager am = (AlarmManager)context.getSystemService(ALARM_SERVICE);
-            am.setRepeating(AlarmManager.RTC_WAKEUP, nextMeasure.getTimeInMillis(),interval, pendingIntent);
+        int reminderSetting = 0;
+        Calendar calendar = Calendar.getInstance();
+        if (receiver instanceof WaterReceiver) {
+            reminderSetting = Integer.parseInt(preferences.getString("water_reminder", "2"));
+            calendar.setTimeInMillis(plant.getLastWaterNotification());
         }
-    }
-
-    /**
-     * Create reminders to user to fertilize their plants
-     * @param context - current app context
-     * @param plant - plant to remind user to fertilize
-     * @param id - id
-     */
-    private void setFertilizeReminders(Context context, Plant plant, int id) {
-        Intent intent = new Intent(context, FertilizerReceiver.class);
-        intent.putExtra("name", plant.getName());
-        intent.putExtra("plant_id", plant.getId());
-        intent.putExtra("id", id);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, id, intent, 0);
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        int hour = preferences.getInt("water_hour", 9);
-        int minute = preferences.getInt("water_minute", 0);
-        int reminderSetting = Integer.parseInt(preferences.getString("fertilizer_reminder", "2"));
-        Calendar lastFertilized = Calendar.getInstance();
-        lastFertilized.setTimeInMillis(plant.getLastFertilizerNotification());
-        if (reminderSetting != 0) {
-            Calendar nextMeasure = Calendar.getInstance();
-            long interval = getReminderIntervalInMillis(reminderSetting);
-            nextMeasure.setTimeInMillis(lastFertilized.getTimeInMillis() + interval);
-            nextMeasure.set(Calendar.HOUR, hour);
-            nextMeasure.set(Calendar.MINUTE, minute);
-            AlarmManager am = (AlarmManager) context.getSystemService(ALARM_SERVICE);
-            am.setRepeating(AlarmManager.RTC_WAKEUP, nextMeasure.getTimeInMillis(), interval, pendingIntent);
+        else if (receiver instanceof HeightMeasureReceiver) {
+            reminderSetting = Integer.parseInt(preferences.getString("height_reminder", "2"));
+            calendar.setTimeInMillis(plant.getLastMeasureNotification());
         }
-    }
-
-    /**
-     * Create reminders to user to water their plants
-     * @param context - current app context
-     * @param plant - plant to remind user to water
-     * @param id - id
-     */
-    private void setWaterReminders(Context context, Plant plant, int id) {
-        Intent intent = new Intent(context, WaterReceiver.class);
-        intent.putExtra("name", plant.getName());
-        intent.putExtra("plant_id", plant.getId());
-        intent.putExtra("id", id);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, id, intent, 0);
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        int hour = preferences.getInt("water_hour", 9);
-        int minute = preferences.getInt("water_minute", 0);
-        int reminderSetting = Integer.parseInt(preferences.getString("water_reminder", "2"));
-        Calendar lastWatered = Calendar.getInstance();
-        lastWatered.setTimeInMillis(plant.getLastWatered());
+        else if (receiver instanceof FertilizerReceiver) {
+            reminderSetting = Integer.parseInt(preferences.getString("fertilizer_reminder", "2"));
+            calendar.setTimeInMillis(plant.getLastFertilizerNotification());
+        }
+        else if (receiver instanceof UpdatePhotoReceiver) {
+            reminderSetting = Integer.parseInt(preferences.getString("photo_reminder", "2"));
+            calendar.setTimeInMillis(plant.getLastPhotoNotification());
+        }
         if (reminderSetting != 0) {
             Calendar nextMeasure = Calendar.getInstance();
             long interval = getReminderIntervalInMillis(reminderSetting);
-            nextMeasure.setTimeInMillis(lastWatered.getTimeInMillis() + interval);
+            nextMeasure.setTimeInMillis(calendar.getTimeInMillis() + interval);
             nextMeasure.set(Calendar.HOUR, hour);
             nextMeasure.set(Calendar.MINUTE, minute);
             AlarmManager am = (AlarmManager) context.getSystemService(ALARM_SERVICE);
@@ -746,15 +657,6 @@ public class DatabaseManager {
             calendar.add(Calendar.DAY_OF_YEAR, 30);
         }
         return calendar.getTimeInMillis();
-    }
-
-    /**
-     * Update the last measured field
-     * @param plantId - plant that was just measured
-     */
-    public void updateLastMeasureNotification(String plantId) {
-        String userId = getUserId();
-        mDatabase.child("users").child(userId).child("plants").child(plantId).child("lastMeasureNotification").setValue(System.currentTimeMillis());
     }
 
     /**

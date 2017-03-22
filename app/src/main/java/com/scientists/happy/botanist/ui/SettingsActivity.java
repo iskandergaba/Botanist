@@ -30,6 +30,7 @@ public class SettingsActivity extends AppCompatActivity {
     public static final String WATER_MINUTE_KEY = "water_minute";
     public static final String HEIGHT_REMINDER_KEY = "height_reminder";
     public static final String FERTILIZER_REMINDER_KEY = "fertilizer_reminder";
+    public static final String PHOTO_REMINDER_KEY = "photo_reminder";
     /**
      * Upon launching the activity
      * @param savedInstanceState - current app state
@@ -65,6 +66,8 @@ public class SettingsActivity extends AppCompatActivity {
             });
             updatePref(HEIGHT_REMINDER_KEY);
             updatePref(FERTILIZER_REMINDER_KEY);
+            updatePref(WATER_REMINDER_KEY);
+            updatePref(PHOTO_REMINDER_KEY);
         }
 
         /**
@@ -102,7 +105,7 @@ public class SettingsActivity extends AppCompatActivity {
          * @param key - which preference
          */
         private void updatePref(String key){
-            ListPreference preference = (ListPreference)findPreference(key);
+            ListPreference preference = (ListPreference) findPreference(key);
             CharSequence entry = preference.getEntry();
             String value = preference.getValue();
             preference.setSummary(entry);

@@ -31,7 +31,6 @@ public class WaterReceiver extends BroadcastReceiver {
                         .setContentText("Tap \"I watered this plant\" once you water " + name).setContentIntent(resultPendingIntent);
         NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
         mNotifyMgr.notify(notificationId, mBuilder.build());
-        DatabaseManager database = DatabaseManager.getInstance();
-        database.updateLastWatered(context, plantId);
+        DatabaseManager.getInstance().updateNotificationTime(context, plantId, "lastWaterNotification");
     }
 }

@@ -31,7 +31,6 @@ public class FertilizerReceiver extends BroadcastReceiver {
                         .setContentText("Tap \"I fertilized this plant\" once you fertilize " + name).setContentIntent(resultPendingIntent);
         NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
         mNotifyMgr.notify(notificationId, mBuilder.build());
-        DatabaseManager database = DatabaseManager.getInstance();
-        database.updateLastFertilizerNotification(context, plantId);
+        DatabaseManager.getInstance().updateNotificationTime(context, plantId, "lastFertilizerNotification");
     }
 }

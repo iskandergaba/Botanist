@@ -45,6 +45,16 @@ public class ProfileActivity extends AppCompatActivity {
         height = i.getExtras().getDouble(HEIGHT_KEY);
         setTitle(name + "\'s Profile");
         ImageView picture = (ImageView) findViewById(R.id.plant_picture);
+        picture.setOnClickListener(new View.OnClickListener() {
+            /**
+             * User clicked to update picture
+             * @param v - current view
+             */
+            @Override
+            public void onClick(View v) {
+                buildHeightInputDialog().show();
+            }
+        });
         StorageReference storageReference = FirebaseStorage.getInstance().getReference()
                 // TODO: clean a bit
                 .child(mDatabase.getUserId()).child(plantId+ ".jpg");
@@ -156,7 +166,7 @@ public class ProfileActivity extends AppCompatActivity {
              * @param id - the user id
              */
             public void onClick(DialogInterface dialog, int id) {
-                mDatabase.updateLastFertilizerNotification(ProfileActivity.this, plantId);
+                mDatabase.updateNotificationTime(ProfileActivity.this, plantId, "lastFertilizerNotification");
                 Intent resultIntent = new Intent();
                 setResult(RESULT_OK, resultIntent);
                 finish();
@@ -188,7 +198,7 @@ public class ProfileActivity extends AppCompatActivity {
              * @param id - the user id
              */
             public void onClick(DialogInterface dialog, int id) {
-                mDatabase.updateLastWatered(ProfileActivity.this, plantId);
+                mDatabase.updateNotificationTime(ProfileActivity.this, plantId, "lastWaterNotification");
                 Intent resultIntent = new Intent();
                 setResult(RESULT_OK, resultIntent);
                 finish();
