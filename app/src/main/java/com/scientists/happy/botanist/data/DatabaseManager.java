@@ -22,7 +22,6 @@ import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.bumptech.glide.Glide;
 import com.firebase.ui.database.FirebaseListAdapter;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
@@ -45,11 +44,13 @@ import com.scientists.happy.botanist.services.UpdatePhotoReceiver;
 import com.scientists.happy.botanist.services.WaterReceiver;
 import com.scientists.happy.botanist.ui.ProfileActivity;
 import com.scientists.happy.botanist.ui.SettingsActivity;
-
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import static android.content.Context.ALARM_SERVICE;
 public class DatabaseManager {
@@ -208,13 +209,7 @@ public class DatabaseManager {
                     if (!snapshot.exists()) {
                         mDatabase.child("users").child(userId).child("plants").child(plantId).setValue(plant);
                         setPlantsNumber(++mPlantsNumber);
-                        if (bmp != null) {
-                            ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                            bmp.compress(Bitmap.CompressFormat.JPEG, 100, stream);
-                            byte[] data = stream.toByteArray();
-                            StorageReference filepath = mStorage.child(userId).child(plant.getId() + ".jpg");
-                            filepath.putBytes(data);
-                        }
+                        updatePlantImage(0, plantId, bmp);
                     }
                 }
 
@@ -231,12 +226,31 @@ public class DatabaseManager {
     }
 
     /**
+     * Update a plant's image
+     * @param photoNum - suffix of image path
+     * @param plantId - id of the plant whose image needs to update
+     * @param bmp - new image
+     */
+    public void updatePlantImage(int photoNum, String plantId, Bitmap bmp) {
+        String userId = getUserId();
+        if ((userId != null) && (bmp != null)) {
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            bmp.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+            byte[] data = stream.toByteArray();
+            StorageReference filepath = mStorage.child(userId).child(plantId + "_" + photoNum + ".jpg");
+            filepath.putBytes(data);
+            mDatabase.child("users").child(userId).child("plants").child(plantId).child("photoNum").setValue(photoNum);
+        }
+    }
+
+    /**
      * Remove plant from the database
      * @param context - the current app context
      * @param name - the name of the plant
      * @param species - the species of the plant
+     * @param photoNum - the number of pictures that plant has
      */
-    public void deletePlant(Context context, String name, String species) {
+    public void deletePlant(Context context, String name, String species, final int photoNum) {
         final String userId = getUserId();
         final String plantId = species + "_" + name;
         deleteAllReminders(context);
@@ -251,7 +265,9 @@ public class DatabaseManager {
                     if (snapshot.exists()) {
                         mDatabase.child("users").child(userId).child("plants").child(plantId).removeValue();
                         setPlantsNumber(--mPlantsNumber);
-                        mStorage.child(userId).child(plantId + ".jpg").delete();
+                        for (int i = 0; i <= photoNum; i++) {
+                            mStorage.child(userId).child(plantId + "_" + i + ".jpg").delete();
+                        }
                     }
                 }
 
@@ -349,7 +365,7 @@ public class DatabaseManager {
                  */
                 @Override
                 protected void populateView(final View view, final Plant plant, final int position) {
-                    StorageReference storageReference = mStorage.child(userId).child(plant.getId() + ".jpg");
+                    StorageReference storageReference = mStorage.child(userId).child(plant.getId() + "_" + plant.getPhotoNum() + ".jpg");
                     ((TextView) view.findViewById(R.id.grid_item_nickname)).setText(plant.getName());
                     ((TextView) view.findViewById(R.id.grid_item_species)).setText(plant.getSpecies());
                     ImageView picture = (ImageView) view.findViewById(R.id.grid_item_image_view);
@@ -366,6 +382,7 @@ public class DatabaseManager {
                             i.putExtra("name", plant.getName());
                             i.putExtra("species", plant.getSpecies());
                             i.putExtra("height", plant.getHeight());
+                            i.putExtra("photoNum", plant.getPhotoNum());
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                                 View sharedImageView = view.findViewById(R.id.grid_item_image_view);
                                 Bundle bundle = ActivityOptions.makeSceneTransitionAnimation(activity, sharedImageView, "image_main_to_profile_transition").toBundle();
@@ -539,6 +556,22 @@ public class DatabaseManager {
     }
 
     /**
+     * Create a gif of the plant
+     * @param activity - calling activity to render gif
+     * @param plantId - the id of the plant to form a gif of
+     * @param photoNum - the number of pictures of the plant exist on firebase
+     */
+    public void makePlantGif(final Activity activity, String plantId, int photoNum) {
+        final String userId = getUserId();
+        if (userId != null) {
+            for (int i = 0; i <= photoNum; i++) {
+                StorageReference storageReference = mStorage.child(userId).child(plantId + "_" + i + ".jpg");
+
+            }
+        }
+    }
+
+    /**
      * Delete the birthday reminders
      * @param context - the current app context
      */
@@ -632,6 +665,10 @@ public class DatabaseManager {
             Calendar nextMeasure = Calendar.getInstance();
             long interval = getReminderIntervalInMillis(reminderSetting);
             nextMeasure.setTimeInMillis(calendar.getTimeInMillis() + interval);
+            // photo updates happen bi-daily, others update daily.
+            if (receiver instanceof UpdatePhotoReceiver) {
+                nextMeasure.add(Calendar.DAY_OF_MONTH, 2);
+            }
             nextMeasure.set(Calendar.HOUR, hour);
             nextMeasure.set(Calendar.MINUTE, minute);
             AlarmManager am = (AlarmManager) context.getSystemService(ALARM_SERVICE);
