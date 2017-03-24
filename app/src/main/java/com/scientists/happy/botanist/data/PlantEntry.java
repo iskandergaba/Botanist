@@ -642,7 +642,7 @@ public class PlantEntry {
      * Get noxious statuses
      * @return Returns the noxious statuses
      */
-    public List<String> getNoxiousStatuses() {
+    public List<String> getNoxious() {
         return noxious;
     }
 
@@ -650,7 +650,7 @@ public class PlantEntry {
      * Set noxious statuses
      * @param statuses - noxious statuses
      */
-    public void setNoxiousStatuses(List<String> statuses) {
+    public void setNoxious(List<String> statuses) {
         noxious = statuses;
     }
 
@@ -736,7 +736,7 @@ public class PlantEntry {
 
     /**
      * check if toxic
-     * @retun true if toxic, false otherwise
+     * @return true if toxic, false otherwise
      */
     public boolean isToxic() {
         if (toxicity == null) {

@@ -67,8 +67,7 @@ public class AddPlantActivity extends AppCompatActivity {
              */
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
-                if (hasFocus)
-                {
+                if (hasFocus) {
                     showDatePicker();
                 }
             }

@@ -9,6 +9,7 @@ class Plant {
     private Map<String, Double> heights;
     private long birthday, lastWaterNotification, lastMeasureNotification, lastFertilizerNotification, lastPhotoNotification;
     private double height;
+    private int photoNum;
     /**
      * Required by Firebase, this useless constructor must remain
      */
@@ -34,6 +35,7 @@ class Plant {
         this.lastWaterNotification = lastMeasureNotification;
         this.lastPhotoNotification = lastMeasureNotification;
         this.heights.put(Long.toString(lastMeasureNotification), height);
+        photoNum = -1;
     }
 
     /**
@@ -114,6 +116,14 @@ class Plant {
      */
     public long getLastPhotoNotification() {
         return lastPhotoNotification;
+    }
+
+    /**
+     * Get the number of the most recent photo
+     * @return Returns the number of the most recent photo
+     */
+    public int getPhotoNum() {
+        return photoNum;
     }
 
     /**

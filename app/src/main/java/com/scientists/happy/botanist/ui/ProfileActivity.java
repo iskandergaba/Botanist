@@ -3,6 +3,7 @@
 package com.scientists.happy.botanist.ui;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -19,15 +20,23 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.scientists.happy.botanist.R;
 import com.scientists.happy.botanist.data.DatabaseManager;
+import com.vansuita.pickimage.bean.PickResult;
+import com.vansuita.pickimage.bundle.PickSetup;
+import com.vansuita.pickimage.dialog.PickImageDialog;
+import com.vansuita.pickimage.listeners.IPickResult;
 public class ProfileActivity extends AppCompatActivity {
     private static final String ID_KEY = "plant_id";
     private static final String NAME_KEY = "name";
     private static final String SPECIES_KEY = "species";
     private static final String HEIGHT_KEY = "height";
+    private static final String PHOTO_KEY = "photoNum";
     private String name, species, plantId;
+    private int photoNum;
+    private Bitmap mBitmap;
     private double height;
     private DatabaseManager mDatabase;
     private TextView mHeightTextView, mGroup;
+    private ImageView mPicture;
     /**
      * Launch the activity
      * @param savedInstanceState - current view state
@@ -43,23 +52,46 @@ public class ProfileActivity extends AppCompatActivity {
         name = i.getExtras().getString(NAME_KEY);
         species = i.getExtras().getString(SPECIES_KEY);
         height = i.getExtras().getDouble(HEIGHT_KEY);
+        photoNum = i.getExtras().getInt(PHOTO_KEY);
         setTitle(name + "\'s Profile");
-        ImageView picture = (ImageView) findViewById(R.id.plant_picture);
-        picture.setOnClickListener(new View.OnClickListener() {
+        mPicture = (ImageView) findViewById(R.id.plant_picture);
+        mPicture.setOnClickListener(new View.OnClickListener() {
             /**
-             * User clicked to update picture
-             * @param v - current view
+             * Handle click event in the picture
+             * @param v - the current view
              */
             @Override
             public void onClick(View v) {
-                //TODO: stuff, definitely not showing the height dialog
+                final PickSetup setup = new PickSetup().setSystemDialog(true);
+                PickImageDialog.build(setup).setOnPickResult(new IPickResult() {
+                    /**
+                     * Handle the selected result
+                     * @param r - the selected result
+                     */
+                    @Override
+                    public void onPickResult(PickResult r) {
+                        mBitmap = r.getBitmap();
+                        mPicture.setImageBitmap(mBitmap);
+                        mDatabase.updatePlantImage(photoNum + 1, plantId, mBitmap);
+                    }
+                }).show(getSupportFragmentManager());
             }
         });
         StorageReference storageReference = FirebaseStorage.getInstance().getReference()
                 // TODO: clean a bit
-                .child(mDatabase.getUserId()).child(plantId+ ".jpg");
-        Glide.with(this).using(new FirebaseImageLoader()).load(storageReference).placeholder(R.drawable.flowey).into(picture);
+                .child(mDatabase.getUserId()).child(plantId + "_" + photoNum + ".jpg");
+        Glide.with(this).using(new FirebaseImageLoader()).load(storageReference).placeholder(R.drawable.flowey).into(mPicture);
         TextView nameTextView = (TextView) findViewById(R.id.plant_name);
+        nameTextView.setOnClickListener(new View.OnClickListener() {
+            /**
+             * User clicked update height
+             * @param v - current view
+             */
+            @Override
+            public void onClick(View v) {
+                // TODO: Change plant name
+            }
+        });
         nameTextView.setText(getString(R.string.name_fmt, name));
         TextView speciesTextView = (TextView) findViewById(R.id.plant_species);
         speciesTextView.setText(getString(R.string.species_fmt, species));
@@ -269,7 +301,7 @@ public class ProfileActivity extends AppCompatActivity {
              * @param id - the user id
              */
             public void onClick(DialogInterface dialog, int id) {
-                mDatabase.deletePlant(ProfileActivity.this, name, species);
+                mDatabase.deletePlant(ProfileActivity.this, name, species, photoNum);
                 Intent resultIntent = new Intent();
                 setResult(RESULT_OK, resultIntent);
                 finish();
