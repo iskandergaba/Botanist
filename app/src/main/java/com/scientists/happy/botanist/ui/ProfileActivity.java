@@ -199,9 +199,6 @@ public class ProfileActivity extends AppCompatActivity {
              */
             public void onClick(DialogInterface dialog, int id) {
                 mDatabase.updateNotificationTime(plantId, "lastFertilizerNotification");
-                Intent resultIntent = new Intent();
-                setResult(RESULT_OK, resultIntent);
-                finish();
             }
         });
         builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
@@ -231,9 +228,6 @@ public class ProfileActivity extends AppCompatActivity {
              */
             public void onClick(DialogInterface dialog, int id) {
                 mDatabase.updateNotificationTime(plantId, "lastWaterNotification");
-                Intent resultIntent = new Intent();
-                setResult(RESULT_OK, resultIntent);
-                finish();
             }
         });
         builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
