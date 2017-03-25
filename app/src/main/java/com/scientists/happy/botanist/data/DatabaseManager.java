@@ -49,12 +49,14 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import static android.content.Context.ALARM_SERVICE;
 public class DatabaseManager {
     private static final int TOXIC_WARNING_LABEL_COLOR = 0xffff4444;
+    private static final int NOXIOUS_WARNING_LABEL_COLOR = 0xf17a0a;
     private static final int HEIGHT_MEASURE_RECEIVER_ID_OFFSET = 1000;
     private static final int FERTILIZER_RECEIVER_ID_OFFSET = 2000;
     private static final int UPDATE_PHOTO_RECEIVER_ID_OFFSET = 3000;
@@ -456,6 +458,23 @@ public class DatabaseManager {
                         toxicWarningTextView.setBackgroundColor(TOXIC_WARNING_LABEL_COLOR);
                     } else {
                         toxicWarningTextView.setVisibility(View.GONE);
+                    }
+                    TextView noxiousWarningTextView = (TextView) view.findViewById(R.id.noxious_warning);
+                    List<String> noxious = entry.getNoxious();
+                    if (noxious != null) {
+                        noxiousWarningTextView.setVisibility(View.VISIBLE);
+                        if (noxious.contains("Noxious")) {
+                            noxiousWarningTextView.setText(R.string.noxious_warning);
+                        }
+                        if (noxious.contains("Quarantine")) {
+                            noxiousWarningTextView.setText(noxiousWarningTextView.getText() + " \n\n" + view.getContext().getString(R.string.quarantine_warning));
+                        }
+                        if (noxious.contains("Regulated")) {
+                            noxiousWarningTextView.setText(noxiousWarningTextView.getText() + " \n\n" + view.getContext().getString(R.string.regulated_warning));
+                        }
+                        if (noxious.contains("Banned")) {
+                            noxiousWarningTextView.setText(noxiousWarningTextView.getText() + " \n\n" + view.getContext().getString(R.string.banned_warning));
+                        }
                     }
                 }
 

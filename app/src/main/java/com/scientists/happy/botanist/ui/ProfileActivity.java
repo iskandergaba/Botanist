@@ -81,7 +81,7 @@ public class ProfileActivity extends AppCompatActivity {
                 // TODO: clean a bit
                 .child(mDatabase.getUserId()).child(plantId + "_" + photoNum + ".jpg");
         Glide.with(this).using(new FirebaseImageLoader()).load(storageReference).placeholder(R.drawable.flowey).into(mPicture);
-        TextView nameTextView = (TextView) findViewById(R.id.plant_name);
+        final TextView nameTextView = (TextView) findViewById(R.id.plant_name);
         nameTextView.setOnClickListener(new View.OnClickListener() {
             /**
              * User clicked update height
@@ -89,7 +89,7 @@ public class ProfileActivity extends AppCompatActivity {
              */
             @Override
             public void onClick(View v) {
-                // TODO: Change plant name
+                //TODO: Edit name
             }
         });
         nameTextView.setText(getString(R.string.name_fmt, name));

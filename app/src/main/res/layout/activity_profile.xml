@@ -25,20 +25,23 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@android:color/holo_red_light"
+            android:padding="@dimen/fab_margin"
             android:text="@string/toxic_warning"
             android:textColor="@color/cardview_light_background"
             android:textSize="18sp"
             android:visibility="gone"
             tools:background="@android:color/holo_red_light" />
 
-        <Button
-            android:text="@string/delete_dialog_title"
+        <TextView
+            android:id="@+id/noxious_warning"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/button"
-            android:textColor="@android:color/white"
-            android:background="@android:color/holo_red_light"
-            android:onClick="onPressDelete" />
+            android:background="?android:attr/colorActivatedHighlight"
+            android:padding="@dimen/fab_margin"
+            android:textColor="@color/cardview_light_background"
+            android:textSize="18sp"
+            android:visibility="gone"
+            tools:background="?android:attr/colorActivatedHighlight" />
 
         <LinearLayout
             android:id="@+id/plantinfo"
@@ -52,8 +55,9 @@
 
             <TextView
                 android:id="@+id/plant_name"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_weight="1.96"
                 android:text="@string/name_fmt"
                 android:textColor="@android:color/black"
                 android:textSize="16sp"
@@ -61,7 +65,7 @@
 
             <TextView
                 android:id="@+id/plant_species"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingTop="8dp"
                 android:text="@string/species_fmt"
@@ -133,6 +137,16 @@
                 android:visibility="gone" />
 
         </LinearLayout>
+
+        <Button
+            android:id="@+id/button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/holo_red_light"
+            android:onClick="onPressDelete"
+            android:text="@string/delete_dialog_title"
+            android:textColor="@android:color/white" />
+
     </LinearLayout>
 
 </ScrollView>
