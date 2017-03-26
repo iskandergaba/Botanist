@@ -622,6 +622,18 @@ public class DatabaseManager {
     }
 
     /**
+     * Update the name of a plant
+     * @param plantId - the ID of the plant
+     * @param newName - the new name for the plant
+     */
+    public void setPlantName(String plantId, String newName) {
+        String userId = getUserId();
+        if (userId != null) {
+            mDatabase.child("users").child(userId).child("plants").child(plantId).child("name").setValue(newName);
+        }
+    }
+
+    /**
      * Set when to remind about birthdays
      * @param context - the current app context
      * @param plant - the plant whose birthday is reminded of

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
@@ -17,7 +18,6 @@
             android:scaleType="centerCrop"
             android:src="@drawable/flowey"
             android:id="@+id/plant_picture"
-            android:transitionName="image_main_to_profile_transition"
             android:contentDescription="@string/plant_picture_desc" />
 
         <TextView
@@ -44,32 +44,51 @@
             tools:background="?android:attr/colorActivatedHighlight" />
 
         <LinearLayout
-            android:orientation="vertical"
+            android:id="@+id/plantinfo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:orientation="vertical"
             android:paddingBottom="@dimen/activity_vertical_margin"
             android:paddingLeft="@dimen/activity_horizontal_margin"
             android:paddingRight="@dimen/activity_horizontal_margin"
             android:paddingTop="@dimen/activity_vertical_margin">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/name_fmt"
-                android:id="@+id/plant_name"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:textColor="@android:color/black"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1.96"
+                android:paddingTop="8dp"
+                android:weightSum="2">
+
+                <TextView
+                    android:id="@+id/plant_name"
+                    android:layout_width="199dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/name_fmt"
+                    android:textColor="@android:color/black"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <Button
+                    android:id="@+id/change_name_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginRight="8dp"
+                    android:layout_weight="3.32"
+                    android:text="@string/update_name" />
+
+            </LinearLayout>
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/species_fmt"
                 android:id="@+id/plant_species"
-                android:textSize="16sp"
-                android:textStyle="bold"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:paddingTop="8dp"
-                android:textColor="@android:color/black"/>
+                android:text="@string/species_fmt"
+                android:textColor="@android:color/black"
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -78,14 +97,14 @@
                 android:weightSum="2">
 
                 <TextView
+                    android:id="@+id/plant_height"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:text="@string/height_fmt"
-                    android:id="@+id/plant_height"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
                     android:textColor="@android:color/black"
-                    android:layout_weight="1"/>
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
 
                 <Button
                     android:id="@+id/height_button"
@@ -93,20 +112,20 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="8dp"
                     android:layout_marginRight="8dp"
-                    android:text="@string/update_height"
-                    android:layout_weight="1"/>
+                    android:layout_weight="1"
+                    android:text="@string/update_height" />
 
             </LinearLayout>
 
             <TextView
+                android:id="@+id/title_care_tips"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingTop="8dp"
                 android:text="Care Tips:"
-                android:id="@+id/title_care_tips"
+                android:textColor="@android:color/black"
                 android:textSize="16sp"
-                android:textStyle="bold"
-                android:textColor="@android:color/black"/>
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/care_tips"
@@ -125,26 +144,26 @@
                 android:id="@+id/poop_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:onClick="onFertilizerButtonPress"
                 android:text="@string/fertilized" />
+
+            <TextView
+                android:id="@+id/invisible_man"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="TextView"
+                android:visibility="gone" />
 
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/invisible_man"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="TextView"
-            android:visibility="gone" />
-
         <Button
-            android:text="@string/delete_dialog_title"
+            android:id="@+id/button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/button"
-            android:textColor="@android:color/white"
             android:background="@android:color/holo_red_light"
-            android:onClick="onPressDelete" />
+            android:onClick="onPressDelete"
+            android:text="@string/delete_dialog_title"
+            android:textColor="@android:color/white" />
+
     </LinearLayout>
 
 </ScrollView>

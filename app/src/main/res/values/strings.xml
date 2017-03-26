@@ -61,5 +61,6 @@
     <string name="quarantine_warning">QUARANTINE: U.S. federal and/or state laws require this plant to be grown under quarantine. Please check your local laws to make sure you are in compliance.</string>
     <string name="regulated_warning">REGULATED: This plant is placed under restrictions in some U.S. states. Please check your local laws to be sure that you are in compliance.</string>
     <string name="banned_warning">BANNED: Possession of this plant is illegal in some U.S. states. Please check your local laws to be sure that you are in compliance.</string>
-    <string name="update_name">Change</string>
+    <string name="update_name">Change Name</string>
 </resources>
+

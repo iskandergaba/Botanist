@@ -53,15 +53,32 @@
             android:paddingRight="@dimen/activity_horizontal_margin"
             android:paddingTop="@dimen/activity_vertical_margin">
 
-            <TextView
-                android:id="@+id/plant_name"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="1.96"
-                android:text="@string/name_fmt"
-                android:textColor="@android:color/black"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+                android:paddingTop="8dp"
+                android:weightSum="2">
+
+                <TextView
+                    android:id="@+id/plant_name"
+                    android:layout_width="199dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/name_fmt"
+                    android:textColor="@android:color/black"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <Button
+                    android:id="@+id/change_name_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginRight="8dp"
+                    android:layout_weight="3.32"
+                    android:text="@string/update_name" />
+
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/plant_species"
