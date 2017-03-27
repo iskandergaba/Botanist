@@ -8,6 +8,7 @@
     <string name="plant_nickname">Flowey</string>
     <string name="title_activity_settings">Settings</string>
     <string name="title_activity_similar_plants">Similar Plants</string>
+    <string name="facebook_app_id">1868216650126708</string>
 
     <string name="loading" tools:override="true">Loading…</string>
 

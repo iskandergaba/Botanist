@@ -5,6 +5,7 @@
 
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
         android:allowBackup="true"
@@ -18,14 +19,17 @@
             android:exported="false"
             android:grantUriPermissions="true"
             tools:replace="android:authorities">
-        <provider android:authorities="com.facebook.app.FacebookContentProvider{APP_ID}"
+        </provider>
+        <provider
+            android:authorities="com.facebook.app.FacebookContentProvider.com.scientists.happy.botanist"
             android:name="com.facebook.FacebookContentProvider"
             android:exported="true"/>
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/picker_provider_paths" />
-        </provider>
-
+        <meta-data
+            android:name="android.support.FILE_PROVIDER_PATHS"
+            android:resource="@xml/picker_provider_paths" />
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_app_id"/>
         <receiver android:name=".services.BirthdayReceiver" />
         <receiver android:name=".services.HeightMeasureReceiver" />
         <receiver android:name=".services.FertilizerReceiver" />
