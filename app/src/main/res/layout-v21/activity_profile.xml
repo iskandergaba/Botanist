@@ -18,6 +18,7 @@
             android:scaleType="centerCrop"
             android:src="@drawable/flowey"
             android:id="@+id/plant_picture"
+            android:transitionName="image_main_to_profile_transition"
             android:contentDescription="@string/plant_picture_desc" />
 
         <TextView
@@ -55,8 +56,7 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1.96"
+                android:layout_height="wrap_content"
                 android:paddingTop="8dp"
                 android:weightSum="2">
 
@@ -75,7 +75,6 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="8dp"
                     android:layout_marginRight="8dp"
-                    android:layout_weight="3.32"
                     android:text="@string/update_name" />
 
             </LinearLayout>
@@ -150,7 +149,6 @@
                 android:id="@+id/invisible_man"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="TextView"
                 android:visibility="gone" />
 
         </LinearLayout>

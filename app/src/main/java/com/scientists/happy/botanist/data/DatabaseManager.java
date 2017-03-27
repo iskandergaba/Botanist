@@ -16,12 +16,14 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.bumptech.glide.Glide;
 import com.firebase.ui.database.FirebaseListAdapter;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
@@ -44,14 +46,12 @@ import com.scientists.happy.botanist.services.UpdatePhotoReceiver;
 import com.scientists.happy.botanist.services.WaterReceiver;
 import com.scientists.happy.botanist.ui.ProfileActivity;
 import com.scientists.happy.botanist.ui.SettingsActivity;
+
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
 import static android.content.Context.ALARM_SERVICE;
 public class DatabaseManager {
@@ -111,7 +111,7 @@ public class DatabaseManager {
      * Singleton DatabaseManager constructor
      */
     private DatabaseManager() {
-        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+//        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
         mAutoCompleteCache = new HashMap<>();
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mStorage = FirebaseStorage.getInstance().getReference();
@@ -704,6 +704,7 @@ public class DatabaseManager {
             nextMeasure.set(Calendar.MINUTE, minute);
             AlarmManager am = (AlarmManager) context.getSystemService(ALARM_SERVICE);
             am.setRepeating(AlarmManager.RTC_WAKEUP, nextMeasure.getTimeInMillis(), interval, pendingIntent);
+            Log.v("fuck", interval + "");
         }
     }
 

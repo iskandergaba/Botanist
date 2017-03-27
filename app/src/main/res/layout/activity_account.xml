@@ -24,7 +24,7 @@
             android:layout_height="64dp"
             android:layout_marginBottom="@dimen/activity_vertical_margin"
             android:contentDescription="@string/account_picture"
-            android:src="@mipmap/ic_launcher" />
+            android:src="@drawable/icon" />
 
         <TextView
             android:id="@+id/name"
