@@ -23,6 +23,13 @@
 
     <string name="species_fmt">Species: %s</string>
 
+    <string name="level_fmt">Level: %s</string>
+
+    <string name="level_0">Plant Murderer</string>
+    <string name="level_1">Little Botanist</string>
+    <string name="level_2">Heisenberg</string>
+    <string name="level_3">The Botanist</string>
+
     <!-- Server Client ID.  This should be a valid Web OAuth 2.0 Client ID obtained
          from https://console.developers.google.com/ -->
     <string name="server_client_id" translatable="false">993462563911-9h2lig8m0klrfst5ob8lu2lprnqgf2nf.apps.googleusercontent.com</string>
@@ -62,5 +69,9 @@
     <string name="quarantine_warning">QUARANTINE: U.S. federal and/or state laws require this plant to be grown under quarantine. Please check your local laws to make sure you are in compliance.</string>
     <string name="regulated_warning">REGULATED: This plant is placed under restrictions in some U.S. states. Please check your local laws to be sure that you are in compliance.</string>
     <string name="banned_warning">BANNED: Possession of this plant is illegal in some U.S. states. Please check your local laws to be sure that you are in compliance.</string>
-    <string name="update_name">Change</string>
+    <string name="update_name">Change Name</string>
+    <string name="user_badge_desc">User badge</string>
+
+    <string name="fertilization_link" translatable="false"><a href='http://www.finegardening.com/fertilizing-basics'>Learn more about fertilization</a></string>
 </resources>
+

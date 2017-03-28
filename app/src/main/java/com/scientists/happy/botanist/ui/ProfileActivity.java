@@ -7,6 +7,8 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.text.InputType;
+import android.text.method.LinkMovementMethod;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -37,6 +39,7 @@ public class ProfileActivity extends AppCompatActivity {
     private DatabaseManager mDatabase;
     private TextView mHeightTextView, mGroup;
     private ImageView mPicture;
+    private String changeNameText = "";
     /**
      * Launch the activity
      * @param savedInstanceState - current view state
@@ -77,19 +80,24 @@ public class ProfileActivity extends AppCompatActivity {
                 }).show(getSupportFragmentManager());
             }
         });
+
+        TextView fertilizationLink = (TextView)findViewById(R.id.fertilization_link);
+        fertilizationLink.setMovementMethod(LinkMovementMethod.getInstance());
+
         StorageReference storageReference = FirebaseStorage.getInstance().getReference()
                 // TODO: clean a bit
                 .child(mDatabase.getUserId()).child(plantId + "_" + photoNum + ".jpg");
         Glide.with(this).using(new FirebaseImageLoader()).load(storageReference).placeholder(R.drawable.flowey).into(mPicture);
-        final TextView nameTextView = (TextView) findViewById(R.id.plant_name);
-        nameTextView.setOnClickListener(new View.OnClickListener() {
+        TextView nameTextView = (TextView) findViewById(R.id.plant_name);
+        Button changeNameButton = (Button) findViewById(R.id.change_name_button);
+        changeNameButton.setOnClickListener(new View.OnClickListener() {
             /**
-             * User clicked update height
+             * User clicked change name
              * @param v - current view
              */
             @Override
             public void onClick(View v) {
-                //TODO: Edit name
+                buildChangeNameDialog().show();
             }
         });
         nameTextView.setText(getString(R.string.name_fmt, name));
@@ -228,6 +236,8 @@ public class ProfileActivity extends AppCompatActivity {
              */
             public void onClick(DialogInterface dialog, int id) {
                 mDatabase.updateNotificationTime(plantId, "lastWaterNotification");
+                mDatabase.setWaterCount(mDatabase.getWaterCount() + 1);
+                mDatabase.updateUserRating();
             }
         });
         builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
@@ -312,6 +322,43 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
         // Get the AlertDialog from create()
+        return builder.create();
+    }
+
+    /**
+     * Allow the user to change the name of the plant
+     * @return - returns the alert window
+     */
+    private AlertDialog buildChangeNameDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Change Plant Name");
+
+        // Set up the input
+        final EditText input = new EditText(this);
+
+        // Specify the type of input expected
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        builder.setView(input);
+
+        // Set up the buttons
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                changeNameText = input.getText().toString();
+                mDatabase.setPlantName(plantId, changeNameText);
+                name = changeNameText;
+                TextView nameTextView = (TextView) findViewById(R.id.plant_name);
+                nameTextView.setText(name);
+                setTitle(name + "\'s Profile");
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
         return builder.create();
     }
 }
