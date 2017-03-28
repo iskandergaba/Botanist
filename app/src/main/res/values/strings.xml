@@ -70,5 +70,7 @@
     <string name="banned_warning">BANNED: Possession of this plant is illegal in some U.S. states. Please check your local laws to be sure that you are in compliance.</string>
     <string name="update_name">Change Name</string>
     <string name="user_badge_desc">User badge</string>
+
+    <string name="fertilization_link" translatable="false"><a href='http://www.finegardening.com/fertilizing-basics'>Learn more about fertilization</a></string>
 </resources>
 
