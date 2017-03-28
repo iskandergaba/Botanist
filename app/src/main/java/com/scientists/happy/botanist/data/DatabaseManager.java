@@ -1,5 +1,5 @@
 // Singleton Database manager for Firebase
-// @author: Iskander Gaba
+// @author: Christopher Besser, Antonio Muscarella, and Iskander Gaba
 package com.scientists.happy.botanist.data;
 import android.app.Activity;
 import android.app.ActivityOptions;
