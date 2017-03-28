@@ -14,6 +14,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -51,27 +52,6 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
     private DatabaseManager mDatabase;
 
     /**
-     * The activity was stopped
-     */
-    @Override
-    protected void onStop() {
-        super.onStop();
-        if (mAuthListener != null) {
-            mAuth.removeAuthStateListener(mAuthListener);
-        }
-    }
-
-    /**
-     * Handle back button press
-     * @return Returns a success code
-     */
-    @Override
-    public boolean onSupportNavigateUp() {
-        super.onBackPressed();
-        return true;
-    }
-
-    /**
      * Launch the activity
      * @param savedInstanceState - current app state
      */
@@ -85,6 +65,9 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
         mBotanistSinceTextView = (TextView) findViewById(R.id.botanist_since);
         mPlantsNumberTextView = (TextView) findViewById(R.id.plants_number);
         mAccountImageView = (ImageView) findViewById(R.id.account_picture);
+        TextView levelTextView = (TextView) findViewById(R.id.level_text_view);
+        ImageView badge = (ImageView) findViewById(R.id.user_badge);
+        ProgressBar levelProgressBar = (ProgressBar) findViewById(R.id.level_progress_bar);
         // Button listeners
         findViewById(R.id.sign_out_button).setOnClickListener(this);
         findViewById(R.id.revoke_access_button).setOnClickListener(this);
@@ -116,6 +99,24 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
         mGoogleApiClient = new GoogleApiClient.Builder(this).enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso).build();
 
+        double rating = mDatabase.getUserRating();
+        if (rating < 0) {
+            badge.setImageResource(R.drawable.badge_level0);
+            levelTextView.setText(getString(R.string.level_0));
+            levelProgressBar.setProgress(0);
+        } else if (rating < 0.35) {
+            badge.setImageResource(R.drawable.badge_level1);
+            levelTextView.setText(getString(R.string.level_1));
+            levelProgressBar.setProgress(35);
+        } else if (rating < 0.75) {
+            badge.setImageResource(R.drawable.badge_level2);
+            levelTextView.setText(getString(R.string.level_2));
+            levelProgressBar.setProgress(75);
+        } else {
+            badge.setImageResource(R.drawable.badge_level3);
+            levelTextView.setText(getString(R.string.level_3));
+            levelProgressBar.setProgress(100);
+        }
     }
 
     /**
@@ -149,6 +150,27 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
             });
         }
         mAuth.addAuthStateListener(mAuthListener);
+    }
+
+    /**
+     * The activity was stopped
+     */
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (mAuthListener != null) {
+            mAuth.removeAuthStateListener(mAuthListener);
+        }
+    }
+
+    /**
+     * Handle back button press
+     * @return Returns a success code
+     */
+    @Override
+    public boolean onSupportNavigateUp() {
+        super.onBackPressed();
+        return true;
     }
 
     /**
