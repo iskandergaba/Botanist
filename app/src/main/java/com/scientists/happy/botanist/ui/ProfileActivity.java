@@ -231,6 +231,8 @@ public class ProfileActivity extends AppCompatActivity {
              */
             public void onClick(DialogInterface dialog, int id) {
                 mDatabase.updateNotificationTime(plantId, "lastWaterNotification");
+                mDatabase.setWaterCount(mDatabase.getWaterCount() + 1);
+                mDatabase.updateUserRating();
             }
         });
         builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {

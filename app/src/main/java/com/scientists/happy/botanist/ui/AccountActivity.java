@@ -15,7 +15,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
+
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.google.android.gms.auth.api.Auth;
@@ -29,13 +29,11 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthCredential;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.GoogleAuthProvider;
-import com.scientists.happy.botanist.data.DatabaseManager;
 import com.scientists.happy.botanist.R;
+import com.scientists.happy.botanist.data.DatabaseManager;
+
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 public class AccountActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, View.OnClickListener {
@@ -51,8 +49,9 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
     private DatabaseManager mDatabase;
+
     /**
-     * The app was stopped
+     * The activity was stopped
      */
     @Override
     protected void onStop() {
@@ -116,6 +115,7 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
         // options specified by gso.
         mGoogleApiClient = new GoogleApiClient.Builder(this).enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso).build();
+
     }
 
     /**
@@ -177,7 +177,6 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
             // Signed in successfully, show authenticated UI.
             GoogleSignInAccount acct = result.getSignInAccount();
             if (acct != null) {
-                firebaseAuthWithGoogle(acct);
                 SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy", Locale.US);
                 mNameTextView.setText(acct.getDisplayName());
                 mEmailTextView.setText(getString(R.string.email_fmt, acct.getEmail()));
@@ -197,36 +196,6 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
                 });
             }
         }
-    }
-
-    /**
-     * Connect user to firebase
-     * @param acct - the user account
-     */
-    private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
-        Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getId());
-        showProgressDialog();
-        AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
-        mAuth.signInWithCredential(credential).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-            /**
-             * Complete the sign in task
-             * @param task - the task to sign in
-             */
-            @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-                Log.d(TAG, "signInWithCredential:onComplete:" + task.isSuccessful());
-                // If sign in fails, display a message to the user. If sign in succeeds
-                // the auth state listener will be notified and logic to handle the
-                // signed in user can be handled in the listener.
-                if (!task.isSuccessful()) {
-                    Log.w(TAG, "signInWithCredential", task.getException());
-                    Toast.makeText(AccountActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
-                }
-                // [START_EXCLUDE]
-                hideProgressDialog();
-                // [END_EXCLUDE]
-            }
-        });
     }
 
     /**
