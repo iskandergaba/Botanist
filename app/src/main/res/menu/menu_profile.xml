@@ -8,4 +8,9 @@
         android:orderInCategory="100"
         android:title="@string/similar"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/action_create_gif"
+        android:orderInCategory="200"
+        android:title="@string/create_gif"
+        app:showAsAction="never" />
 </menu>

@@ -1,6 +1,7 @@
 // Plant profile
 // @author: Antonio Muscarella and Christopher Besser
 package com.scientists.happy.botanist.ui;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -14,6 +15,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
 import com.google.firebase.storage.FirebaseStorage;
@@ -30,6 +32,7 @@ public class ProfileActivity extends AppCompatActivity {
     private static final String SPECIES_KEY = "species";
     private static final String HEIGHT_KEY = "height";
     private static final String PHOTO_KEY = "photoNum";
+    private static final String GIF_LOCATION_KEY = "gifLocation";
     private String name, species, plantId;
     private int photoNum;
     private Bitmap mBitmap;
@@ -37,6 +40,7 @@ public class ProfileActivity extends AppCompatActivity {
     private DatabaseManager mDatabase;
     private TextView mHeightTextView, mGroup;
     private ImageView mPicture;
+    private String gifLocation;
     /**
      * Launch the activity
      * @param savedInstanceState - current view state
@@ -53,6 +57,7 @@ public class ProfileActivity extends AppCompatActivity {
         species = i.getExtras().getString(SPECIES_KEY);
         height = i.getExtras().getDouble(HEIGHT_KEY);
         photoNum = i.getExtras().getInt(PHOTO_KEY);
+        gifLocation = i.getExtras().getString(GIF_LOCATION_KEY);
         setTitle(name + "\'s Profile");
         mPicture = (ImageView) findViewById(R.id.plant_picture);
         mPicture.setOnClickListener(new View.OnClickListener() {
@@ -73,6 +78,7 @@ public class ProfileActivity extends AppCompatActivity {
                         mBitmap = r.getBitmap();
                         mPicture.setImageBitmap(mBitmap);
                         mDatabase.updatePlantImage(photoNum + 1, plantId, mBitmap);
+                        photoNum++;
                     }
                 }).show(getSupportFragmentManager());
             }
@@ -95,6 +101,8 @@ public class ProfileActivity extends AppCompatActivity {
         nameTextView.setText(getString(R.string.name_fmt, name));
         TextView speciesTextView = (TextView) findViewById(R.id.plant_species);
         speciesTextView.setText(getString(R.string.species_fmt, species));
+        TextView gifTextView = (TextView) findViewById(R.id.gif_location);
+        gifTextView.setText(getString(R.string.gif_fmt, gifLocation));
         mHeightTextView = (TextView) findViewById(R.id.plant_height);
         mHeightTextView.setText(getString(R.string.height_fmt, height));
         Button heightButton = (Button) findViewById(R.id.height_button);
@@ -156,11 +164,12 @@ public class ProfileActivity extends AppCompatActivity {
         if (id == R.id.action_similar_plants) {
             Intent i = new Intent(this, SimilarPlantsActivity.class);
             i.putExtra("species", plantId);
-            System.out.println("Species: " + species);
             i.putExtra("group", mGroup.getText().toString());
-            System.out.println("Group: " + mGroup.getText().toString());
             startActivity(i);
             return true;
+        }
+        else if (id == R.id.action_create_gif) {
+            mDatabase.makePlantGif(this, plantId, photoNum);
         }
         return super.onOptionsItemSelected(item);
     }
@@ -199,6 +208,8 @@ public class ProfileActivity extends AppCompatActivity {
              */
             public void onClick(DialogInterface dialog, int id) {
                 mDatabase.updateNotificationTime(plantId, "lastFertilizerNotification");
+                Context context = getApplicationContext();
+                Toast.makeText(context, "Update successful", Toast.LENGTH_SHORT).show();
             }
         });
         builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
@@ -228,6 +239,8 @@ public class ProfileActivity extends AppCompatActivity {
              */
             public void onClick(DialogInterface dialog, int id) {
                 mDatabase.updateNotificationTime(plantId, "lastWaterNotification");
+                Context context = getApplicationContext();
+                Toast.makeText(context, "Update successful", Toast.LENGTH_SHORT).show();
             }
         });
         builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
@@ -263,6 +276,8 @@ public class ProfileActivity extends AppCompatActivity {
                     mDatabase.updatePlantHeight(ProfileActivity.this, plantId, height);
                     mHeightTextView.setText(getString(R.string.height_fmt, height));
                 }
+                Context context = getApplicationContext();
+                Toast.makeText(context, "Update successful", Toast.LENGTH_SHORT).show();
             }
         }).setNegativeButton(R.string.mdtp_cancel, new DialogInterface.OnClickListener() {
             /**

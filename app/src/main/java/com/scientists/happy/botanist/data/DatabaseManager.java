@@ -14,6 +14,7 @@ import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.view.View;
@@ -44,22 +45,23 @@ import com.scientists.happy.botanist.services.UpdatePhotoReceiver;
 import com.scientists.happy.botanist.services.WaterReceiver;
 import com.scientists.happy.botanist.ui.ProfileActivity;
 import com.scientists.happy.botanist.ui.SettingsActivity;
+import com.scientists.happy.botanist.utils.GifSequenceWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
-
 import static android.content.Context.ALARM_SERVICE;
+import static android.os.Environment.getExternalStoragePublicDirectory;
 public class DatabaseManager {
     private static final int TOXIC_WARNING_LABEL_COLOR = 0xffff4444;
     private static final int HEIGHT_MEASURE_RECEIVER_ID_OFFSET = 1000;
     private static final int FERTILIZER_RECEIVER_ID_OFFSET = 2000;
     private static final int UPDATE_PHOTO_RECEIVER_ID_OFFSET = 3000;
     private static final int BIRTHDAY_RECEIVER_ID_OFFSET = 4000;
-    //private static final String TAG = "DatabaseManager";
     private long mPlantsNumber;
     private long mBotanistSince;
     private ProgressDialog mProgressDialog;
@@ -102,6 +104,88 @@ public class DatabaseManager {
                 }
             });
             return null;
+        }
+    }
+
+    private class LoadImages extends AsyncTask<Void, Void, Boolean> {
+        int numPhotos;
+        Activity parent;
+        String userId;
+        String plantId;
+        File outFile;
+        /**
+         * Prepare to launch task
+         */
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            TextView location = (TextView) parent.findViewById(R.id.gif_location);
+            location.setText("Gif Location: Creating gif...");
+        }
+
+        /**
+         * Create the background process for loading images
+         * @param numPhotos - number of images taken of the plant
+         * @param activity - calling activity
+         * @param plantId - id of plant to make gif of
+         */
+        public LoadImages(int numPhotos, Activity activity, String plantId) {
+            parent = activity;
+            this.numPhotos = numPhotos;
+            userId = getUserId();
+            this.plantId = plantId;
+        }
+
+        /**
+         * Background asynchronous update
+         * @param params - process parameters
+         * @return Returns nothing
+         */
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            GifSequenceWriter gifWriter = new GifSequenceWriter();
+            gifWriter.start(out);
+            // 500 ms frame
+            gifWriter.setDelay(500);
+            for (int i = 0; i <= numPhotos; i++) {
+                StorageReference storageReference = mStorage.child(userId).child(plantId + "_" + i + ".jpg");
+                try {
+                    Bitmap bmp = Glide.with(parent).using(new FirebaseImageLoader()).load(storageReference).asBitmap().into(-1, -1).get();
+                    gifWriter.addFrame(bmp);
+                }
+                catch (InterruptedException | ExecutionException e) {
+                    return false;
+                }
+            }
+            gifWriter.finish();
+            try {
+                // created gif files are written to pictures public external storage
+                outFile = new File(getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), plantId + ".gif");
+                FileOutputStream output = new FileOutputStream(outFile);
+                output.write(out.toByteArray());
+                output.flush();
+                output.close();
+                return true;
+            }
+            catch (IOException e) {
+                return false;
+            }
+        }
+
+        /**
+         * Determine if execution succeeded
+         * @param success - true if doInBackground succeeded.
+         */
+        @Override
+        protected void onPostExecute(Boolean success) {
+            TextView location = (TextView) parent.findViewById(R.id.gif_location);
+            String text = "Gif Location: Failure making .gif";
+            if (success) {
+                text = "Gif Location: " + outFile.getAbsolutePath();
+            }
+            location.setText(text);
+            mDatabase.child("users").child(userId).child("plants").child(plantId).child("gifLocation").setValue(text);
         }
     }
 
@@ -240,6 +324,7 @@ public class DatabaseManager {
             StorageReference filepath = mStorage.child(userId).child(plantId + "_" + photoNum + ".jpg");
             filepath.putBytes(data);
             mDatabase.child("users").child(userId).child("plants").child(plantId).child("photoNum").setValue(photoNum);
+            updateNotificationTime(plantId, "lastPhotoNotification");
         }
     }
 
@@ -383,6 +468,7 @@ public class DatabaseManager {
                             i.putExtra("species", plant.getSpecies());
                             i.putExtra("height", plant.getHeight());
                             i.putExtra("photoNum", plant.getPhotoNum());
+                            i.putExtra("gifLocation", plant.getGifLocation());
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                                 View sharedImageView = view.findViewById(R.id.grid_item_image_view);
                                 Bundle bundle = ActivityOptions.makeSceneTransitionAnimation(activity, sharedImageView, "image_main_to_profile_transition").toBundle();
@@ -557,17 +643,17 @@ public class DatabaseManager {
 
     /**
      * Create a gif of the plant
-     * @param activity - calling activity to render gif
+     * @param activity - calling activity
      * @param plantId - the id of the plant to form a gif of
-     * @param photoNum - the number of pictures of the plant exist on firebase
+     * @param photoNum - the number of pictures of the plant that were taken
      */
     public void makePlantGif(final Activity activity, String plantId, int photoNum) {
         final String userId = getUserId();
-        if (userId != null) {
-            for (int i = 0; i <= photoNum; i++) {
-                StorageReference storageReference = mStorage.child(userId).child(plantId + "_" + i + ".jpg");
-
-            }
+        if ((photoNum > 1) && (userId != null)) {
+            new LoadImages(photoNum, activity, plantId).execute();
+        }
+        else {
+            Toast.makeText(activity, "Must take at least 2 pictures for a .gif", Toast.LENGTH_SHORT);
         }
     }
 
