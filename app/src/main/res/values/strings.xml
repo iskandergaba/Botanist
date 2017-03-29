@@ -15,7 +15,7 @@
     <!-- Button labels -->
     <string name="sign_out">Sign out</string>
     <string name="disconnect">Delete Account</string>
-
+    <string name="gif_fmt">Gif Location: %s</string>
     <string name="name_fmt">Name: %s</string>
     <string name="email_fmt">Email: %s</string>
     <string name="botanist_since_fmt">Botanist Since: %s</string>
@@ -53,6 +53,7 @@
     <string name="no_plants">No plants added</string>
     <string name="set_birthday">Set birthday</string>
     <string name="loading_similar">Loading similar plants...</string>
+    <string name="create_gif">Export pictures to .gif</string>
     <string name="plant_picture_desc">Plant picture</string>
     <string name="tap_to_take_a_picture">Choose a picture</string>
     <string name="name">Name</string>

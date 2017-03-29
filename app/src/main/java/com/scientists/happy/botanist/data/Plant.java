@@ -10,6 +10,7 @@ class Plant {
     private long birthday, lastWaterNotification, lastMeasureNotification, lastFertilizerNotification, lastPhotoNotification;
     private double height;
     private int photoNum;
+    private String gifLocation;
     /**
      * Required by Firebase, this useless constructor must remain
      */
@@ -36,6 +37,7 @@ class Plant {
         this.lastPhotoNotification = lastMeasureNotification;
         this.heights.put(Long.toString(lastMeasureNotification), height);
         photoNum = -1;
+        gifLocation = "No Gif made (yet!)";
     }
 
     /**
@@ -124,6 +126,14 @@ class Plant {
      */
     public int getPhotoNum() {
         return photoNum;
+    }
+
+    /**
+     * Get gif location
+     * @return Get the location of the plant gif
+     */
+    public String getGifLocation() {
+        return gifLocation;
     }
 
     /**
