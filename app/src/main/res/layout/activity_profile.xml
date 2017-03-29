@@ -61,7 +61,7 @@
 
                 <TextView
                     android:id="@+id/plant_name"
-                    android:layout_width="199dp"
+                    android:layout_width="188dp"
                     android:layout_height="wrap_content"
                     android:text="@string/name_fmt"
                     android:textColor="@android:color/black"

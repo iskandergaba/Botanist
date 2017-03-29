@@ -11,6 +11,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -69,6 +70,7 @@ public class DatabaseManager {
     private Map<String, String> mAutoCompleteCache;
     private StorageReference mStorage;
     private DatabaseReference mDatabase;
+    private String mDiseaseUrl;
     private static DatabaseManager mDatabaseManager;
     private class PrepareAutocompleteTask extends AsyncTask<Void, Void, Void> {
         /**
@@ -438,6 +440,60 @@ public class DatabaseManager {
                     if (!plant.equals(species)) {
                         ((TextView) view.findViewById(android.R.id.text1)).setText(plant);
                     }
+                }
+            };
+        }
+        return null;
+    }
+
+    /**
+     * Get a plant adapter for the diseases a plant can have
+     * @param activity - the current activity
+     * @param group - group the plant belongs to
+     * @return Returns an adapter for the plants
+     */
+    public FirebaseListAdapter<String> getDiseases(final Activity activity, String group) {
+        final String userId = getUserId();
+        if (userId != null) {
+            DatabaseReference databaseRef = mDatabase.child("Diseases").child(group);
+            return new FirebaseListAdapter<String>(activity, String.class, android.R.layout.simple_list_item_1, databaseRef) {
+                /**
+                 * Show images in glide
+                 * @param view - the current view
+                 * @param disease - the disease to display
+                 * @param position - the position in the menu
+                 */
+                @Override
+                protected void populateView(final View view, final String disease, final int position) {
+                    ((TextView) view.findViewById(android.R.id.text1)).setText(disease);
+                    mDatabase.child("DiseaseUrls").child(disease).addListenerForSingleValueEvent(new ValueEventListener() {
+                        /**
+                         * Handle a change in the database contents
+                         * @param snapshot - current database contents
+                         */
+                        @Override
+                        public void onDataChange(DataSnapshot snapshot) {
+                            if (snapshot.exists()) {
+                                mDiseaseUrl = (String) snapshot.getValue();
+                            }
+                        }
+
+                        /**
+                         * Do nothing when the process is cancelled
+                         * @param databaseError - Ignored error
+                         */
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                        }
+                    });
+                    ((TextView) view.findViewById(android.R.id.text1)).setOnClickListener(new View.OnClickListener() {
+
+                        @Override
+                        public void onClick(View v) {
+                            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(mDiseaseUrl));
+                            activity.startActivity(browserIntent);
+                        }
+                    });
                 }
             };
         }

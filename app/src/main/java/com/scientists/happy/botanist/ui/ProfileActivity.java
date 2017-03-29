@@ -164,11 +164,13 @@ public class ProfileActivity extends AppCompatActivity {
         if (id == R.id.action_similar_plants) {
             Intent i = new Intent(this, SimilarPlantsActivity.class);
             i.putExtra("species", plantId);
-            System.out.println("Species: " + species);
             i.putExtra("group", mGroup.getText().toString());
-            System.out.println("Group: " + mGroup.getText().toString());
             startActivity(i);
             return true;
+        } else if (id == R.id.action_diseases) {
+            Intent i = new Intent(this, DiseaseActivity.class);
+            i.putExtra("group", mGroup.getText().toString());
+            startActivity(i);
         }
         return super.onOptionsItemSelected(item);
     }

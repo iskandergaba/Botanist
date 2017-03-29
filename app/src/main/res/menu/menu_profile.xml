@@ -8,4 +8,9 @@
         android:orderInCategory="100"
         android:title="@string/similar"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/action_diseases"
+        android:orderInCategory="101"
+        android:title="@string/diseases"
+        app:showAsAction="never" />
 </menu>
