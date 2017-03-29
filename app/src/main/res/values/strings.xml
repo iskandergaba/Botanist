@@ -8,6 +8,7 @@
     <string name="plant_nickname">Flowey</string>
     <string name="title_activity_settings">Settings</string>
     <string name="title_activity_similar_plants">Similar Plants</string>
+    <string name="title_activity_disease">Diseases and Pests</string>
 
     <string name="loading" tools:override="true">Loading…</string>
 
@@ -38,7 +39,8 @@
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="account">Account</string>
-    <string name="similar">Similar</string>
+    <string name="similar">Similar Plants</string>
+    <string name="diseases">Diseases &amp; Pests</string>
     <string name="signed_out">Signed out</string>
     <string name="account_picture">Account Picture</string>
     <string name="no_plants">No plants added</string>
@@ -62,5 +64,6 @@
     <string name="regulated_warning">REGULATED: This plant is placed under restrictions in some U.S. states. Please check your local laws to be sure that you are in compliance.</string>
     <string name="banned_warning">BANNED: Possession of this plant is illegal in some U.S. states. Please check your local laws to be sure that you are in compliance.</string>
     <string name="update_name">Change Name</string>
+    <string name="loading_diseases">Loading diseases and pests...</string>
 </resources>
 
