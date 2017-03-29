@@ -13,4 +13,9 @@
         android:orderInCategory="200"
         android:title="@string/create_gif"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/action_diseases"
+        android:orderInCategory="101"
+        android:title="@string/diseases"
+        app:showAsAction="never" />
 </menu>

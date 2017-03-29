@@ -73,6 +73,7 @@ public class Parser
     private static final String[] RARE_SYMBOLS = {"R", "U", "RI", "WL"};
     private static final String[] ENDANGERED_SYMBOLS = {"E", "T", "HS", "SA", "SR", "SC", "CE", "H", "FP", "CV", "EV", "V", "S"};
     private static final String[] CRITICALLY_ENDANGERED_SYMBOLS = {"X", "PX", "PREX", "PRX"};
+
     private File input;
     private File output;
     private BufferedReader br;
@@ -436,7 +437,7 @@ public class Parser
      * @param delim - char to split the string on
      * @return - LinkedList of the split string elements
      */
-    public LinkedList<String> splitString(String str, char delim)
+    public static LinkedList<String> splitString(String str, char delim)
     {
         LinkedList<String> result = new LinkedList<String>();
         int start = 0;
@@ -460,9 +461,12 @@ public class Parser
     {
         try
         {
-            Parser p = new Parser("usdaplants.csv", "out.json");
-            p.parseInputFile();
-            p.writeToOutputFile();
+            //Parser p = new Parser("usdaplants.csv", "out.json");
+            //p.parseInputFile();
+            //p.writeToOutputFile();
+            DiseaseParser dp = new DiseaseParser("plantdiseases.csv", "diseasesOut.json");
+            dp.parseInputFile();
+            dp.writeToOutputFile();
         }
         catch (IOException e)
         {

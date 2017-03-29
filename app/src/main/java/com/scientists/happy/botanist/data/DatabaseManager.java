@@ -1,5 +1,5 @@
 // Singleton Database manager for Firebase
-// @author: Iskander Gaba
+// @author: Christopher Besser, Antonio Muscarella, and Iskander Gaba
 package com.scientists.happy.botanist.data;
 import android.app.Activity;
 import android.app.ActivityOptions;
@@ -11,6 +11,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -52,22 +53,28 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import static android.content.Context.ALARM_SERVICE;
 import static android.os.Environment.getExternalStoragePublicDirectory;
 public class DatabaseManager {
     private static final int TOXIC_WARNING_LABEL_COLOR = 0xffff4444;
+    private static final int NOXIOUS_WARNING_LABEL_COLOR = 0xf17a0a;
     private static final int HEIGHT_MEASURE_RECEIVER_ID_OFFSET = 1000;
     private static final int FERTILIZER_RECEIVER_ID_OFFSET = 2000;
     private static final int UPDATE_PHOTO_RECEIVER_ID_OFFSET = 3000;
     private static final int BIRTHDAY_RECEIVER_ID_OFFSET = 4000;
     private long mPlantsNumber;
+    private long mPlantsAdded, mPlantsDeleted, mPlantsNumber;
+    private long mWaterCount, mMeasureCount, mPhotoCount;
     private long mBotanistSince;
+    private double mRating;
     private ProgressDialog mProgressDialog;
     private Map<String, String> mAutoCompleteCache;
     private StorageReference mStorage;
     private DatabaseReference mDatabase;
+    private String mDiseaseUrl;
     private static DatabaseManager mDatabaseManager;
     private class PrepareAutocompleteTask extends AsyncTask<Void, Void, Void> {
         /**
@@ -193,7 +200,7 @@ public class DatabaseManager {
      * Singleton DatabaseManager constructor
      */
     private DatabaseManager() {
-        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+//        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
         mAutoCompleteCache = new HashMap<>();
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mStorage = FirebaseStorage.getInstance().getReference();
@@ -294,6 +301,8 @@ public class DatabaseManager {
                         mDatabase.child("users").child(userId).child("plants").child(plantId).setValue(plant);
                         setPlantsNumber(++mPlantsNumber);
                         updatePlantImage(0, plantId, bmp);
+                        setAddedNumber(getAddedNumber() + 1);
+                        updateUserRating();
                     }
                 }
 
@@ -325,6 +334,8 @@ public class DatabaseManager {
             filepath.putBytes(data);
             mDatabase.child("users").child(userId).child("plants").child(plantId).child("photoNum").setValue(photoNum);
             updateNotificationTime(plantId, "lastPhotoNotification");
+            setPhotoCount(getPhotoCount() + 1);
+            updateUserRating();
         }
     }
 
@@ -353,6 +364,8 @@ public class DatabaseManager {
                         for (int i = 0; i <= photoNum; i++) {
                             mStorage.child(userId).child(plantId + "_" + i + ".jpg").delete();
                         }
+                        setDeletedNumber(getDeletedNumber() + 1);
+                        updateUserRating();
                     }
                 }
 
@@ -388,6 +401,9 @@ public class DatabaseManager {
                 public void onComplete(@NonNull Task<Void> task) {
                     if (!task.isSuccessful()) {
                         Toast.makeText(context, "Height update failed, try again", Toast.LENGTH_SHORT).show();
+                    } else {
+                        setMeasureCount(getMeasureCount() + 1);
+                        updateUserRating();
                     }
                 }
             });
@@ -519,6 +535,60 @@ public class DatabaseManager {
     }
 
     /**
+     * Get a plant adapter for the diseases a plant can have
+     * @param activity - the current activity
+     * @param group - group the plant belongs to
+     * @return Returns an adapter for the plants
+     */
+    public FirebaseListAdapter<String> getDiseases(final Activity activity, String group) {
+        final String userId = getUserId();
+        if (userId != null) {
+            DatabaseReference databaseRef = mDatabase.child("Diseases").child(group);
+            return new FirebaseListAdapter<String>(activity, String.class, android.R.layout.simple_list_item_1, databaseRef) {
+                /**
+                 * Show images in glide
+                 * @param view - the current view
+                 * @param disease - the disease to display
+                 * @param position - the position in the menu
+                 */
+                @Override
+                protected void populateView(final View view, final String disease, final int position) {
+                    ((TextView) view.findViewById(android.R.id.text1)).setText(disease);
+                    mDatabase.child("DiseaseUrls").child(disease).addListenerForSingleValueEvent(new ValueEventListener() {
+                        /**
+                         * Handle a change in the database contents
+                         * @param snapshot - current database contents
+                         */
+                        @Override
+                        public void onDataChange(DataSnapshot snapshot) {
+                            if (snapshot.exists()) {
+                                mDiseaseUrl = (String) snapshot.getValue();
+                            }
+                        }
+
+                        /**
+                         * Do nothing when the process is cancelled
+                         * @param databaseError - Ignored error
+                         */
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                        }
+                    });
+                    ((TextView) view.findViewById(android.R.id.text1)).setOnClickListener(new View.OnClickListener() {
+
+                        @Override
+                        public void onClick(View v) {
+                            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(mDiseaseUrl));
+                            activity.startActivity(browserIntent);
+                        }
+                    });
+                }
+            };
+        }
+        return null;
+    }
+
+    /**
      * Get a plant adapter
      * @param view - the current activity
      * @param name of the plant to fetch
@@ -542,6 +612,23 @@ public class DatabaseManager {
                         toxicWarningTextView.setBackgroundColor(TOXIC_WARNING_LABEL_COLOR);
                     } else {
                         toxicWarningTextView.setVisibility(View.GONE);
+                    }
+                    TextView noxiousWarningTextView = (TextView) view.findViewById(R.id.noxious_warning);
+                    List<String> noxious = entry.getNoxious();
+                    if (noxious != null) {
+                        noxiousWarningTextView.setVisibility(View.VISIBLE);
+                        if (noxious.contains("Noxious")) {
+                            noxiousWarningTextView.setText(R.string.noxious_warning);
+                        }
+                        if (noxious.contains("Quarantine")) {
+                            noxiousWarningTextView.setText(noxiousWarningTextView.getText() + " \n\n" + view.getContext().getString(R.string.quarantine_warning));
+                        }
+                        if (noxious.contains("Regulated")) {
+                            noxiousWarningTextView.setText(noxiousWarningTextView.getText() + " \n\n" + view.getContext().getString(R.string.regulated_warning));
+                        }
+                        if (noxious.contains("Banned")) {
+                            noxiousWarningTextView.setText(noxiousWarningTextView.getText() + " \n\n" + view.getContext().getString(R.string.banned_warning));
+                        }
                     }
                 }
 
@@ -678,13 +765,285 @@ public class DatabaseManager {
     }
 
     /**
+     * Get the user rating
+     * @return Returns the user rating
+     */
+    public double getUserRating() {
+        final String userId = getUserId();
+        if (userId != null) {
+            mDatabase.child("users").child(userId).child("rating").addListenerForSingleValueEvent(new ValueEventListener() {
+                /**
+                 * Handle a change in the database contents
+                 * @param snapshot - current database contents
+                 */
+                @Override
+                public void onDataChange(DataSnapshot snapshot) {
+                    if (snapshot.exists()) {
+                        mRating = Double.valueOf(String.valueOf(snapshot.getValue()));
+                    }
+                }
+
+                /**
+                 * Do nothing when the process is cancelled
+                 * @param databaseError - Ignored error
+                 */
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                }
+            });
+        }
+        return mRating;
+    }
+
+    public void updateUserRating() {
+        String userId = getUserId();
+        long added = getAddedNumber();
+        long deleted = getDeletedNumber();
+
+
+        mRating = ((1.3 * added - deleted / 100))
+                * (getWaterCount() + getMeasureCount() + getPhotoCount() + 1) / ( 10 * (added + deleted + 1));
+
+        if (userId != null) {
+            mDatabase.child("users").child(userId).child("rating").setValue(mRating);
+        }
+    }
+
+    /**
+     * Get the total number of plants watering
+     * @return Returns the total number of times the user watered plants
+     */
+    public long getWaterCount() {
+        final String userId = getUserId();
+        if (userId != null) {
+            mDatabase.child("users").child(userId).child("waterCount").addListenerForSingleValueEvent(new ValueEventListener() {
+                /**
+                 * Handle a change in the database contents
+                 * @param snapshot - current database contents
+                 */
+                @Override
+                public void onDataChange(DataSnapshot snapshot) {
+                    if (snapshot.exists()) {
+                        mWaterCount = (long) snapshot.getValue();
+                    }
+                }
+
+                /**
+                 * Do nothing when the process is cancelled
+                 * @param databaseError - Ignored error
+                 */
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                }
+            });
+        }
+        return mWaterCount;
+    }
+
+    /**
+     * Update the total number of plants watering
+     * @param count - the new total number of time the user watered plants
+     */
+    public void setWaterCount(long count) {
+        String userId = getUserId();
+        if (userId != null) {
+            mDatabase.child("users").child(userId).child("waterCount").setValue(count);
+        }
+    }
+
+    /**
+     * Get the total number of height measurements
+     * @return Returns the total number of times the user measured the height of plants
+     */
+    private long getMeasureCount() {
+        final String userId = getUserId();
+        if (userId != null) {
+            mDatabase.child("users").child(userId).child("measureCount").addListenerForSingleValueEvent(new ValueEventListener() {
+                /**
+                 * Handle a change in the database contents
+                 * @param snapshot - current database contents
+                 */
+                @Override
+                public void onDataChange(DataSnapshot snapshot) {
+                    if (snapshot.exists()) {
+                        mMeasureCount = (long) snapshot.getValue();
+                    }
+                }
+
+                /**
+                 * Do nothing when the process is cancelled
+                 * @param databaseError - Ignored error
+                 */
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                }
+            });
+        }
+        return mMeasureCount;
+    }
+
+    /**
+     * Update the total number of height measurements
+     * @param count - the new total number of time the user measured the height of plants
+     */
+    private void setMeasureCount(long count) {
+        String userId = getUserId();
+        mWaterCount = count;
+        if (userId != null) {
+            mDatabase.child("users").child(userId).child("measureCount").setValue(count);
+        }
+    }
+
+    /**
+     * Get the total number of photos
+     * @return Returns the total number of photos uploaded by the user
+     */
+    private long getPhotoCount() {
+        final String userId = getUserId();
+        if (userId != null) {
+            mDatabase.child("users").child(userId).child("photoCount").addListenerForSingleValueEvent(new ValueEventListener() {
+                /**
+                 * Handle a change in the database contents
+                 * @param snapshot - current database contents
+                 */
+                @Override
+                public void onDataChange(DataSnapshot snapshot) {
+                    if (snapshot.exists()) {
+                        mPhotoCount = (long) snapshot.getValue();
+                    }
+                }
+
+                /**
+                 * Do nothing when the process is cancelled
+                 * @param databaseError - Ignored error
+                 */
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                }
+            });
+        }
+        return mPhotoCount;
+    }
+
+    /**
+     * Update the total number of photos
+     * @param count - the new total number of photos uploaded by the user
+     */
+    private void setPhotoCount(long count) {
+        String userId = getUserId();
+        mMeasureCount = count;
+        if (userId != null) {
+            mDatabase.child("users").child(userId).child("photoCount").setValue(count);
+        }
+    }
+
+    /**
+     * Get how long the user has been a botanist
+     * @return Returns the total number of added plants
+     */
+    private long getAddedNumber() {
+        final String userId = getUserId();
+        if (userId != null) {
+            mDatabase.child("users").child(userId).child("plantsAdded").addListenerForSingleValueEvent(new ValueEventListener() {
+                /**
+                 * Handle a change in the database contents
+                 * @param snapshot - current database contents
+                 */
+                @Override
+                public void onDataChange(DataSnapshot snapshot) {
+                    if (snapshot.exists()) {
+                        mPlantsAdded = (long) snapshot.getValue();
+                    }
+                }
+
+                /**
+                 * Do nothing when the process is cancelled
+                 * @param databaseError - Ignored error
+                 */
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                }
+            });
+        }
+        return mPlantsAdded;
+    }
+
+    /**
+     * Update the number of plants
+     * @param count - the new number of added plants
+     */
+    private void setAddedNumber(long count) {
+        String userId = getUserId();
+        mPlantsAdded = count;
+        if (userId != null) {
+            mDatabase.child("users").child(userId).child("plantsAdded").setValue(count);
+        }
+    }
+
+    /**
+     * Get how long the user has been a botanist
+     * @return Returns the total number of deleted plants
+     */
+    private long getDeletedNumber() {
+        final String userId = getUserId();
+        if (userId != null) {
+            mDatabase.child("users").child(userId).child("plantsDeleted").addListenerForSingleValueEvent(new ValueEventListener() {
+                /**
+                 * Handle a change in the database contents
+                 * @param snapshot - current database contents
+                 */
+                @Override
+                public void onDataChange(DataSnapshot snapshot) {
+                    if (snapshot.exists()) {
+                        mPlantsDeleted = (long) snapshot.getValue();
+                    }
+                }
+
+                /**
+                 * Do nothing when the process is cancelled
+                 * @param databaseError - Ignored error
+                 */
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                }
+            });
+        }
+        return mPlantsDeleted;
+    }
+
+    /**
+     * Update the number of plants
+     * @param count - the new number of deleted plants
+     */
+    private void setDeletedNumber(long count) {
+        String userId = getUserId();
+        mPlantsDeleted = count;
+        if (userId != null) {
+            mDatabase.child("users").child(userId).child("plantsDeleted").setValue(count);
+        }
+    }
+
+    /**
      * Update the number of plants
      * @param count - the new number of plants
      */
     private void setPlantsNumber(long count) {
         String userId = getUserId();
+        mPlantsNumber = count;
         if (userId != null) {
             mDatabase.child("users").child(userId).child("plantsNumber").setValue(count);
+        }
+    }
+
+    /**
+     * Update the name of a plant
+     * @param plantId - the ID of the plant
+     * @param newName - the new name for the plant
+     */
+    public void setPlantName(String plantId, String newName) {
+        String userId = getUserId();
+        if (userId != null) {
+            mDatabase.child("users").child(userId).child("plants").child(plantId).child("name").setValue(newName);
         }
     }
 
