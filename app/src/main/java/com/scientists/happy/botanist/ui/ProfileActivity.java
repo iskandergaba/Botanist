@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
+import android.text.method.LinkMovementMethod;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -79,6 +80,10 @@ public class ProfileActivity extends AppCompatActivity {
                 }).show(getSupportFragmentManager());
             }
         });
+
+        TextView fertilizationLink = (TextView)findViewById(R.id.fertilization_link);
+        fertilizationLink.setMovementMethod(LinkMovementMethod.getInstance());
+
         StorageReference storageReference = FirebaseStorage.getInstance().getReference()
                 // TODO: clean a bit
                 .child(mDatabase.getUserId()).child(plantId + "_" + photoNum + ".jpg");
@@ -233,6 +238,8 @@ public class ProfileActivity extends AppCompatActivity {
              */
             public void onClick(DialogInterface dialog, int id) {
                 mDatabase.updateNotificationTime(plantId, "lastWaterNotification");
+                mDatabase.setWaterCount(mDatabase.getWaterCount() + 1);
+                mDatabase.updateUserRating();
             }
         });
         builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {

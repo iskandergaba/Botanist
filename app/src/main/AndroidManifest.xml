@@ -18,11 +18,10 @@
             android:exported="false"
             android:grantUriPermissions="true"
             tools:replace="android:authorities">
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/picker_provider_paths" />
         </provider>
-
+        <meta-data
+            android:name="android.support.FILE_PROVIDER_PATHS"
+            android:resource="@xml/picker_provider_paths" />
         <receiver android:name=".services.BirthdayReceiver" />
         <receiver android:name=".services.HeightMeasureReceiver" />
         <receiver android:name=".services.FertilizerReceiver" />

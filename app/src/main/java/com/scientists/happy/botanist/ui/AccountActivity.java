@@ -14,8 +14,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
+
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.google.android.gms.auth.api.Auth;
@@ -29,13 +30,11 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthCredential;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.GoogleAuthProvider;
-import com.scientists.happy.botanist.data.DatabaseManager;
 import com.scientists.happy.botanist.R;
+import com.scientists.happy.botanist.data.DatabaseManager;
+
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 public class AccountActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, View.OnClickListener {
@@ -51,26 +50,6 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
     private DatabaseManager mDatabase;
-    /**
-     * The app was stopped
-     */
-    @Override
-    protected void onStop() {
-        super.onStop();
-        if (mAuthListener != null) {
-            mAuth.removeAuthStateListener(mAuthListener);
-        }
-    }
-
-    /**
-     * Handle back button press
-     * @return Returns a success code
-     */
-    @Override
-    public boolean onSupportNavigateUp() {
-        super.onBackPressed();
-        return true;
-    }
 
     /**
      * Launch the activity
@@ -86,6 +65,9 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
         mBotanistSinceTextView = (TextView) findViewById(R.id.botanist_since);
         mPlantsNumberTextView = (TextView) findViewById(R.id.plants_number);
         mAccountImageView = (ImageView) findViewById(R.id.account_picture);
+        TextView levelTextView = (TextView) findViewById(R.id.level_text_view);
+        ImageView badge = (ImageView) findViewById(R.id.user_badge);
+        ProgressBar levelProgressBar = (ProgressBar) findViewById(R.id.level_progress_bar);
         // Button listeners
         findViewById(R.id.sign_out_button).setOnClickListener(this);
         findViewById(R.id.revoke_access_button).setOnClickListener(this);
@@ -116,6 +98,25 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
         // options specified by gso.
         mGoogleApiClient = new GoogleApiClient.Builder(this).enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso).build();
+
+        double rating = mDatabase.getUserRating();
+        if (rating < 0) {
+            badge.setImageResource(R.drawable.badge_level0);
+            levelTextView.setText(getString(R.string.level_0));
+            levelProgressBar.setProgress(0);
+        } else if (rating < 0.35) {
+            badge.setImageResource(R.drawable.badge_level1);
+            levelTextView.setText(getString(R.string.level_1));
+            levelProgressBar.setProgress(35);
+        } else if (rating < 0.75) {
+            badge.setImageResource(R.drawable.badge_level2);
+            levelTextView.setText(getString(R.string.level_2));
+            levelProgressBar.setProgress(75);
+        } else {
+            badge.setImageResource(R.drawable.badge_level3);
+            levelTextView.setText(getString(R.string.level_3));
+            levelProgressBar.setProgress(100);
+        }
     }
 
     /**
@@ -152,6 +153,27 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
     }
 
     /**
+     * The activity was stopped
+     */
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (mAuthListener != null) {
+            mAuth.removeAuthStateListener(mAuthListener);
+        }
+    }
+
+    /**
+     * Handle back button press
+     * @return Returns a success code
+     */
+    @Override
+    public boolean onSupportNavigateUp() {
+        super.onBackPressed();
+        return true;
+    }
+
+    /**
      * The sign in activity resolved
      * @param requestCode - the request code
      * @param resultCode - sign in result
@@ -177,7 +199,6 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
             // Signed in successfully, show authenticated UI.
             GoogleSignInAccount acct = result.getSignInAccount();
             if (acct != null) {
-                firebaseAuthWithGoogle(acct);
                 SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy", Locale.US);
                 mNameTextView.setText(acct.getDisplayName());
                 mEmailTextView.setText(getString(R.string.email_fmt, acct.getEmail()));
@@ -197,36 +218,6 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
                 });
             }
         }
-    }
-
-    /**
-     * Connect user to firebase
-     * @param acct - the user account
-     */
-    private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
-        Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getId());
-        showProgressDialog();
-        AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
-        mAuth.signInWithCredential(credential).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-            /**
-             * Complete the sign in task
-             * @param task - the task to sign in
-             */
-            @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-                Log.d(TAG, "signInWithCredential:onComplete:" + task.isSuccessful());
-                // If sign in fails, display a message to the user. If sign in succeeds
-                // the auth state listener will be notified and logic to handle the
-                // signed in user can be handled in the listener.
-                if (!task.isSuccessful()) {
-                    Log.w(TAG, "signInWithCredential", task.getException());
-                    Toast.makeText(AccountActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
-                }
-                // [START_EXCLUDE]
-                hideProgressDialog();
-                // [END_EXCLUDE]
-            }
-        });
     }
 
     /**
