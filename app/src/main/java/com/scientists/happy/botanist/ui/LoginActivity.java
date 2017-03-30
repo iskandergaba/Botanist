@@ -61,7 +61,8 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                 if (user != null) {
                     // User is signed in
                     Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
-                } else {
+                }
+                else {
                     // User is signed out
                     Log.d(TAG, "onAuthStateChanged:signed_out");
                 }
@@ -91,7 +92,8 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             Log.d(TAG, "Got cached sign-in");
             GoogleSignInResult result = opr.get();
             handleSignInResult(result);
-        } else {
+        }
+        else {
             // If the user has not previously signed in on this device or the sign-in has expired,
             // this asynchronous branch will attempt to sign in the user silently.  Cross-device
             // single sign-on will occur in this branch.
@@ -148,7 +150,8 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             if (acct != null) {
                 firebaseAuthWithGoogle(acct);
             }
-        } else {
+        }
+        else {
             Toast.makeText(LoginActivity.this, "Sign in to get started", Toast.LENGTH_SHORT).show();
         }
     }
@@ -178,7 +181,8 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                     Log.w(TAG, "signInWithCredential", task.getException());
                     Toast.makeText(LoginActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
                     mSignInButton.setEnabled(true);
-                } else {
+                }
+                else {
                     mDatabase.addUserRecords(user.getUid(), acct.getDisplayName(), acct.getEmail());
                     Toast.makeText(LoginActivity.this, "Authentication successful.", Toast.LENGTH_SHORT).show();
                     startActivity(new Intent(LoginActivity.this, MainActivity.class));

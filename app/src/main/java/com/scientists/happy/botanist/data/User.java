@@ -1,14 +1,12 @@
 // User object
 // @author: Iskander Gaba
 package com.scientists.happy.botanist.data;
-
 class User {
     private String userName, email, userId;
     private double rating;
     private long botanistSince;
     private int plantsAdded, plantsDeleted, plantsNumber;
     private int waterCount, measureCount, photoCount;
-
     /**
      * Create a new user
      */
@@ -78,6 +76,10 @@ class User {
         return plantsDeleted;
     }
 
+    /**
+     * Fetch a user's rating
+     * @return Returns the user's botanist quality
+     */
     public double getRating() {
         return rating;
     }
@@ -90,14 +92,26 @@ class User {
         return botanistSince;
     }
 
+    /**
+     * Fetch how many times the user watered their plants
+     * @return Returns the number of times the user watered their plants
+     */
     public int getWaterCount() {
         return waterCount;
     }
 
+    /**
+     * Fetch the number of times the user fertilized their plants
+     * @return Returns the number of times the user fertilized their plants
+     */
     public int getMeasureCount() {
         return measureCount;
     }
 
+    /**
+     * Fetch the number of times the user took photos of their plants
+     * @return Returns the number of times the user took photos of their plants
+     */
     public int getPhotoCount() {
         return photoCount;
     }

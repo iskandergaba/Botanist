@@ -7,16 +7,21 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
+import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -60,12 +65,10 @@ import static android.content.Context.ALARM_SERVICE;
 import static android.os.Environment.getExternalStoragePublicDirectory;
 public class DatabaseManager {
     private static final int TOXIC_WARNING_LABEL_COLOR = 0xffff4444;
-    private static final int NOXIOUS_WARNING_LABEL_COLOR = 0xf17a0a;
     private static final int HEIGHT_MEASURE_RECEIVER_ID_OFFSET = 1000;
     private static final int FERTILIZER_RECEIVER_ID_OFFSET = 2000;
     private static final int UPDATE_PHOTO_RECEIVER_ID_OFFSET = 3000;
     private static final int BIRTHDAY_RECEIVER_ID_OFFSET = 4000;
-    private long mPlantsNumber;
     private long mPlantsAdded, mPlantsDeleted, mPlantsNumber;
     private long mWaterCount, mMeasureCount, mPhotoCount;
     private long mBotanistSince;
@@ -146,7 +149,7 @@ public class DatabaseManager {
         /**
          * Background asynchronous update
          * @param params - process parameters
-         * @return Returns nothing
+         * @return Returns a success code
          */
         @Override
         protected Boolean doInBackground(Void... params) {
@@ -162,13 +165,19 @@ public class DatabaseManager {
                     gifWriter.addFrame(bmp);
                 }
                 catch (InterruptedException | ExecutionException e) {
+                    e.printStackTrace();
                     return false;
                 }
             }
             gifWriter.finish();
             try {
                 // created gif files are written to pictures public external storage
-                outFile = new File(getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), plantId + ".gif");
+                File outputDir = getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+                // Apparently, the external storage public directory only sometimes exists?
+                if (!outputDir.exists()) {
+                    outputDir.mkdir();
+                }
+                outFile = new File(outputDir, plantId + ".gif");
                 FileOutputStream output = new FileOutputStream(outFile);
                 output.write(out.toByteArray());
                 output.flush();
@@ -176,6 +185,7 @@ public class DatabaseManager {
                 return true;
             }
             catch (IOException e) {
+                e.printStackTrace();
                 return false;
             }
         }
@@ -280,7 +290,8 @@ public class DatabaseManager {
         else if (mAutoCompleteCache.containsKey(species)) {
             // If the user typed a common name, fetch the scientific name
             plant = new Plant(name, mAutoCompleteCache.get(species), birthday, height);
-        } else if (mAutoCompleteCache.containsValue(species)) {
+        }
+        else if (mAutoCompleteCache.containsValue(species)) {
             // The user must have entered the correct scientific name
             plant = new Plant(name, species, birthday, height);
         }
@@ -342,13 +353,11 @@ public class DatabaseManager {
     /**
      * Remove plant from the database
      * @param context - the current app context
-     * @param name - the name of the plant
-     * @param species - the species of the plant
+     * @param plantId - the name of the plant
      * @param photoNum - the number of pictures that plant has
      */
-    public void deletePlant(Context context, String name, String species, final int photoNum) {
+    public void deletePlant(final Context context, final String plantId, final int photoNum) {
         final String userId = getUserId();
-        final String plantId = species + "_" + name;
         deleteAllReminders(context);
         if (userId != null) {
             mDatabase.child("users").child(userId).child("plants").child(plantId).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -367,6 +376,11 @@ public class DatabaseManager {
                         setDeletedNumber(getDeletedNumber() + 1);
                         updateUserRating();
                     }
+                    File gif = new File(getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), plantId + ".gif");
+                    if (gif.exists()) {
+                        gif.delete();
+                        updateGallery(gif, context);
+                    }
                 }
 
                 /**
@@ -377,6 +391,42 @@ public class DatabaseManager {
                 public void onCancelled(DatabaseError databaseError) {
                 }
             });
+        }
+    }
+
+    /**
+     * Delete gif reference from the Android Gallery
+     * @param gif - gif to delete
+     * @param context - app context
+     */
+    public void updateGallery(File gif, Context context) {
+        if (Build.VERSION.SDK_INT >= 14) {
+            MediaScannerConnection.scanFile(context, new String[]{Environment.getExternalStorageDirectory().toString()}, null,
+                    new MediaScannerConnection.OnScanCompletedListener() {
+                /**
+                 * Gallery scan completed
+                 * @param path - path of the deleted image
+                 * @param uri of the deleted image
+                 */
+                public void onScanCompleted(String path, Uri uri) {
+                }
+            });
+        }
+        else {
+            String[] projection = { MediaStore.Images.Media._ID };
+            String selection = MediaStore.Images.Media.DATA + " = ?";
+            String[] selectionArgs = new String[] { gif.getAbsolutePath() };
+            Uri queryUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+            ContentResolver contentResolver = context.getContentResolver();
+            Cursor c = contentResolver.query(queryUri, projection, selection, selectionArgs, null);
+            if (c.moveToFirst()) {
+                long id = c.getLong(c.getColumnIndexOrThrow(MediaStore.Images.Media._ID));
+                Uri deleteUri = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id);
+                contentResolver.delete(deleteUri, null, null);
+            }
+            else {
+            }
+            c.close();
         }
     }
 
@@ -401,7 +451,8 @@ public class DatabaseManager {
                 public void onComplete(@NonNull Task<Void> task) {
                     if (!task.isSuccessful()) {
                         Toast.makeText(context, "Height update failed, try again", Toast.LENGTH_SHORT).show();
-                    } else {
+                    }
+                    else {
                         setMeasureCount(getMeasureCount() + 1);
                         updateUserRating();
                     }
@@ -417,7 +468,8 @@ public class DatabaseManager {
                 public void onComplete(@NonNull Task<Void> task) {
                     if (!task.isSuccessful()) {
                         Toast.makeText(context, "Height update failed, try again", Toast.LENGTH_SHORT).show();
-                    } else {
+                    }
+                    else {
                         updateNotificationTime(plantId, "lastMeasureNotification");
                     }
                     hideProgressDialog();
@@ -427,7 +479,7 @@ public class DatabaseManager {
     }
 
     /**
-     * Update last watered
+     * Update a notification
      * @param plantId - the id of the plant (species_name)
      * @param field - the field to update
      */
@@ -489,7 +541,8 @@ public class DatabaseManager {
                                 View sharedImageView = view.findViewById(R.id.grid_item_image_view);
                                 Bundle bundle = ActivityOptions.makeSceneTransitionAnimation(activity, sharedImageView, "image_main_to_profile_transition").toBundle();
                                 activity.startActivity(i, bundle);
-                            } else {
+                            }
+                            else {
                                 activity.startActivity(i);
                             }
                         }
@@ -575,7 +628,10 @@ public class DatabaseManager {
                         }
                     });
                     ((TextView) view.findViewById(android.R.id.text1)).setOnClickListener(new View.OnClickListener() {
-
+                        /**
+                         * User pressed a disease
+                         * @param v - current app view
+                         */
                         @Override
                         public void onClick(View v) {
                             Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(mDiseaseUrl));
@@ -610,7 +666,8 @@ public class DatabaseManager {
                     if (entry.isToxic()) {
                         toxicWarningTextView.setVisibility(View.VISIBLE);
                         toxicWarningTextView.setBackgroundColor(TOXIC_WARNING_LABEL_COLOR);
-                    } else {
+                    }
+                    else {
                         toxicWarningTextView.setVisibility(View.GONE);
                     }
                     TextView noxiousWarningTextView = (TextView) view.findViewById(R.id.noxious_warning);
@@ -795,15 +852,15 @@ public class DatabaseManager {
         return mRating;
     }
 
+    /**
+     * Rate user based on recent plant parenting skills
+     */
     public void updateUserRating() {
         String userId = getUserId();
         long added = getAddedNumber();
         long deleted = getDeletedNumber();
-
-
         mRating = ((1.3 * added - deleted / 100))
                 * (getWaterCount() + getMeasureCount() + getPhotoCount() + 1) / ( 10 * (added + deleted + 1));
-
         if (userId != null) {
             mDatabase.child("users").child(userId).child("rating").setValue(mRating);
         }
@@ -1131,9 +1188,11 @@ public class DatabaseManager {
         calendar.setTimeInMillis(0);
         if (setting == 1) {
             calendar.add(Calendar.DAY_OF_YEAR, 1);
-        } else if (setting == 2) {
+        }
+        else if (setting == 2) {
             calendar.add(Calendar.DAY_OF_YEAR, 7);
-        } else if (setting == 3) {
+        }
+        else if (setting == 3) {
             calendar.add(Calendar.DAY_OF_YEAR, 30);
         }
         return calendar.getTimeInMillis();

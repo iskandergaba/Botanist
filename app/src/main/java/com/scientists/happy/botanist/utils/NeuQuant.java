@@ -493,6 +493,6 @@ class NeuQuant {
         }
         freq[bestpos] += beta;
         bias[bestpos] -= betagamma;
-        return (bestbiaspos);
+        return bestbiaspos;
     }
 }

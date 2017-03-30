@@ -741,11 +741,8 @@ public class PlantEntry {
     public boolean isToxic() {
         if (toxicity == null) {
             return false;
-        } else if (toxicity.equals("Slight") || toxicity.equals("Moderate") || toxicity.equals("Severe")) {
-            return true;
-        } else {
-            return false;
         }
+        return toxicity.equals("Slight") || toxicity.equals("Moderate") || toxicity.equals("Severe");
     }
 
     /**
@@ -755,11 +752,14 @@ public class PlantEntry {
     private String inferSunRequirements() {
         if (!hasMeaningfulData(shade)) {
             return "NA";
-        } else if (shade.equals("Intolerant")) {
+        }
+        else if (shade.equals("Intolerant")) {
             return "• This plant has a low shade tolerance and should receive full sunlight.\n";
-        } else if (shade.equals("Intermediate")) {
+        }
+        else if (shade.equals("Intermediate")) {
             return "• This plant has a moderate shade tolerance and should receive moderate sunlight.\n";
-        } else {
+        }
+        else {
             return "• This plant has high shade tolerance and may be placed in partially shaded areas.\n";
         }
     }
@@ -801,10 +801,7 @@ public class PlantEntry {
      * @return Returns whether s is useful
      */
     private boolean hasMeaningfulData(String s) {
-        if (s == null || s.equals("NA") || s.isEmpty()) {
-            return false;
-        }
-        return true;
+        return !(s == null || s.equals("NA") || s.isEmpty());
     }
 
     /**
@@ -896,7 +893,8 @@ public class PlantEntry {
             careTips.append("• This plant's seeds are ");
             if (seedPersistence.equals("Yes")) {
                 careTips.append("persistent.\n");
-            } else {
+            }
+            else {
                 careTips.append("not persistent.\n");
             }
         }
@@ -915,14 +913,16 @@ public class PlantEntry {
         if (hasMeaningfulData(humanPalate)) {
             if (humanPalate.equals("Yes")) {
                 careTips.append("• Edible to humans\n");
-            } else {
+            }
+            else {
                 careTips.append("• Not edible to humans\n");
             }
         }
         if (hasMeaningfulData(fertility)) {
             if (fertility.equals("High") || fertility.equals("Medium")) {
                 careTips.append("• This plant must be grown in fertilized soil\n");
-            } else {
+            }
+            else {
                 careTips.append("• This plant does not need to be grown in fertilized soil\n");
             }
         }
@@ -935,10 +935,12 @@ public class PlantEntry {
                 if (i == noxious.size() - 1) {
                     if (noxious.size() > 1) {
                         careTips.append(" and " + noxious.get(i) + ".\n");
-                    } else {
+                    }
+                    else {
                         careTips.append(noxious.get(i) + ".\n");
                     }
-                } else {
+                }
+                else {
                     careTips.append(noxious.get(i) + ",");
                 }
             }

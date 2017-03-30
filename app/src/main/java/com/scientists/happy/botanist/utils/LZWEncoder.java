@@ -278,7 +278,8 @@ class LZWEncoder {
             if (clear_flg) {
                 maxcode = MAXCODE(n_bits = g_init_bits);
                 clear_flg = false;
-            } else {
+            }
+            else {
                 ++n_bits;
                 if (n_bits == maxbits) {
                     maxcode = maxmaxcode;
