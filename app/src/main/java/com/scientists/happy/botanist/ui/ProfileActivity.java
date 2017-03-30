@@ -86,10 +86,8 @@ public class ProfileActivity extends AppCompatActivity {
                 }).show(getSupportFragmentManager());
             }
         });
-
         TextView fertilizationLink = (TextView)findViewById(R.id.fertilization_link);
         fertilizationLink.setMovementMethod(LinkMovementMethod.getInstance());
-
         StorageReference storageReference = FirebaseStorage.getInstance().getReference()
                 // TODO: clean a bit
                 .child(mDatabase.getUserId()).child(plantId + "_" + photoNum + ".jpg");
@@ -156,8 +154,7 @@ public class ProfileActivity extends AppCompatActivity {
      * @return Returns success code
      */
     @Override
-    public boolean onCreateOptionsMenu(Menu menu)
-    {
+    public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_profile, menu);
         return true;
     }
@@ -175,7 +172,8 @@ public class ProfileActivity extends AppCompatActivity {
             i.putExtra("group", mGroup.getText().toString());
             startActivity(i);
             return true;
-        } else if (id == R.id.action_diseases) {
+        }
+        else if (id == R.id.action_diseases) {
             Intent i = new Intent(this, DiseaseActivity.class);
             i.putExtra("group", mGroup.getText().toString());
             startActivity(i);
@@ -324,7 +322,7 @@ public class ProfileActivity extends AppCompatActivity {
              * @param id - the user id
              */
             public void onClick(DialogInterface dialog, int id) {
-                mDatabase.deletePlant(ProfileActivity.this, name, species, photoNum);
+                mDatabase.deletePlant(ProfileActivity.this, plantId, photoNum);
                 Intent resultIntent = new Intent();
                 setResult(RESULT_OK, resultIntent);
                 finish();
@@ -358,17 +356,27 @@ public class ProfileActivity extends AppCompatActivity {
         builder.setView(input);
         // Set up the buttons
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            /**
+             * User clicked submit
+             * @param dialog - warning dialog
+             * @param which - user selected option
+             */
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 changeNameText = input.getText().toString();
                 mDatabase.setPlantName(plantId, changeNameText);
                 name = changeNameText;
                 TextView nameTextView = (TextView) findViewById(R.id.plant_name);
-                nameTextView.setText(name);
+                nameTextView.setText("Name: " + name);
                 setTitle(name + "\'s Profile");
             }
         });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            /**
+             * User cancelled name update
+             * @param dialog - warning dialog
+             * @param which - user selected option
+             */
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.cancel();

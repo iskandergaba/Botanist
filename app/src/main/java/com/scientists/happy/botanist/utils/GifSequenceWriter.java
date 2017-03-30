@@ -132,10 +132,10 @@ public class GifSequenceWriter {
             // encode and write pixel data
             writePixels();
             firstFrame = false;
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             ok = false;
         }
-
         return ok;
     }
 
@@ -400,7 +400,8 @@ public class GifSequenceWriter {
         if (firstFrame) {
             // no LCT - GCT is used for first (or only) frame
             out.write(0);
-        } else {
+        }
+        else {
             // specify normal LCT. 1 local color table 1 = yes. 2 interlace - 0 = no. 3 sorted - 0 = no. 4 - 5 reserved. 6 - 8 size of color table
             out.write(0x80 | palSize);
         }

@@ -16,7 +16,6 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.google.android.gms.auth.api.Auth;
@@ -34,7 +33,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.scientists.happy.botanist.R;
 import com.scientists.happy.botanist.data.DatabaseManager;
-
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 public class AccountActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, View.OnClickListener {
@@ -50,7 +48,6 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
     private DatabaseManager mDatabase;
-
     /**
      * Launch the activity
      * @param savedInstanceState - current app state
@@ -84,7 +81,8 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
                 if (user != null) {
                     // User is signed in
                     Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
-                } else {
+                }
+                else {
                     // User is signed out
                     Log.d(TAG, "onAuthStateChanged:signed_out");
                 }
@@ -94,25 +92,26 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
         // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail().requestIdToken(getString(R.string.default_web_client_id)).build();
-        // Build a GoogleApiClient with access to the Google Sign-In API and the
-        // options specified by gso.
+        // Build a GoogleApiClient with access to the Google Sign-In API and the options specified by gso.
         mGoogleApiClient = new GoogleApiClient.Builder(this).enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso).build();
-
         double rating = mDatabase.getUserRating();
         if (rating < 0) {
             badge.setImageResource(R.drawable.badge_level0);
             levelTextView.setText(getString(R.string.level_0));
             levelProgressBar.setProgress(0);
-        } else if (rating < 0.35) {
+        }
+        else if (rating < 0.35) {
             badge.setImageResource(R.drawable.badge_level1);
             levelTextView.setText(getString(R.string.level_1));
             levelProgressBar.setProgress(35);
-        } else if (rating < 0.75) {
+        }
+        else if (rating < 0.75) {
             badge.setImageResource(R.drawable.badge_level2);
             levelTextView.setText(getString(R.string.level_2));
             levelProgressBar.setProgress(75);
-        } else {
+        }
+        else {
             badge.setImageResource(R.drawable.badge_level3);
             levelTextView.setText(getString(R.string.level_3));
             levelProgressBar.setProgress(100);
@@ -132,7 +131,8 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
             Log.d(TAG, "Got cached sign-in");
             GoogleSignInResult result = opr.get();
             handleSignInResult(result);
-        } else {
+        }
+        else {
             // If the user has not previously signed in on this device or the sign-in has expired,
             // this asynchronous branch will attempt to sign in the user silently. Cross-device
             // single sign-on will occur in this branch.

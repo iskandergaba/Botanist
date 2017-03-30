@@ -13,7 +13,6 @@ import android.widget.GridView;
 import android.widget.ListAdapter;
 import com.scientists.happy.botanist.R;
 import com.scientists.happy.botanist.data.DatabaseManager;
-
 public class MainActivity extends AppCompatActivity {
     private static final int VIEW_ACCOUNT = 1;
     private DatabaseManager mDatabase;
