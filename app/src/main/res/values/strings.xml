@@ -15,15 +15,16 @@
     <!-- Button labels -->
     <string name="sign_out">Sign out</string>
     <string name="disconnect">Delete Account</string>
-    <string name="gif_fmt">Gif Location: %s</string>
+
+    <string name="gif_fmt">GIF Location: %s</string>
     <string name="name_fmt">Name: %s</string>
     <string name="email_fmt">Email: %s</string>
     <string name="botanist_since_fmt">Botanist Since: %s</string>
     <string name="plants_number_fmt">Number of plants: %d</string>
-
     <string name="species_fmt">Species: %s</string>
-
     <string name="level_fmt">Level: %s</string>
+
+    <string name="gif_loading">Creating GIF…</string>
 
     <string name="level_0">Plant Murderer</string>
     <string name="level_1">Little Botanist</string>
@@ -52,8 +53,8 @@
     <string name="account_picture">Account Picture</string>
     <string name="no_plants">No plants added</string>
     <string name="set_birthday">Set birthday</string>
-    <string name="loading_similar">Loading similar plants...</string>
-    <string name="create_gif">Export pictures to .gif</string>
+    <string name="loading_similar">Loading similar plants…</string>
+    <string name="create_gif">Export pictures to GIF</string>
     <string name="plant_picture_desc">Plant picture</string>
     <string name="tap_to_take_a_picture">Choose a picture</string>
     <string name="name">Name</string>
@@ -62,7 +63,7 @@
     <string name="add_plant">Add Plant</string>
     <string name="last_watered">Last watered (Now)</string>
     <string name="height_in_inches">Height in inches (0.0)</string>
-    <string name="loading_care_tips">Loading care tips...</string>
+    <string name="loading_care_tips">Loading care tips…</string>
     <string name="toxic_warning">TOXIC WARNING: This plant or parts of it are considered toxic. Do not ingest, handle with care, and keep out of reach of pets and small children.</string>
     <string name="height_fmt">Height: %.1f inches</string>
     <string name="update_height">Update height</string>
@@ -72,8 +73,9 @@
     <string name="regulated_warning">REGULATED: This plant is placed under restrictions in some U.S. states. Please check your local laws to be sure that you are in compliance.</string>
     <string name="banned_warning">BANNED: Possession of this plant is illegal in some U.S. states. Please check your local laws to be sure that you are in compliance.</string>
     <string name="update_name">Change Name</string>
-    <string name="loading_diseases">Loading diseases and pests...</string>
+    <string name="loading_diseases">Loading diseases and pests…</string>
     <string name="user_badge_desc">User badge</string>
     <string name="fertilization_link" translatable="false"><a href='http://www.finegardening.com/fertilizing-basics'>Learn more about fertilization</a></string>
+    <string name="care_tips">Care Tips:</string>
 </resources>
 

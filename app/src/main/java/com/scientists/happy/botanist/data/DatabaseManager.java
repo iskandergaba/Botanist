@@ -7,21 +7,16 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
-import android.content.ContentResolver;
-import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
-import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -64,7 +59,7 @@ import java.util.concurrent.ExecutionException;
 import static android.content.Context.ALARM_SERVICE;
 import static android.os.Environment.getExternalStoragePublicDirectory;
 public class DatabaseManager {
-    private static final int TOXIC_WARNING_LABEL_COLOR = 0xffff4444;
+
     private static final int HEIGHT_MEASURE_RECEIVER_ID_OFFSET = 1000;
     private static final int FERTILIZER_RECEIVER_ID_OFFSET = 2000;
     private static final int UPDATE_PHOTO_RECEIVER_ID_OFFSET = 3000;
@@ -130,7 +125,7 @@ public class DatabaseManager {
         protected void onPreExecute() {
             super.onPreExecute();
             TextView location = (TextView) parent.findViewById(R.id.gif_location);
-            location.setText("Gif Location: Creating gif...");
+            location.setText(parent.getString(R.string.gif_fmt, parent.getString(R.string.gif_loading)));
         }
 
         /**
@@ -139,7 +134,7 @@ public class DatabaseManager {
          * @param activity - calling activity
          * @param plantId - id of plant to make gif of
          */
-        public LoadImages(int numPhotos, Activity activity, String plantId) {
+        private LoadImages(int numPhotos, Activity activity, String plantId) {
             parent = activity;
             this.numPhotos = numPhotos;
             userId = getUserId();
@@ -149,7 +144,7 @@ public class DatabaseManager {
         /**
          * Background asynchronous update
          * @param params - process parameters
-         * @return Returns a success code
+         * @return Returns nothing
          */
         @Override
         protected Boolean doInBackground(Void... params) {
@@ -165,19 +160,13 @@ public class DatabaseManager {
                     gifWriter.addFrame(bmp);
                 }
                 catch (InterruptedException | ExecutionException e) {
-                    e.printStackTrace();
                     return false;
                 }
             }
             gifWriter.finish();
             try {
                 // created gif files are written to pictures public external storage
-                File outputDir = getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-                // Apparently, the external storage public directory only sometimes exists?
-                if (!outputDir.exists()) {
-                    outputDir.mkdir();
-                }
-                outFile = new File(outputDir, plantId + ".gif");
+                outFile = new File(getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), plantId + ".gif");
                 FileOutputStream output = new FileOutputStream(outFile);
                 output.write(out.toByteArray());
                 output.flush();
@@ -185,7 +174,6 @@ public class DatabaseManager {
                 return true;
             }
             catch (IOException e) {
-                e.printStackTrace();
                 return false;
             }
         }
@@ -197,11 +185,11 @@ public class DatabaseManager {
         @Override
         protected void onPostExecute(Boolean success) {
             TextView location = (TextView) parent.findViewById(R.id.gif_location);
-            String text = "Gif Location: Failure making .gif";
+            String text = "Failure making GIF";
             if (success) {
-                text = "Gif Location: " + outFile.getAbsolutePath();
+                text = outFile.getAbsolutePath();
             }
-            location.setText(text);
+            location.setText(parent.getString(R.string.gif_fmt, text));
             mDatabase.child("users").child(userId).child("plants").child(plantId).child("gifLocation").setValue(text);
         }
     }
@@ -290,8 +278,7 @@ public class DatabaseManager {
         else if (mAutoCompleteCache.containsKey(species)) {
             // If the user typed a common name, fetch the scientific name
             plant = new Plant(name, mAutoCompleteCache.get(species), birthday, height);
-        }
-        else if (mAutoCompleteCache.containsValue(species)) {
+        } else if (mAutoCompleteCache.containsValue(species)) {
             // The user must have entered the correct scientific name
             plant = new Plant(name, species, birthday, height);
         }
@@ -353,10 +340,10 @@ public class DatabaseManager {
     /**
      * Remove plant from the database
      * @param context - the current app context
-     * @param plantId - the name of the plant
+     * @param plantId - the id of the plant
      * @param photoNum - the number of pictures that plant has
      */
-    public void deletePlant(final Context context, final String plantId, final int photoNum) {
+    public void deletePlant(Context context, final String plantId, final int photoNum) {
         final String userId = getUserId();
         deleteAllReminders(context);
         if (userId != null) {
@@ -376,11 +363,6 @@ public class DatabaseManager {
                         setDeletedNumber(getDeletedNumber() + 1);
                         updateUserRating();
                     }
-                    File gif = new File(getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), plantId + ".gif");
-                    if (gif.exists()) {
-                        gif.delete();
-                        updateGallery(gif, context);
-                    }
                 }
 
                 /**
@@ -391,42 +373,6 @@ public class DatabaseManager {
                 public void onCancelled(DatabaseError databaseError) {
                 }
             });
-        }
-    }
-
-    /**
-     * Delete gif reference from the Android Gallery
-     * @param gif - gif to delete
-     * @param context - app context
-     */
-    public void updateGallery(File gif, Context context) {
-        if (Build.VERSION.SDK_INT >= 14) {
-            MediaScannerConnection.scanFile(context, new String[]{Environment.getExternalStorageDirectory().toString()}, null,
-                    new MediaScannerConnection.OnScanCompletedListener() {
-                /**
-                 * Gallery scan completed
-                 * @param path - path of the deleted image
-                 * @param uri of the deleted image
-                 */
-                public void onScanCompleted(String path, Uri uri) {
-                }
-            });
-        }
-        else {
-            String[] projection = { MediaStore.Images.Media._ID };
-            String selection = MediaStore.Images.Media.DATA + " = ?";
-            String[] selectionArgs = new String[] { gif.getAbsolutePath() };
-            Uri queryUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-            ContentResolver contentResolver = context.getContentResolver();
-            Cursor c = contentResolver.query(queryUri, projection, selection, selectionArgs, null);
-            if (c.moveToFirst()) {
-                long id = c.getLong(c.getColumnIndexOrThrow(MediaStore.Images.Media._ID));
-                Uri deleteUri = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id);
-                contentResolver.delete(deleteUri, null, null);
-            }
-            else {
-            }
-            c.close();
         }
     }
 
@@ -451,8 +397,7 @@ public class DatabaseManager {
                 public void onComplete(@NonNull Task<Void> task) {
                     if (!task.isSuccessful()) {
                         Toast.makeText(context, "Height update failed, try again", Toast.LENGTH_SHORT).show();
-                    }
-                    else {
+                    } else {
                         setMeasureCount(getMeasureCount() + 1);
                         updateUserRating();
                     }
@@ -468,8 +413,7 @@ public class DatabaseManager {
                 public void onComplete(@NonNull Task<Void> task) {
                     if (!task.isSuccessful()) {
                         Toast.makeText(context, "Height update failed, try again", Toast.LENGTH_SHORT).show();
-                    }
-                    else {
+                    } else {
                         updateNotificationTime(plantId, "lastMeasureNotification");
                     }
                     hideProgressDialog();
@@ -479,7 +423,7 @@ public class DatabaseManager {
     }
 
     /**
-     * Update a notification
+     * Update last watered
      * @param plantId - the id of the plant (species_name)
      * @param field - the field to update
      */
@@ -535,14 +479,13 @@ public class DatabaseManager {
                             i.putExtra("name", plant.getName());
                             i.putExtra("species", plant.getSpecies());
                             i.putExtra("height", plant.getHeight());
-                            i.putExtra("photoNum", plant.getPhotoNum());
-                            i.putExtra("gifLocation", plant.getGifLocation());
+                            i.putExtra("photo_num", plant.getPhotoNum());
+                            i.putExtra("gif_location", plant.getGifLocation());
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                                 View sharedImageView = view.findViewById(R.id.grid_item_image_view);
                                 Bundle bundle = ActivityOptions.makeSceneTransitionAnimation(activity, sharedImageView, "image_main_to_profile_transition").toBundle();
                                 activity.startActivity(i, bundle);
-                            }
-                            else {
+                            } else {
                                 activity.startActivity(i);
                             }
                         }
@@ -627,7 +570,7 @@ public class DatabaseManager {
                         public void onCancelled(DatabaseError databaseError) {
                         }
                     });
-                    ((TextView) view.findViewById(android.R.id.text1)).setOnClickListener(new View.OnClickListener() {
+                    view.findViewById(android.R.id.text1).setOnClickListener(new View.OnClickListener() {
                         /**
                          * User pressed a disease
                          * @param v - current app view
@@ -660,14 +603,12 @@ public class DatabaseManager {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     PlantEntry entry = dataSnapshot.getValue(PlantEntry.class);
-                    ((TextView) view.findViewById(R.id.invisible_man)).setText(entry.getGroup());
+                    ((TextView) view.findViewById(R.id.group_holder)).setText(entry.getGroup());
                     ((TextView) view.findViewById(R.id.care_tips)).setText(entry.generateCareTips());
                     TextView toxicWarningTextView = (TextView) view.findViewById(R.id.toxic_warning);
                     if (entry.isToxic()) {
                         toxicWarningTextView.setVisibility(View.VISIBLE);
-                        toxicWarningTextView.setBackgroundColor(TOXIC_WARNING_LABEL_COLOR);
-                    }
-                    else {
+                    } else {
                         toxicWarningTextView.setVisibility(View.GONE);
                     }
                     TextView noxiousWarningTextView = (TextView) view.findViewById(R.id.noxious_warning);
@@ -797,7 +738,7 @@ public class DatabaseManager {
             new LoadImages(photoNum, activity, plantId).execute();
         }
         else {
-            Toast.makeText(activity, "Must take at least 2 pictures for a .gif", Toast.LENGTH_SHORT);
+            Toast.makeText(activity, "Must take at least 2 pictures for a .gif", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -852,15 +793,15 @@ public class DatabaseManager {
         return mRating;
     }
 
-    /**
-     * Rate user based on recent plant parenting skills
-     */
     public void updateUserRating() {
         String userId = getUserId();
         long added = getAddedNumber();
         long deleted = getDeletedNumber();
+
+
         mRating = ((1.3 * added - deleted / 100))
                 * (getWaterCount() + getMeasureCount() + getPhotoCount() + 1) / ( 10 * (added + deleted + 1));
+
         if (userId != null) {
             mDatabase.child("users").child(userId).child("rating").setValue(mRating);
         }
@@ -1188,11 +1129,9 @@ public class DatabaseManager {
         calendar.setTimeInMillis(0);
         if (setting == 1) {
             calendar.add(Calendar.DAY_OF_YEAR, 1);
-        }
-        else if (setting == 2) {
+        } else if (setting == 2) {
             calendar.add(Calendar.DAY_OF_YEAR, 7);
-        }
-        else if (setting == 3) {
+        } else if (setting == 3) {
             calendar.add(Calendar.DAY_OF_YEAR, 30);
         }
         return calendar.getTimeInMillis();

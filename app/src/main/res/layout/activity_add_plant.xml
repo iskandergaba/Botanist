@@ -102,15 +102,6 @@
             android:inputType="numberDecimal"
             android:maxLines="1"/>
 
-        <!--Later on, probably on the 3rd iteration-->
-        <!--<EditText-->
-            <!--android:id="@+id/water_edit_text"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:hint="@string/last_watered"-->
-            <!--android:inputType="date"-->
-            <!--android:maxLines="1"/>-->
-
     </LinearLayout>
 
     <Button

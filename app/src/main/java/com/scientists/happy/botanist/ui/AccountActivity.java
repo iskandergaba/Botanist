@@ -36,7 +36,7 @@ import com.scientists.happy.botanist.data.DatabaseManager;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 public class AccountActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, View.OnClickListener {
-    private static final String TAG = "SignInActivity";
+    private static final String TAG = "AccountActivity";
     private static final int RC_SIGN_IN = 9001;
     private GoogleApiClient mGoogleApiClient;
     private ImageView mAccountImageView;

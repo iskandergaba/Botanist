@@ -8,7 +8,6 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.text.InputType;
 import android.text.method.LinkMovementMethod;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -33,16 +32,15 @@ public class ProfileActivity extends AppCompatActivity {
     private static final String NAME_KEY = "name";
     private static final String SPECIES_KEY = "species";
     private static final String HEIGHT_KEY = "height";
-    private static final String PHOTO_KEY = "photoNum";
-    private static final String GIF_LOCATION_KEY = "gifLocation";
-    private String name, species, plantId;
+    private static final String PHOTO_KEY = "photo_num";
+    private static final String GIF_LOCATION_KEY = "gif_location";
+    private String name, plantId;
+    private double height;
     private int photoNum;
     private Bitmap mBitmap;
-    private double height;
     private DatabaseManager mDatabase;
     private TextView mHeightTextView, mGroup;
     private ImageView mPicture;
-    private String gifLocation;
     private String changeNameText = "";
     /**
      * Launch the activity
@@ -57,10 +55,10 @@ public class ProfileActivity extends AppCompatActivity {
         Intent i = getIntent();
         plantId = i.getExtras().getString(ID_KEY);
         name = i.getExtras().getString(NAME_KEY);
-        species = i.getExtras().getString(SPECIES_KEY);
+        String species = i.getExtras().getString(SPECIES_KEY);
         height = i.getExtras().getDouble(HEIGHT_KEY);
         photoNum = i.getExtras().getInt(PHOTO_KEY);
-        gifLocation = i.getExtras().getString(GIF_LOCATION_KEY);
+        String mGifLocation = i.getExtras().getString(GIF_LOCATION_KEY);
         setTitle(name + "\'s Profile");
         mPicture = (ImageView) findViewById(R.id.plant_picture);
         mPicture.setOnClickListener(new View.OnClickListener() {
@@ -89,7 +87,6 @@ public class ProfileActivity extends AppCompatActivity {
         TextView fertilizationLink = (TextView)findViewById(R.id.fertilization_link);
         fertilizationLink.setMovementMethod(LinkMovementMethod.getInstance());
         StorageReference storageReference = FirebaseStorage.getInstance().getReference()
-                // TODO: clean a bit
                 .child(mDatabase.getUserId()).child(plantId + "_" + photoNum + ".jpg");
         Glide.with(this).using(new FirebaseImageLoader()).load(storageReference).placeholder(R.drawable.flowey).into(mPicture);
         TextView nameTextView = (TextView) findViewById(R.id.plant_name);
@@ -108,11 +105,11 @@ public class ProfileActivity extends AppCompatActivity {
         TextView speciesTextView = (TextView) findViewById(R.id.plant_species);
         speciesTextView.setText(getString(R.string.species_fmt, species));
         TextView gifTextView = (TextView) findViewById(R.id.gif_location);
-        gifTextView.setText(getString(R.string.gif_fmt, gifLocation));
+        gifTextView.setText(getString(R.string.gif_fmt, mGifLocation));
         mHeightTextView = (TextView) findViewById(R.id.plant_height);
         mHeightTextView.setText(getString(R.string.height_fmt, height));
+        mGroup = (TextView) findViewById(R.id.group_holder);
         Button heightButton = (Button) findViewById(R.id.height_button);
-        mGroup = (TextView) findViewById(R.id.invisible_man);
         heightButton.setOnClickListener(new View.OnClickListener() {
             /**
              * User clicked update height
@@ -143,6 +140,18 @@ public class ProfileActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 buildWateredDialog().show();
+            }
+        });
+        Button deleteButton = (Button) findViewById(R.id.delete_button);
+        deleteButton.setOnClickListener(new View.OnClickListener() {
+            /**
+             * Delete plant from PlantArray when delete button is pressed
+             * @param v - the button view
+             */
+            @Override
+            public void onClick(View v) {
+                AlertDialog dialog = buildDeleteDialog();
+                dialog.show();
             }
         });
         mDatabase.editProfile(this.findViewById(android.R.id.content), species);
@@ -192,15 +201,6 @@ public class ProfileActivity extends AppCompatActivity {
     public boolean onSupportNavigateUp() {
         super.onBackPressed();
         return true;
-    }
-
-    /**
-     * Delete plant from PlantArray when delete button is pressed
-     * @param view - current app view
-     */
-    protected void onPressDelete(View view) {
-        AlertDialog dialog = buildDeleteDialog();
-        dialog.show();
     }
 
     /**
@@ -273,7 +273,8 @@ public class ProfileActivity extends AppCompatActivity {
      */
     private AlertDialog buildHeightInputDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setView(R.layout.height_input_dialog).setTitle("Record new height").setPositiveButton(R.string.mdtp_ok, new DialogInterface.OnClickListener() {
+        builder.setView(R.layout.height_input_dialog).setTitle("Record New Height")
+                .setPositiveButton(R.string.mdtp_ok, new DialogInterface.OnClickListener() {
             /**
              * User clicked submit
              * @param dialog - current dialog
@@ -299,7 +300,49 @@ public class ProfileActivity extends AppCompatActivity {
              */
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                // Do nothing on cancel
+                // Cancel
+                dialog.cancel();
+            }
+        });
+        return builder.create();
+    }
+
+    /**
+     * Allow the user to change the name of the plant
+     * @return - returns the alert window
+     */
+    private AlertDialog buildChangeNameDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setView(R.layout.name_input_dialog).setTitle("Change Plant Name");
+        // Set up the buttons
+        builder.setPositiveButton(R.string.mdtp_ok, new DialogInterface.OnClickListener() {
+            /**
+             * User clicked submit
+             * @param dialog - warning dialog
+             * @param which - user selected option
+             */
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                EditText inputEditText = (EditText) ((AlertDialog) dialog).findViewById(R.id.name_edit_text);
+                if (inputEditText != null) {
+                    changeNameText = inputEditText.getText().toString();
+                    mDatabase.setPlantName(plantId, changeNameText);
+                    name = changeNameText;
+                    TextView nameTextView = (TextView) findViewById(R.id.plant_name);
+                    nameTextView.setText(getString(R.string.name_fmt, name));
+                    setTitle(name + "\'s Profile");
+                }
+            }
+        });
+        builder.setNegativeButton(R.string.mdtp_cancel, new DialogInterface.OnClickListener() {
+            /**
+             * User cancelled name update
+             * @param dialog - warning dialog
+             * @param which - user selected option
+             */
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
             }
         });
         return builder.create();
@@ -339,49 +382,6 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
         // Get the AlertDialog from create()
-        return builder.create();
-    }
-
-    /**
-     * Allow the user to change the name of the plant
-     * @return - returns the alert window
-     */
-    private AlertDialog buildChangeNameDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Change Plant Name");
-        // Set up the input
-        final EditText input = new EditText(this);
-        // Specify the type of input expected
-        input.setInputType(InputType.TYPE_CLASS_TEXT);
-        builder.setView(input);
-        // Set up the buttons
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            /**
-             * User clicked submit
-             * @param dialog - warning dialog
-             * @param which - user selected option
-             */
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                changeNameText = input.getText().toString();
-                mDatabase.setPlantName(plantId, changeNameText);
-                name = changeNameText;
-                TextView nameTextView = (TextView) findViewById(R.id.plant_name);
-                nameTextView.setText("Name: " + name);
-                setTitle(name + "\'s Profile");
-            }
-        });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            /**
-             * User cancelled name update
-             * @param dialog - warning dialog
-             * @param which - user selected option
-             */
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-            }
-        });
         return builder.create();
     }
 }

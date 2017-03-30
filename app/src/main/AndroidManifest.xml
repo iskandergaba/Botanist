@@ -12,16 +12,18 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="${applicationId}.com.vansuita.pickimage.provider"
             android:exported="false"
             android:grantUriPermissions="true"
             tools:replace="android:authorities">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/picker_provider_paths" />
         </provider>
-        <meta-data
-            android:name="android.support.FILE_PROVIDER_PATHS"
-            android:resource="@xml/picker_provider_paths" />
+
         <receiver android:name=".services.BirthdayReceiver" />
         <receiver android:name=".services.HeightMeasureReceiver" />
         <receiver android:name=".services.FertilizerReceiver" />
@@ -38,10 +40,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".ui.MainActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+
         <activity
             android:name=".ui.ProfileActivity"
             android:parentActivityName=".ui.MainActivity">
@@ -49,6 +54,25 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.scientists.happy.botanist.ui.MainActivity" />
         </activity>
+
+        <activity
+            android:name=".ui.SimilarPlantsActivity"
+            android:label="@string/title_activity_similar_plants"
+            android:parentActivityName=".ui.ProfileActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.scientists.happy.botanist.ui.ProfileActivity" />
+        </activity>
+
+        <activity
+            android:name=".ui.DiseaseActivity"
+            android:label="@string/title_activity_disease"
+            android:parentActivityName=".ui.ProfileActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.scientists.happy.botanist.ui.ProfileActivity" />
+        </activity>
+
         <activity
             android:name=".ui.AddPlantActivity"
             android:label="@string/title_activity_add_plant"
@@ -58,6 +82,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.scientists.happy.botanist.ui.MainActivity" />
         </activity>
+
         <activity
             android:name=".ui.AccountActivity"
             android:label="@string/title_activity_account"
@@ -66,6 +91,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.scientists.happy.botanist.ui.MainActivity" />
         </activity>
+
         <activity
             android:name=".ui.SettingsActivity"
             android:label="@string/title_activity_settings"
@@ -74,22 +100,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.scientists.happy.botanist.ui.MainActivity" />
         </activity>
-        <activity
-            android:name=".ui.SimilarPlantsActivity"
-            android:label="@string/title_activity_similar_plants"
-            android:parentActivityName=".ui.ProfileActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.scientists.happy.botanist.ui.ProfileActivity" />
-        </activity>
-        <activity
-            android:name=".ui.DiseaseActivity"
-            android:label="@string/title_activity_disease"
-            android:parentActivityName=".ui.ProfileActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.scientists.happy.botanist.ui.ProfileActivity" />
-        </activity>
+
     </application>
 
 </manifest>
