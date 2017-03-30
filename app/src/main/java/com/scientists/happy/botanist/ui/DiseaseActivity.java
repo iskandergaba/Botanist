@@ -19,7 +19,7 @@ public class DiseaseActivity extends AppCompatActivity {
         setContentView(R.layout.activity_disease);
         mDatabase = DatabaseManager.getInstance();
         ListView list = (ListView) findViewById(R.id.diseases);
-        list.setEmptyView(findViewById(R.id.empty_list));
+        list.setEmptyView(findViewById(R.id.empty_list_view));
         String group = (String) getIntent().getExtras().get("group");
         ListAdapter adapter = mDatabase.getDiseases(this, group);
         list.setAdapter(adapter);
