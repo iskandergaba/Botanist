@@ -449,7 +449,7 @@ public class ProfileActivity extends AppCompatActivity {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         int hour = preferences.getInt("water_hour", 9);
         int minute = preferences.getInt("water_minute", 0);
-        int reminderSetting = 0;
+        int reminderSetting;
         Calendar cal = Calendar.getInstance();
         if (type.equals(WATER_KEY)) {
             reminderSetting = Integer.parseInt(preferences.getString(SettingsActivity.WATER_REMINDER_KEY, "1"));
@@ -470,6 +470,6 @@ public class ProfileActivity extends AppCompatActivity {
         calendarIntent.putExtra(CalendarContract.EXTRA_EVENT_END_TIME, cal.getTimeInMillis() + 36000);
         calendarIntent.putExtra(CalendarContract.Events.ALL_DAY, false);
         calendarIntent.putExtra(CalendarContract.Events.DESCRIPTION, title);
-        context.startActivity(calendarIntent);
+        context.startActivity(calendarIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
     }
 }

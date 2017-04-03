@@ -14,23 +14,18 @@
  * limitations under the License.
  */
 package com.scientists.happy.botanist.ui;
+
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
-import android.preference.SwitchPreference;
-import android.support.v13.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.widget.Switch;
-
-import com.scientists.happy.botanist.Manifest;
 import com.scientists.happy.botanist.R;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
+
 public class SettingsActivity extends AppCompatActivity {
     public static SharedPreferences mPreferences;
     public static final String WATER_HOUR_KEY = "water_hour";

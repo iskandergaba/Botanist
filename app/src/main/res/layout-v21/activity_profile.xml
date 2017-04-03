@@ -17,6 +17,7 @@
             android:scaleType="centerCrop"
             android:src="@drawable/flowey"
             android:id="@+id/plant_picture"
+            android:transitionName="image_main_to_profile_transition"
             android:contentDescription="@string/plant_picture_desc" />
 
         <TextView
