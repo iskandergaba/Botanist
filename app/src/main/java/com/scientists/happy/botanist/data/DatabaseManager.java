@@ -2,7 +2,6 @@
 // @author: Christopher Besser, Antonio Muscarella, and Iskander Gaba
 package com.scientists.happy.botanist.data;
 
-import android.Manifest;
 import android.app.Activity;
 import android.app.ActivityOptions;
 import android.app.AlarmManager;
@@ -18,6 +17,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -199,7 +199,13 @@ public class DatabaseManager {
             gifWriter.finish();
             try {
                 // created gif files are written to pictures public external storage
-                outFile = new File(getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), plantId + ".gif");
+                File outputDir = getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+                // Apparently, the external storage public directory only sometimes exists?
+                if (!outputDir.exists()) {
+                    //noinspection ResultOfMethodCallIgnored
+                    outputDir.mkdir();
+                }
+                outFile = new File(outputDir, plantId + ".gif");
                 FileOutputStream output = new FileOutputStream(outFile);
                 output.write(out.toByteArray());
                 output.flush();
@@ -373,7 +379,7 @@ public class DatabaseManager {
      * @param plantId - the id of the plant
      * @param photoNum - the number of pictures that plant has
      */
-    public void deletePlant(Context context, final String plantId, final int photoNum) {
+    public void deletePlant(final Context context, final String plantId, final int photoNum) {
         final String userId = getUserId();
         deleteAllReminders(context);
         if (userId != null) {
@@ -393,6 +399,10 @@ public class DatabaseManager {
                         setDeletedNumber(getDeletedNumber() + 1);
                         updateUserRating();
                     }
+                    File gif = new File(getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), plantId + ".gif");
+                    if (gif.exists() && gif.delete()) {
+                        updateGallery(context);
+                    }
                 }
 
                 /**
@@ -404,6 +414,23 @@ public class DatabaseManager {
                 }
             });
         }
+    }
+
+    /**
+     * Delete gif reference from the Android Gallery
+     * @param context - app context
+     */
+    private void updateGallery(Context context) {
+        MediaScannerConnection.scanFile(context, new String[]{Environment.getExternalStorageDirectory().toString()}, null,
+                new MediaScannerConnection.OnScanCompletedListener() {
+                    /**
+                     * Gallery scan completed
+                     * @param path - path of the deleted image
+                     * @param uri of the deleted image
+                     */
+                    public void onScanCompleted(String path, Uri uri) {
+                    }
+                });
     }
 
     /**
