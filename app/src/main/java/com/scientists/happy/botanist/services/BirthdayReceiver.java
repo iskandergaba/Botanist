@@ -38,7 +38,7 @@ public class BirthdayReceiver extends BroadcastReceiver {
     /**
      * Returns the plant's age in years
      * @param birthday - the plant's birthday
-     * @return Returns birthday in years
+     * @return Returns age in years
      */
     private int getAgeInYears(long birthday) {
         Calendar cal1 = Calendar.getInstance();
