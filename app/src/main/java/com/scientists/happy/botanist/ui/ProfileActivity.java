@@ -497,7 +497,7 @@ public class ProfileActivity extends AppCompatActivity {
         shareIntent.putExtra(Intent.EXTRA_TITLE, title);
         shareIntent.putExtra(Intent.EXTRA_TEXT, text);
         shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        if (mGifLocation.equals("No Gif made (yet!")) {
+        if (mGifLocation == null || mGifLocation.equals("No Gif made (yet!")) {
             shareIntent.setType("plain/text");
         } else {
             Uri gifUri = Uri.parse("file://" + mGifLocation);
