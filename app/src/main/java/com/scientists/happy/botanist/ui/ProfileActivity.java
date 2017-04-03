@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -27,6 +28,7 @@ import com.vansuita.pickimage.bean.PickResult;
 import com.vansuita.pickimage.bundle.PickSetup;
 import com.vansuita.pickimage.dialog.PickImageDialog;
 import com.vansuita.pickimage.listeners.IPickResult;
+
 public class ProfileActivity extends AppCompatActivity {
     private static final String ID_KEY = "plant_id";
     private static final String NAME_KEY = "name";
@@ -152,6 +154,17 @@ public class ProfileActivity extends AppCompatActivity {
             public void onClick(View v) {
                 AlertDialog dialog = buildDeleteDialog();
                 dialog.show();
+            }
+        });
+        Button shareButton = (Button) findViewById(R.id.share_button);
+        shareButton.setOnClickListener(new View.OnClickListener() {
+            /**
+             * User clicked share plant
+             * @param v - current view
+             */
+            @Override
+            public void onClick(View v) {
+                sharePlant();
             }
         });
         mDatabase.editProfile(this.findViewById(android.R.id.content), species);
