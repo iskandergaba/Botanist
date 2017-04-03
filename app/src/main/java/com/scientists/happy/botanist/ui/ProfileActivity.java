@@ -1,7 +1,6 @@
 // Plant profile
 // @author: Antonio Muscarella and Christopher Besser
 package com.scientists.happy.botanist.ui;
-
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -22,7 +21,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.bumptech.glide.Glide;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
 import com.google.firebase.storage.FirebaseStorage;
@@ -33,10 +31,8 @@ import com.vansuita.pickimage.bean.PickResult;
 import com.vansuita.pickimage.bundle.PickSetup;
 import com.vansuita.pickimage.dialog.PickImageDialog;
 import com.vansuita.pickimage.listeners.IPickResult;
-
 import java.util.Calendar;
 import java.util.Locale;
-
 public class ProfileActivity extends AppCompatActivity {
     private static final String ID_KEY = "plant_id";
     private static final String NAME_KEY = "name";
@@ -497,7 +493,7 @@ public class ProfileActivity extends AppCompatActivity {
         shareIntent.putExtra(Intent.EXTRA_TITLE, title);
         shareIntent.putExtra(Intent.EXTRA_TEXT, text);
         shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        if (mGifLocation == null || mGifLocation.equals("No Gif made (yet!")) {
+        if (mGifLocation.equals("No Gif made (yet!)")) {
             shareIntent.setType("plain/text");
         } else {
             Uri gifUri = Uri.parse("file://" + mGifLocation);
