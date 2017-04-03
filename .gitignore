@@ -8,5 +8,6 @@
 /captures
 .externalNativeBuild
 parser/bin/
-parser/usdaplants.csv
-parser/out.json
+parser/*.csv
+parser/*.json
+parser/*.xlsx
