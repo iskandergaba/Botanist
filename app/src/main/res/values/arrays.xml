@@ -13,4 +13,9 @@
         <item>2</item>
         <item>3</item>
     </string-array>
+
+    <string-array name="calendar_active_choices">
+        <item>ON</item>
+        <item>OFF</item>
+    </string-array>
 </resources>
