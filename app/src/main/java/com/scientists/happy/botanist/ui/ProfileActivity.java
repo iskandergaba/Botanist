@@ -30,9 +30,7 @@ import com.vansuita.pickimage.bean.PickResult;
 import com.vansuita.pickimage.bundle.PickSetup;
 import com.vansuita.pickimage.dialog.PickImageDialog;
 import com.vansuita.pickimage.listeners.IPickResult;
-
 import java.util.Calendar;
-
 public class ProfileActivity extends AppCompatActivity {
     private static final String ID_KEY = "plant_id";
     private static final String NAME_KEY = "name";
@@ -457,7 +455,8 @@ public class ProfileActivity extends AppCompatActivity {
             reminderSetting = Integer.parseInt(preferences.getString(SettingsActivity.WATER_REMINDER_KEY, "1"));
             long interval = mDatabase.getReminderIntervalInMillis(reminderSetting);
             cal.setTimeInMillis(lastWatered + interval);
-        } else if (type.equals(FERTILIZER_KEY)) {
+        }
+        else if (type.equals(FERTILIZER_KEY)) {
             reminderSetting = Integer.parseInt(preferences.getString(SettingsActivity.FERTILIZER_REMINDER_KEY, "2"));
             long interval = mDatabase.getReminderIntervalInMillis(reminderSetting);
             cal.setTimeInMillis(lastFertilized + interval);

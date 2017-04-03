@@ -8,14 +8,9 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
-import android.content.ContentResolver;
-import android.content.ContentUris;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
@@ -26,17 +21,12 @@ import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.provider.CalendarContract;
 import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.bumptech.glide.Glide;
 import com.firebase.ui.database.FirebaseListAdapter;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
@@ -60,7 +50,6 @@ import com.scientists.happy.botanist.services.WaterReceiver;
 import com.scientists.happy.botanist.ui.ProfileActivity;
 import com.scientists.happy.botanist.ui.SettingsActivity;
 import com.scientists.happy.botanist.utils.GifSequenceWriter;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -70,29 +59,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
-
 import static android.content.Context.ALARM_SERVICE;
 import static android.os.Environment.getExternalStoragePublicDirectory;
-
 public class DatabaseManager {
-
     private static final int HEIGHT_MEASURE_RECEIVER_ID_OFFSET = 1000;
     private static final int FERTILIZER_RECEIVER_ID_OFFSET = 2000;
     private static final int UPDATE_PHOTO_RECEIVER_ID_OFFSET = 3000;
     private static final int BIRTHDAY_RECEIVER_ID_OFFSET = 4000;
-    // Projection array. Creating indices for this array instead of doing
-    // dynamic lookups improves performance.
-    public static final String[] EVENT_PROJECTION = new String[]{
-            CalendarContract.Calendars._ID,                           // 0
-            CalendarContract.Calendars.ACCOUNT_NAME,                  // 1
-            CalendarContract.Calendars.CALENDAR_DISPLAY_NAME,         // 2
-            CalendarContract.Calendars.OWNER_ACCOUNT                  // 3
-    };
-    // The indices for the projection array above.
-    private static final int PROJECTION_ID_INDEX = 0;
-    private static final int PROJECTION_ACCOUNT_NAME_INDEX = 1;
-    private static final int PROJECTION_DISPLAY_NAME_INDEX = 2;
-    private static final int PROJECTION_OWNER_ACCOUNT_INDEX = 3;
     private long mPlantsAdded, mPlantsDeleted, mPlantsNumber;
     private long mWaterCount, mMeasureCount, mPhotoCount;
     private long mBotanistSince;
@@ -103,10 +76,6 @@ public class DatabaseManager {
     private DatabaseReference mDatabase;
     private String mDiseaseUrl;
     private static DatabaseManager mDatabaseManager;
-
-
-
-
     private class PrepareAutocompleteTask extends AsyncTask<Void, Void, Void> {
         /**
          * Background asynchronous update
@@ -312,13 +281,16 @@ public class DatabaseManager {
         // reject plant addition if species is null
         if ((species == null) || species.equals("")) {
             return;
-        } else if (mAutoCompleteCache.containsKey(species)) {
+        }
+        else if (mAutoCompleteCache.containsKey(species)) {
             // If the user typed a common name, fetch the scientific name
             plant = new Plant(name, mAutoCompleteCache.get(species), birthday, height);
-        } else if (mAutoCompleteCache.containsValue(species)) {
+        }
+        else if (mAutoCompleteCache.containsValue(species)) {
             // The user must have entered the correct scientific name
             plant = new Plant(name, species, birthday, height);
-        } else {
+        }
+        else {
             return;
         }
         final String plantId = plant.getId();
@@ -454,7 +426,8 @@ public class DatabaseManager {
                 public void onComplete(@NonNull Task<Void> task) {
                     if (!task.isSuccessful()) {
                         Toast.makeText(context, "Height update failed, try again", Toast.LENGTH_SHORT).show();
-                    } else {
+                    }
+                    else {
                         setMeasureCount(getMeasureCount() + 1);
                         updateUserRating();
                     }
@@ -470,7 +443,8 @@ public class DatabaseManager {
                         public void onComplete(@NonNull Task<Void> task) {
                             if (!task.isSuccessful()) {
                                 Toast.makeText(context, "Height update failed, try again", Toast.LENGTH_SHORT).show();
-                            } else {
+                            }
+                            else {
                                 updateNotificationTime(plantId, "lastMeasureNotification");
                             }
                             hideProgressDialog();
@@ -544,7 +518,8 @@ public class DatabaseManager {
                                 View sharedImageView = view.findViewById(R.id.grid_item_image_view);
                                 Bundle bundle = ActivityOptions.makeSceneTransitionAnimation(activity, sharedImageView, "image_main_to_profile_transition").toBundle();
                                 activity.startActivity(i, bundle);
-                            } else {
+                            }
+                            else {
                                 activity.startActivity(i);
                             }
                         }
@@ -667,7 +642,8 @@ public class DatabaseManager {
                     TextView toxicWarningTextView = (TextView) view.findViewById(R.id.toxic_warning);
                     if (entry.isToxic()) {
                         toxicWarningTextView.setVisibility(View.VISIBLE);
-                    } else {
+                    }
+                    else {
                         toxicWarningTextView.setVisibility(View.GONE);
                     }
                     TextView noxiousWarningTextView = (TextView) view.findViewById(R.id.noxious_warning);
@@ -1187,9 +1163,11 @@ public class DatabaseManager {
         calendar.setTimeInMillis(0);
         if (setting == 1) {
             calendar.add(Calendar.DAY_OF_YEAR, 1);
-        } else if (setting == 2) {
+        }
+        else if (setting == 2) {
             calendar.add(Calendar.DAY_OF_YEAR, 7);
-        } else if (setting == 3) {
+        }
+        else if (setting == 3) {
             calendar.add(Calendar.DAY_OF_YEAR, 30);
         }
         return calendar.getTimeInMillis();
