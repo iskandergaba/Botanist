@@ -374,8 +374,9 @@ public class ProfileActivity extends AppCompatActivity {
         builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
             /**
              * User clicked confirm
+             *
              * @param dialog - the warning window
-             * @param id - the user id
+             * @param id     - the user id
              */
             public void onClick(DialogInterface dialog, int id) {
                 mDatabase.deletePlant(ProfileActivity.this, plantId, photoNum);
@@ -387,8 +388,9 @@ public class ProfileActivity extends AppCompatActivity {
         builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
             /**
              * User clicked cancel
+             *
              * @param dialog - the warning window
-             * @param id - the user id
+             * @param id     - the user id
              */
             public void onClick(DialogInterface dialog, int id) {
                 // User cancelled the dialog
@@ -396,5 +398,13 @@ public class ProfileActivity extends AppCompatActivity {
         });
         // Get the AlertDialog from create()
         return builder.create();
+    }
+
+    private void sharePlant() {
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_TEXT, "Try botanist!");
+        sendIntent.setType("text/plain");
+        startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.send_to)));
     }
 }
