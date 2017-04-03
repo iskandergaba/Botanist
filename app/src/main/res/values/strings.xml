@@ -79,5 +79,7 @@
     <string name="user_badge_desc">User badge</string>
     <string name="fertilization_link" translatable="false"><a href='http://www.finegardening.com/fertilizing-basics'>Learn more about fertilization</a></string>
     <string name="care_tips">Care Tips:</string>
+    <string name="calendar_sync_text">Add to Calendar</string>
+    <string name="calendar_dialog_text">Which reminder do you want to add to your calendar?</string>
 </resources>
 
