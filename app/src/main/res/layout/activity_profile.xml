@@ -179,14 +179,6 @@
         </LinearLayout>
 
         <Button
-            android:id="@+id/share_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@android:color/holo_blue_dark"
-            android:text="@string/share_text"
-            android:textColor="@android:color/white" />
-
-        <Button
             android:id="@+id/delete_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

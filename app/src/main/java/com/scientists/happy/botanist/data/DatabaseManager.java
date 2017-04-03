@@ -19,7 +19,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
-import android.provider.CalendarContract;
 import android.support.annotation.NonNull;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -27,6 +26,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.bumptech.glide.Glide;
 import com.firebase.ui.database.FirebaseListAdapter;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
@@ -50,6 +50,7 @@ import com.scientists.happy.botanist.services.WaterReceiver;
 import com.scientists.happy.botanist.ui.ProfileActivity;
 import com.scientists.happy.botanist.ui.SettingsActivity;
 import com.scientists.happy.botanist.utils.GifSequenceWriter;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -59,6 +60,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+
 import static android.content.Context.ALARM_SERVICE;
 import static android.os.Environment.getExternalStoragePublicDirectory;
 public class DatabaseManager {
@@ -512,6 +514,7 @@ public class DatabaseManager {
                             i.putExtra("height", plant.getHeight());
                             i.putExtra("photo_num", plant.getPhotoNum());
                             i.putExtra("gif_location", plant.getGifLocation());
+                            i.putExtra("birthday", plant.getBirthday());
                             i.putExtra("last_watered", plant.getLastWaterNotification());
                             i.putExtra("last_fertilized", plant.getLastFertilizerNotification());
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {

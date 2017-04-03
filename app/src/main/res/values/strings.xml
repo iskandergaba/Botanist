@@ -42,8 +42,7 @@
     <string name="sign_out_title">Sign out</string>
     <string name="delete_message">Are you sure you want to delete this plant?</string>
     <string name="delete_dialog_title">Delete Plant</string>
-    <string name="share_text">Share Plant</string>
-    <string name="send_to">Share your plant!</string>
+    <string name="share_dialog_title">Share Plant…</string>
     <string name="confirm_message">Are you sure?</string>
     <string name="watered">I watered this plant</string>
     <string name="yes">Yes</string>
@@ -81,5 +80,6 @@
     <string name="care_tips">Care Tips:</string>
     <string name="calendar_sync_text">Add to Calendar</string>
     <string name="calendar_dialog_text">Which reminder do you want to add to your calendar?</string>
+    <string name="share">Share</string>
 </resources>
 

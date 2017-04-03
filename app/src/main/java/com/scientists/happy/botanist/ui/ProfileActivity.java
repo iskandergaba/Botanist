@@ -1,12 +1,16 @@
 // Plant profile
 // @author: Antonio Muscarella and Christopher Besser
 package com.scientists.happy.botanist.ui;
+
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.provider.CalendarContract;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.method.LinkMovementMethod;
@@ -18,6 +22,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.bumptech.glide.Glide;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
 import com.google.firebase.storage.FirebaseStorage;
@@ -29,6 +34,9 @@ import com.vansuita.pickimage.bundle.PickSetup;
 import com.vansuita.pickimage.dialog.PickImageDialog;
 import com.vansuita.pickimage.listeners.IPickResult;
 
+import java.util.Calendar;
+import java.util.Locale;
+
 public class ProfileActivity extends AppCompatActivity {
     private static final String ID_KEY = "plant_id";
     private static final String NAME_KEY = "name";
@@ -36,7 +44,10 @@ public class ProfileActivity extends AppCompatActivity {
     private static final String HEIGHT_KEY = "height";
     private static final String PHOTO_KEY = "photo_num";
     private static final String GIF_LOCATION_KEY = "gif_location";
-    private String name, plantId;
+    private static final String BIRTHDAY_KEY = "birthday";
+    private static final String WATER_KEY = "last_watered";
+    private static final String FERTILIZER_KEY = "last_fertilized";
+    private String mName, mSpecies, plantId, mGifLocation;
     private double height;
     private int photoNum;
     private Bitmap mBitmap;
@@ -44,6 +55,7 @@ public class ProfileActivity extends AppCompatActivity {
     private TextView mHeightTextView, mGroup;
     private ImageView mPicture;
     private String changeNameText = "";
+    private long mBirthday, mLastWatered, mLastFertilized;
     /**
      * Launch the activity
      * @param savedInstanceState - current view state
@@ -56,12 +68,15 @@ public class ProfileActivity extends AppCompatActivity {
         // store individual plant information from the extras passed through the intent
         Intent i = getIntent();
         plantId = i.getExtras().getString(ID_KEY);
-        name = i.getExtras().getString(NAME_KEY);
-        String species = i.getExtras().getString(SPECIES_KEY);
+        mName = i.getExtras().getString(NAME_KEY);
+        mSpecies = i.getExtras().getString(SPECIES_KEY);
         height = i.getExtras().getDouble(HEIGHT_KEY);
         photoNum = i.getExtras().getInt(PHOTO_KEY);
-        String mGifLocation = i.getExtras().getString(GIF_LOCATION_KEY);
-        setTitle(name + "\'s Profile");
+        mBirthday = i.getExtras().getLong(BIRTHDAY_KEY);
+        mLastWatered = i.getExtras().getLong(WATER_KEY);
+        mLastFertilized = i.getExtras().getLong(FERTILIZER_KEY);
+        mGifLocation = i.getExtras().getString(GIF_LOCATION_KEY);
+        setTitle(mName + "\'s Profile");
         mPicture = (ImageView) findViewById(R.id.plant_picture);
         mPicture.setOnClickListener(new View.OnClickListener() {
             /**
@@ -103,9 +118,9 @@ public class ProfileActivity extends AppCompatActivity {
                 buildChangeNameDialog().show();
             }
         });
-        nameTextView.setText(getString(R.string.name_fmt, name));
+        nameTextView.setText(getString(R.string.name_fmt, mName));
         TextView speciesTextView = (TextView) findViewById(R.id.plant_species);
-        speciesTextView.setText(getString(R.string.species_fmt, species));
+        speciesTextView.setText(getString(R.string.species_fmt, mSpecies));
         TextView gifTextView = (TextView) findViewById(R.id.gif_location);
         gifTextView.setText(getString(R.string.gif_fmt, mGifLocation));
         mHeightTextView = (TextView) findViewById(R.id.plant_height);
@@ -144,6 +159,18 @@ public class ProfileActivity extends AppCompatActivity {
                 buildWateredDialog().show();
             }
         });
+        Button calendarButton = (Button) findViewById(R.id.calendar_button);
+        calendarButton.setOnClickListener(new View.OnClickListener() {
+            /**
+             * Delete plant from PlantArray when delete button is pressed
+             * @param v - the button view
+             */
+            @Override
+            public void onClick(View v) {
+                AlertDialog dialog = buildCalendarDialog();
+                dialog.show();
+            }
+        });
         Button deleteButton = (Button) findViewById(R.id.delete_button);
         deleteButton.setOnClickListener(new View.OnClickListener() {
             /**
@@ -156,18 +183,7 @@ public class ProfileActivity extends AppCompatActivity {
                 dialog.show();
             }
         });
-        Button shareButton = (Button) findViewById(R.id.share_button);
-        shareButton.setOnClickListener(new View.OnClickListener() {
-            /**
-             * User clicked share plant
-             * @param v - current view
-             */
-            @Override
-            public void onClick(View v) {
-                sharePlant();
-            }
-        });
-        mDatabase.editProfile(this.findViewById(android.R.id.content), species);
+        mDatabase.editProfile(this.findViewById(android.R.id.content), mSpecies);
     }
 
     /**
@@ -202,6 +218,9 @@ public class ProfileActivity extends AppCompatActivity {
         }
         else if (id == R.id.action_create_gif) {
             mDatabase.makePlantGif(this, plantId, photoNum);
+        }
+        else if (id == R.id.action_share) {
+            sharePlant();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -288,24 +307,24 @@ public class ProfileActivity extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setView(R.layout.height_input_dialog).setTitle("Record New Height")
                 .setPositiveButton(R.string.mdtp_ok, new DialogInterface.OnClickListener() {
-            /**
-             * User clicked submit
-             * @param dialog - current dialog
-             * @param which - selected option
-             */
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                EditText inputEditText = (EditText) ((AlertDialog) dialog).findViewById(R.id.height_edit_text);
-                double newHeight = Double.parseDouble(inputEditText != null ? inputEditText.getText().toString() : "-1");
-                if (height < newHeight) {
-                    height = newHeight;
-                    mDatabase.updatePlantHeight(ProfileActivity.this, plantId, height);
-                    mHeightTextView.setText(getString(R.string.height_fmt, height));
-                }
-                Context context = getApplicationContext();
-                Toast.makeText(context, "Update successful", Toast.LENGTH_SHORT).show();
-            }
-        }).setNegativeButton(R.string.mdtp_cancel, new DialogInterface.OnClickListener() {
+                    /**
+                     * User clicked submit
+                     * @param dialog - current dialog
+                     * @param which - selected option
+                     */
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        EditText inputEditText = (EditText) ((AlertDialog) dialog).findViewById(R.id.height_edit_text);
+                        double newHeight = Double.parseDouble(inputEditText != null ? inputEditText.getText().toString() : "-1");
+                        if (height < newHeight) {
+                            height = newHeight;
+                            mDatabase.updatePlantHeight(ProfileActivity.this, plantId, height);
+                            mHeightTextView.setText(getString(R.string.height_fmt, height));
+                        }
+                        Context context = getApplicationContext();
+                        Toast.makeText(context, "Update successful", Toast.LENGTH_SHORT).show();
+                    }
+                }).setNegativeButton(R.string.mdtp_cancel, new DialogInterface.OnClickListener() {
             /**
              * User clicked cancel
              * @param dialog - current dialog
@@ -340,10 +359,10 @@ public class ProfileActivity extends AppCompatActivity {
                 if (inputEditText != null) {
                     changeNameText = inputEditText.getText().toString();
                     mDatabase.setPlantName(plantId, changeNameText);
-                    name = changeNameText;
+                    mName = changeNameText;
                     TextView nameTextView = (TextView) findViewById(R.id.plant_name);
-                    nameTextView.setText(getString(R.string.name_fmt, name));
-                    setTitle(name + "\'s Profile");
+                    nameTextView.setText(getString(R.string.name_fmt, mName));
+                    setTitle(mName + "\'s Profile");
                 }
             }
         });
@@ -374,9 +393,8 @@ public class ProfileActivity extends AppCompatActivity {
         builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
             /**
              * User clicked confirm
-             *
              * @param dialog - the warning window
-             * @param id     - the user id
+             * @param id - the user id
              */
             public void onClick(DialogInterface dialog, int id) {
                 mDatabase.deletePlant(ProfileActivity.this, plantId, photoNum);
@@ -388,9 +406,8 @@ public class ProfileActivity extends AppCompatActivity {
         builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
             /**
              * User clicked cancel
-             *
              * @param dialog - the warning window
-             * @param id     - the user id
+             * @param id - the user id
              */
             public void onClick(DialogInterface dialog, int id) {
                 // User cancelled the dialog
@@ -400,11 +417,102 @@ public class ProfileActivity extends AppCompatActivity {
         return builder.create();
     }
 
+    /**
+     * Ask the user which reminder they want to add to their calendar
+     * @return - returns the alert window
+     */
+    private AlertDialog buildCalendarDialog() {
+        // Instantiate an AlertDialog.Builder with its constructor
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        // Chain together various setter methods to set the dialog characteristics
+        builder.setMessage(R.string.calendar_dialog_text).setTitle(R.string.calendar_sync_text);
+        // Add the buttons
+        builder.setPositiveButton("Watering", new DialogInterface.OnClickListener() {
+            /**
+             * User clicked confirm
+             * @param dialog - the warning window
+             * @param id - the user id
+             */
+            public void onClick(DialogInterface dialog, int id) {
+                updateCalendar(getApplicationContext(), "Water " + mName, WATER_KEY);
+            }
+        });
+        builder.setNegativeButton("Fertilizing", new DialogInterface.OnClickListener() {
+            /**
+             * User clicked cancel
+             * @param dialog - the warning window
+             * @param id - the user id
+             */
+            public void onClick(DialogInterface dialog, int id) {
+                updateCalendar(getApplicationContext(), "Fertilize " + mName, FERTILIZER_KEY);
+            }
+        });
+        // Get the AlertDialog from create()
+        return builder.create();
+    }
+
+    /**
+     * write to phone's calendar
+     * @param context - the context from which this is called
+     * @param title - the title of the event to add
+     */
+    private void updateCalendar(Context context, String title, String type) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        int hour = preferences.getInt("water_hour", 9);
+        int minute = preferences.getInt("water_minute", 0);
+        int reminderSetting;
+        Calendar cal = Calendar.getInstance();
+        if (type.equals(WATER_KEY)) {
+            reminderSetting = Integer.parseInt(preferences.getString(SettingsActivity.WATER_REMINDER_KEY, "1"));
+            long interval = mDatabase.getReminderIntervalInMillis(reminderSetting);
+            cal.setTimeInMillis(mLastWatered + interval);
+        }
+        else if (type.equals(FERTILIZER_KEY)) {
+            reminderSetting = Integer.parseInt(preferences.getString(SettingsActivity.FERTILIZER_REMINDER_KEY, "2"));
+            long interval = mDatabase.getReminderIntervalInMillis(reminderSetting);
+            cal.setTimeInMillis(mLastFertilized + interval);
+        }
+        cal.set(Calendar.HOUR, hour);
+        cal.set(Calendar.MINUTE, minute);
+        Intent calendarIntent = new Intent(Intent.ACTION_EDIT);
+        calendarIntent.setType("vnd.android.cursor.item/event");
+        calendarIntent.putExtra(CalendarContract.Events.TITLE, title);
+        calendarIntent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, cal.getTimeInMillis() );
+        calendarIntent.putExtra(CalendarContract.EXTRA_EVENT_END_TIME, cal.getTimeInMillis() + 36000);
+        calendarIntent.putExtra(CalendarContract.Events.ALL_DAY, false);
+        calendarIntent.putExtra(CalendarContract.Events.DESCRIPTION, title);
+        context.startActivity(calendarIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+    }
+
+    /**
+     * Trigger the share intent
+     */
     private void sharePlant() {
-        Intent sendIntent = new Intent();
-        sendIntent.setAction(Intent.ACTION_SEND);
-        sendIntent.putExtra(Intent.EXTRA_TEXT, "Try botanist!");
-        sendIntent.setType("text/plain");
-        startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.send_to)));
+        String title = "Meet my plant: " + mName + "!";
+        String text = "Name: " + mName + "\nSpecies: " + mSpecies + "\nFamily: " + mGroup.getText().toString()
+                + "\nAge: " + String.format(Locale.US, "%.2f", getAgeInDays(mBirthday)) + " days"
+                + "\nHeight: " + height + " inches\nShared via: Botanist";
+        Intent shareIntent = new Intent();
+        shareIntent.setAction(Intent.ACTION_SEND);
+        shareIntent.putExtra(Intent.EXTRA_TITLE, title);
+        shareIntent.putExtra(Intent.EXTRA_TEXT, text);
+        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        if (mGifLocation.equals("No Gif made (yet!")) {
+            shareIntent.setType("plain/text");
+        } else {
+            Uri gifUri = Uri.parse("file://" + mGifLocation);
+            shareIntent.putExtra(Intent.EXTRA_STREAM, gifUri);
+            shareIntent.setType("image/*");
+        }
+        startActivity(Intent.createChooser(shareIntent, getString(R.string.share_dialog_title)));
+    }
+
+    /**
+     * Returns the plant's age in years
+     * @param birthday - the plant's birthday
+     * @return Returns age in days
+     */
+    private double getAgeInDays(long birthday) {
+        return (System.currentTimeMillis() - birthday) / 86400000.0;
     }
 }
