@@ -1,15 +1,22 @@
 // Singleton Database manager for Firebase
 // @author: Christopher Besser, Antonio Muscarella, and Iskander Gaba
 package com.scientists.happy.botanist.data;
+
+import android.Manifest;
 import android.app.Activity;
 import android.app.ActivityOptions;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
+import android.content.ContentResolver;
+import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -17,13 +24,19 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.provider.CalendarContract;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.bumptech.glide.Glide;
 import com.firebase.ui.database.FirebaseListAdapter;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
@@ -47,6 +60,7 @@ import com.scientists.happy.botanist.services.WaterReceiver;
 import com.scientists.happy.botanist.ui.ProfileActivity;
 import com.scientists.happy.botanist.ui.SettingsActivity;
 import com.scientists.happy.botanist.utils.GifSequenceWriter;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -56,14 +70,29 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+
 import static android.content.Context.ALARM_SERVICE;
 import static android.os.Environment.getExternalStoragePublicDirectory;
+
 public class DatabaseManager {
 
     private static final int HEIGHT_MEASURE_RECEIVER_ID_OFFSET = 1000;
     private static final int FERTILIZER_RECEIVER_ID_OFFSET = 2000;
     private static final int UPDATE_PHOTO_RECEIVER_ID_OFFSET = 3000;
     private static final int BIRTHDAY_RECEIVER_ID_OFFSET = 4000;
+    // Projection array. Creating indices for this array instead of doing
+    // dynamic lookups improves performance.
+    public static final String[] EVENT_PROJECTION = new String[]{
+            CalendarContract.Calendars._ID,                           // 0
+            CalendarContract.Calendars.ACCOUNT_NAME,                  // 1
+            CalendarContract.Calendars.CALENDAR_DISPLAY_NAME,         // 2
+            CalendarContract.Calendars.OWNER_ACCOUNT                  // 3
+    };
+    // The indices for the projection array above.
+    private static final int PROJECTION_ID_INDEX = 0;
+    private static final int PROJECTION_ACCOUNT_NAME_INDEX = 1;
+    private static final int PROJECTION_DISPLAY_NAME_INDEX = 2;
+    private static final int PROJECTION_OWNER_ACCOUNT_INDEX = 3;
     private long mPlantsAdded, mPlantsDeleted, mPlantsNumber;
     private long mWaterCount, mMeasureCount, mPhotoCount;
     private long mBotanistSince;
@@ -74,6 +103,10 @@ public class DatabaseManager {
     private DatabaseReference mDatabase;
     private String mDiseaseUrl;
     private static DatabaseManager mDatabaseManager;
+
+
+
+
     private class PrepareAutocompleteTask extends AsyncTask<Void, Void, Void> {
         /**
          * Background asynchronous update
@@ -91,7 +124,7 @@ public class DatabaseManager {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     // Basically, this says "For each DataSnapshot *Data* in dataSnapshot, do what's inside the method.
-                    for (DataSnapshot suggestionSnapshot: dataSnapshot.getChildren()) {
+                    for (DataSnapshot suggestionSnapshot : dataSnapshot.getChildren()) {
                         // Get the suggestion by childing the key of the string you want to get.
                         String commonName = suggestionSnapshot.getKey();
                         String sciName = suggestionSnapshot.getValue(String.class);
@@ -118,6 +151,7 @@ public class DatabaseManager {
         String userId;
         String plantId;
         File outFile;
+
         /**
          * Prepare to launch task
          */
@@ -158,8 +192,7 @@ public class DatabaseManager {
                 try {
                     Bitmap bmp = Glide.with(parent).using(new FirebaseImageLoader()).load(storageReference).asBitmap().into(-1, -1).get();
                     gifWriter.addFrame(bmp);
-                }
-                catch (InterruptedException | ExecutionException e) {
+                } catch (InterruptedException | ExecutionException e) {
                     return false;
                 }
             }
@@ -172,8 +205,7 @@ public class DatabaseManager {
                 output.flush();
                 output.close();
                 return true;
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 return false;
             }
         }
@@ -274,15 +306,13 @@ public class DatabaseManager {
         // reject plant addition if species is null
         if ((species == null) || species.equals("")) {
             return;
-        }
-        else if (mAutoCompleteCache.containsKey(species)) {
+        } else if (mAutoCompleteCache.containsKey(species)) {
             // If the user typed a common name, fetch the scientific name
             plant = new Plant(name, mAutoCompleteCache.get(species), birthday, height);
         } else if (mAutoCompleteCache.containsValue(species)) {
             // The user must have entered the correct scientific name
             plant = new Plant(name, species, birthday, height);
-        }
-        else {
+        } else {
             return;
         }
         final String plantId = plant.getId();
@@ -405,20 +435,20 @@ public class DatabaseManager {
             });
             mDatabase.child("users").child(userId).child("plants").child(plantId).child("height").setValue(heightInInches)
                     .addOnCompleteListener(new OnCompleteListener<Void>() {
-                /**
-                 * Update current plant height
-                 * @param task - update task
-                 */
-                @Override
-                public void onComplete(@NonNull Task<Void> task) {
-                    if (!task.isSuccessful()) {
-                        Toast.makeText(context, "Height update failed, try again", Toast.LENGTH_SHORT).show();
-                    } else {
-                        updateNotificationTime(plantId, "lastMeasureNotification");
-                    }
-                    hideProgressDialog();
-                }
-            });
+                        /**
+                         * Update current plant height
+                         * @param task - update task
+                         */
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (!task.isSuccessful()) {
+                                Toast.makeText(context, "Height update failed, try again", Toast.LENGTH_SHORT).show();
+                            } else {
+                                updateNotificationTime(plantId, "lastMeasureNotification");
+                            }
+                            hideProgressDialog();
+                        }
+                    });
         }
     }
 
@@ -481,6 +511,8 @@ public class DatabaseManager {
                             i.putExtra("height", plant.getHeight());
                             i.putExtra("photo_num", plant.getPhotoNum());
                             i.putExtra("gif_location", plant.getGifLocation());
+                            i.putExtra("last_watered", plant.getLastWaterNotification());
+                            i.putExtra("last_fertilized", plant.getLastFertilizerNotification());
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                                 View sharedImageView = view.findViewById(R.id.grid_item_image_view);
                                 Bundle bundle = ActivityOptions.makeSceneTransitionAnimation(activity, sharedImageView, "image_main_to_profile_transition").toBundle();
@@ -736,8 +768,7 @@ public class DatabaseManager {
         final String userId = getUserId();
         if ((photoNum > 1) && (userId != null)) {
             new LoadImages(photoNum, activity, plantId).execute();
-        }
-        else {
+        } else {
             Toast.makeText(activity, "Must take at least 2 pictures for a .gif", Toast.LENGTH_SHORT).show();
         }
     }
@@ -800,7 +831,7 @@ public class DatabaseManager {
 
 
         mRating = ((1.3 * added - deleted / 100))
-                * (getWaterCount() + getMeasureCount() + getPhotoCount() + 1) / ( 10 * (added + deleted + 1));
+                * (getWaterCount() + getMeasureCount() + getPhotoCount() + 1) / (10 * (added + deleted + 1));
 
         if (userId != null) {
             mDatabase.child("users").child(userId).child("rating").setValue(mRating);
@@ -1124,7 +1155,7 @@ public class DatabaseManager {
      * @param setting - user selected delay
      * @return Returns the millisecond denomination of the delay
      */
-    private long getReminderIntervalInMillis(int setting) {
+    public long getReminderIntervalInMillis(int setting) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(0);
         if (setting == 1) {
