@@ -78,6 +78,7 @@ public class DatabaseManager {
     private DatabaseReference mDatabase;
     private String mDiseaseUrl;
     private static DatabaseManager mDatabaseManager;
+
     private class PrepareAutocompleteTask extends AsyncTask<Void, Void, Void> {
         /**
          * Background asynchronous update
@@ -456,6 +457,39 @@ public class DatabaseManager {
     }
 
     /**
+     * Update plant's height
+     * @param context - the current app context
+     * @param plantId - the id of the plant (species_name)
+     */
+    public void updatePlantWatering(final Context context, final String plantId) {
+        showProgressDialog(context);
+        final String userId = getUserId();
+        String now = Long.toString(System.currentTimeMillis());
+        if (userId != null) {
+            mDatabase.child("users").child(userId).child("plants").child(plantId).child("watering").push()
+                    .setValue(now).addOnCompleteListener(new OnCompleteListener<Void>() {
+                /**
+                 * Update plant heights list
+                 * @param task - update task
+                 */
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if (!task.isSuccessful()) {
+                        Toast.makeText(context, "Update failed, try again", Toast.LENGTH_SHORT).show();
+                    }
+                    else {
+                        updateNotificationTime(plantId, "lastWaterNotification");
+                        setWaterCount(getWaterCount() + 1);
+                        updateUserRating();
+                        Toast.makeText(context, "Update successful", Toast.LENGTH_SHORT).show();
+                    }
+                    hideProgressDialog();
+                }
+            });
+        }
+    }
+
+    /**
      * Update last watered
      * @param plantId - the id of the plant (species_name)
      * @param field - the field to update
@@ -830,7 +864,7 @@ public class DatabaseManager {
         return mRating;
     }
 
-    public void updateUserRating() {
+    private void updateUserRating() {
         String userId = getUserId();
         long added = getAddedNumber();
         long deleted = getDeletedNumber();

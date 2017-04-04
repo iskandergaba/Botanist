@@ -33,6 +33,7 @@ import com.vansuita.pickimage.dialog.PickImageDialog;
 import com.vansuita.pickimage.listeners.IPickResult;
 import java.util.Calendar;
 import java.util.Locale;
+
 public class ProfileActivity extends AppCompatActivity {
     private static final String ID_KEY = "plant_id";
     private static final String NAME_KEY = "name";
@@ -276,11 +277,7 @@ public class ProfileActivity extends AppCompatActivity {
              * @param id - the user id
              */
             public void onClick(DialogInterface dialog, int id) {
-                mDatabase.updateNotificationTime(plantId, "lastWaterNotification");
-                Context context = getApplicationContext();
-                Toast.makeText(context, "Update successful", Toast.LENGTH_SHORT).show();
-                mDatabase.setWaterCount(mDatabase.getWaterCount() + 1);
-                mDatabase.updateUserRating();
+                mDatabase.updatePlantWatering(ProfileActivity.this, plantId);
             }
         });
         builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {

@@ -1,16 +1,17 @@
 // Plant object
 // @author: Antonio Muscarella and Iskander Gaba
 package com.scientists.happy.botanist.data;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 class Plant {
     private static final String DELIMITER = "\t";
-    private String name, species, id;
-    private Map<String, Double> heights;
+    private int photoNum;
     private long birthday, lastWaterNotification, lastMeasureNotification, lastFertilizerNotification, lastPhotoNotification;
     private double height;
-    private int photoNum;
-    private String gifLocation;
+    private String name, species, id, gifLocation;
+    private Map<String, String> watering;
+    private Map<String, Double> heights;
     /**
      * Required by Firebase, this useless constructor must remain
      */
@@ -30,6 +31,7 @@ class Plant {
         this.species = species;
         this.birthday = birthday;
         this.height = height;
+        this.watering = new LinkedHashMap<>();
         this.heights = new LinkedHashMap<>();
         this.lastMeasureNotification = System.currentTimeMillis();
         this.lastFertilizerNotification = lastMeasureNotification;
@@ -70,6 +72,14 @@ class Plant {
      */
     long getBirthday() {
         return birthday;
+    }
+
+    /**
+     * Get the plant heights
+     * @return Returns a list of watering operations times in millis
+     */
+    public Map<String, String> getWatering() {
+        return watering;
     }
 
     /**
@@ -144,4 +154,5 @@ class Plant {
     public String toString() {
         return name + DELIMITER + species + DELIMITER;
     }
+
 }
