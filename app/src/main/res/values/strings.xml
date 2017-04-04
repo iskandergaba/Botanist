@@ -55,7 +55,7 @@
     <string name="no_plants">No plants added</string>
     <string name="set_birthday">Set birthday</string>
     <string name="loading_similar">Loading similar plants…</string>
-    <string name="create_gif">Export pictures to GIF</string>
+    <string name="create_gif">Export Pictures to GIF</string>
     <string name="plant_picture_desc">Plant picture</string>
     <string name="tap_to_take_a_picture">Choose a picture</string>
     <string name="name">Name</string>
@@ -81,5 +81,7 @@
     <string name="calendar_sync_text">Add to Calendar</string>
     <string name="calendar_dialog_text">Which reminder do you want to add to your calendar?</string>
     <string name="share">Share</string>
+    <string name="title_activity_stats">Statistics</string>
+    <string name="stats">Statistics</string>
 </resources>
 

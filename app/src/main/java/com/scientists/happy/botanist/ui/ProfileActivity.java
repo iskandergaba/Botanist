@@ -219,6 +219,9 @@ public class ProfileActivity extends AppCompatActivity {
         else if (id == R.id.action_share) {
             sharePlant();
         }
+        else if (id == R.id.action_stats) {
+            startActivity(new Intent(this, StatsActivity.class));
+        }
         return super.onOptionsItemSelected(item);
     }
 
