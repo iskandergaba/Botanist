@@ -41,6 +41,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.series.DataPoint;
+import com.jjoe64.graphview.series.LineGraphSeries;
 import com.scientists.happy.botanist.R;
 import com.scientists.happy.botanist.services.BirthdayReceiver;
 import com.scientists.happy.botanist.services.FertilizerReceiver;
@@ -55,6 +58,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -406,6 +410,47 @@ public class DatabaseManager {
                     public void onScanCompleted(String path, Uri uri) {
                     }
                 });
+    }
+
+    /**
+     * Get heights with their recording time in millis
+     * @param plantId - plant unique id
+     * @param graph - height graph
+     */
+    public void populateHeightsGraph(String plantId, final GraphView graph) {
+
+        final String userId = getUserId();
+        if (userId != null) {
+            mDatabase.child("users").child(userId).child("plants").child(plantId)
+                    .child("heights").addListenerForSingleValueEvent(new ValueEventListener() {
+                /**
+                 * Handle a change in the user data
+                 * @param snapshot - the current database contents
+                 */
+                @Override
+                public void onDataChange(DataSnapshot snapshot) {
+                    if (snapshot.exists()) {
+                        List<DataPoint> data = new ArrayList<>();
+                        for (DataSnapshot record : snapshot.getChildren()) {
+                            long date = Long.parseLong(record.getKey());
+                            double height = record.getValue(Double.class);
+                            data.add(new DataPoint(date, height));
+                        }
+                        DataPoint[] points = data.toArray(new DataPoint[data.size()]);
+                        LineGraphSeries<DataPoint> series = new LineGraphSeries<>(points);
+                        graph.addSeries(series);
+                    }
+                }
+
+                /**
+                 * Do nothing when the process cancels
+                 * @param databaseError - Ignored error
+                 */
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                }
+            });
+        }
     }
 
     /**

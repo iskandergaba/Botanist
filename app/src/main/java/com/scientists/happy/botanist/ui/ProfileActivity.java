@@ -203,7 +203,7 @@ public class ProfileActivity extends AppCompatActivity {
         int id = item.getItemId();
         if (id == R.id.action_similar_plants) {
             Intent i = new Intent(this, SimilarPlantsActivity.class);
-            i.putExtra("species", plantId);
+            i.putExtra("species", mSpecies);
             i.putExtra("group", mGroup.getText().toString());
             startActivity(i);
             return true;
@@ -212,15 +212,20 @@ public class ProfileActivity extends AppCompatActivity {
             Intent i = new Intent(this, DiseaseActivity.class);
             i.putExtra("group", mGroup.getText().toString());
             startActivity(i);
+            return true;
         }
         else if (id == R.id.action_create_gif) {
             mDatabase.makePlantGif(this, plantId, photoNum);
+            return true;
         }
         else if (id == R.id.action_share) {
             sharePlant();
+            return true;
         }
         else if (id == R.id.action_stats) {
-            startActivity(new Intent(this, StatsActivity.class));
+            Intent i = new Intent(this, StatsActivity.class);
+            i.putExtra("plant_id", plantId);
+            startActivity(i);
         }
         return super.onOptionsItemSelected(item);
     }
