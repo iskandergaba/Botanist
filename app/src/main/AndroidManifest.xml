@@ -79,6 +79,15 @@
         </activity>
 
         <activity
+            android:name=".ui.StatsActivity"
+            android:label="@string/title_activity_stats"
+            android:parentActivityName=".ui.ProfileActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.scientists.happy.botanist.ui.ProfileActivity" />
+        </activity>
+
+        <activity
             android:name=".ui.AddPlantActivity"
             android:label="@string/title_activity_add_plant"
             android:parentActivityName=".ui.MainActivity"

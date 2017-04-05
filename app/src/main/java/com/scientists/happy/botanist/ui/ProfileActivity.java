@@ -33,6 +33,7 @@ import com.vansuita.pickimage.dialog.PickImageDialog;
 import com.vansuita.pickimage.listeners.IPickResult;
 import java.util.Calendar;
 import java.util.Locale;
+
 public class ProfileActivity extends AppCompatActivity {
     private static final String ID_KEY = "plant_id";
     private static final String NAME_KEY = "name";
@@ -202,7 +203,7 @@ public class ProfileActivity extends AppCompatActivity {
         int id = item.getItemId();
         if (id == R.id.action_similar_plants) {
             Intent i = new Intent(this, SimilarPlantsActivity.class);
-            i.putExtra("species", plantId);
+            i.putExtra("species", mSpecies);
             i.putExtra("group", mGroup.getText().toString());
             startActivity(i);
             return true;
@@ -211,12 +212,20 @@ public class ProfileActivity extends AppCompatActivity {
             Intent i = new Intent(this, DiseaseActivity.class);
             i.putExtra("group", mGroup.getText().toString());
             startActivity(i);
+            return true;
         }
         else if (id == R.id.action_create_gif) {
             mDatabase.makePlantGif(this, plantId, photoNum);
+            return true;
         }
         else if (id == R.id.action_share) {
             sharePlant();
+            return true;
+        }
+        else if (id == R.id.action_stats) {
+            Intent i = new Intent(this, StatsActivity.class);
+            i.putExtra("plant_id", plantId);
+            startActivity(i);
         }
         return super.onOptionsItemSelected(item);
     }
@@ -276,11 +285,7 @@ public class ProfileActivity extends AppCompatActivity {
              * @param id - the user id
              */
             public void onClick(DialogInterface dialog, int id) {
-                mDatabase.updateNotificationTime(plantId, "lastWaterNotification");
-                Context context = getApplicationContext();
-                Toast.makeText(context, "Update successful", Toast.LENGTH_SHORT).show();
-                mDatabase.setWaterCount(mDatabase.getWaterCount() + 1);
-                mDatabase.updateUserRating();
+                mDatabase.updatePlantWatering(ProfileActivity.this, plantId);
             }
         });
         builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {

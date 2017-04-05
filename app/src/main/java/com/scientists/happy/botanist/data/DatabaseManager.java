@@ -12,6 +12,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -30,6 +31,14 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.firebase.ui.database.FirebaseListAdapter;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
+import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -55,8 +64,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -78,6 +89,7 @@ public class DatabaseManager {
     private DatabaseReference mDatabase;
     private String mDiseaseUrl;
     private static DatabaseManager mDatabaseManager;
+
     private class PrepareAutocompleteTask extends AsyncTask<Void, Void, Void> {
         /**
          * Background asynchronous update
@@ -408,6 +420,130 @@ public class DatabaseManager {
     }
 
     /**
+     * Populate height chart
+     * @param plantId - plant unique id
+     */
+    public void populateHeightChart(String plantId, final LineChart chart) {
+
+        final String userId = getUserId();
+        if (userId != null) {
+            mDatabase.child("users").child(userId).child("plants").child(plantId)
+                    .child("heights").addListenerForSingleValueEvent(new ValueEventListener() {
+                /**
+                 * Handle a change in the user data
+                 * @param snapshot - the current database contents
+                 */
+                @Override
+                public void onDataChange(DataSnapshot snapshot) {
+                    if (snapshot.exists()) {
+                        List<Entry> entries = new ArrayList<>();
+                        for (DataSnapshot record : snapshot.getChildren()) {
+                            long time = Long.parseLong(record.getKey());
+                            float height = record.getValue(Float.class);
+                            entries.add(new Entry(time, height));
+                        }
+
+                        if (!entries.isEmpty()) {
+                            LineDataSet dataSet = new LineDataSet(entries, "Height in inches");
+                            dataSet.setLineWidth(1.5f);
+                            dataSet.setColors(Color.RED);
+                            LineData lineData = new LineData(dataSet);
+                            lineData.setValueTextSize(7f);
+                            chart.setData(lineData);
+                            chart.invalidate();
+                        }
+                    }
+                }
+
+                /**
+                 * Do nothing when the process cancels
+                 * @param databaseError - Ignored error
+                 */
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                }
+            });
+        }
+    }
+
+    /**
+     * Populate water chart
+     * @param plantId - plant unique id
+     */
+    public void populateWaterChart(String plantId, final BarChart chart) {
+
+        final String userId = getUserId();
+        if (userId != null) {
+            mDatabase.child("users").child(userId).child("plants").child(plantId)
+                    .child("watering").addListenerForSingleValueEvent(new ValueEventListener() {
+                Map<Long, Integer> watering = new LinkedHashMap<>();
+                /**
+                 * Handle a change in the user data
+                 * @param snapshot - the current database contents
+                 */
+                @Override
+                public void onDataChange(DataSnapshot snapshot) {
+                    if (snapshot.exists()) {
+                        Calendar today = Calendar.getInstance();
+                        watering.put(today.getTimeInMillis(), 0);
+                        for (int i = 1; i < 7; i++) {
+                            Calendar day = Calendar.getInstance();
+                            day.set(Calendar.DAY_OF_YEAR, today.get(Calendar.DAY_OF_YEAR) - i);
+                            watering.put(day.getTimeInMillis(), 0);
+                        }
+                        for (DataSnapshot record : snapshot.getChildren()) {
+                            processTime(Long.parseLong(record.getValue(String.class)));
+                        }
+
+                        List<BarEntry> entries = new ArrayList<>();
+                        int diff = 7 - today.get(Calendar.DAY_OF_WEEK);
+                        for (long timeStamp : watering.keySet()) {
+                            Calendar date = Calendar.getInstance();
+                            date.setTimeInMillis(timeStamp);
+                            // Just to ensure that today appears always as the latest bar
+                            int day = date.get(Calendar.DAY_OF_WEEK) + diff;
+                            if (day > 7) day %= 7;
+                            entries.add(new BarEntry(day, watering.get(timeStamp)));
+                        }
+
+                        if (!entries.isEmpty()) {
+                            BarDataSet dataSet = new BarDataSet(entries, "Times Watered");
+                            BarData barData = new BarData(dataSet);
+                            barData.setBarWidth(0.9f);
+                            barData.setValueTextSize(10f);
+                            chart.setData(barData);
+                            chart.invalidate();
+                        }
+                    }
+                }
+
+                /**
+                 * Do nothing when the process cancels
+                 * @param databaseError - Ignored error
+                 */
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                }
+
+                private void processTime(long time) {
+                    Calendar date = Calendar.getInstance();
+                    date.setTimeInMillis(time);
+                    for (long timeStamp : watering.keySet()) {
+                        Calendar day = Calendar.getInstance();
+                        day.setTimeInMillis(timeStamp);
+                        if (date.get(Calendar.YEAR) == day.get(Calendar.YEAR)
+                                && date.get(Calendar.DAY_OF_YEAR) == day.get(Calendar.DAY_OF_YEAR)) {
+                            int count = watering.remove(timeStamp);
+                            watering.put(timeStamp, ++count);
+                            break;
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    /**
      * Update plant's height
      * @param context - the current app context
      * @param plantId - the id of the plant (species_name)
@@ -452,6 +588,39 @@ public class DatabaseManager {
                             hideProgressDialog();
                         }
                     });
+        }
+    }
+
+    /**
+     * Update plant's height
+     * @param context - the current app context
+     * @param plantId - the id of the plant (species_name)
+     */
+    public void updatePlantWatering(final Context context, final String plantId) {
+        showProgressDialog(context);
+        final String userId = getUserId();
+        String now = Long.toString(System.currentTimeMillis());
+        if (userId != null) {
+            mDatabase.child("users").child(userId).child("plants").child(plantId).child("watering").push()
+                    .setValue(now).addOnCompleteListener(new OnCompleteListener<Void>() {
+                /**
+                 * Update plant heights list
+                 * @param task - update task
+                 */
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if (!task.isSuccessful()) {
+                        Toast.makeText(context, "Update failed, try again", Toast.LENGTH_SHORT).show();
+                    }
+                    else {
+                        updateNotificationTime(plantId, "lastWaterNotification");
+                        setWaterCount(getWaterCount() + 1);
+                        updateUserRating();
+                        Toast.makeText(context, "Update successful", Toast.LENGTH_SHORT).show();
+                    }
+                    hideProgressDialog();
+                }
+            });
         }
     }
 
@@ -830,7 +999,7 @@ public class DatabaseManager {
         return mRating;
     }
 
-    public void updateUserRating() {
+    private void updateUserRating() {
         String userId = getUserId();
         long added = getAddedNumber();
         long deleted = getDeletedNumber();
