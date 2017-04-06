@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.scientists.happy.botanist">
 
-    <uses-permission android:name="android.permission.VIBRATE"/>
-    <uses-permission android:name="android.permission.WAKE_LOCK"/>
-    <uses-permission android:name="android.permission.READ_CALENDAR"/>
-    <uses-permission android:name="android.permission.WRITE_CALENDAR"/>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.READ_CALENDAR" />
+    <uses-permission android:name="android.permission.WRITE_CALENDAR" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -17,7 +16,6 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="${applicationId}.com.vansuita.pickimage.provider"
@@ -45,21 +43,21 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".ui.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
-        </activity>
 
+        </activity>
         <activity
             android:name=".ui.ProfileActivity"
-            android:parentActivityName=".ui.MainActivity">
+            android:parentActivityName=".ui.MainActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:label="@string/title_activity_profile">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.scientists.happy.botanist.ui.MainActivity" />
         </activity>
-
         <activity
             android:name=".ui.SimilarPlantsActivity"
             android:label="@string/title_activity_similar_plants"
@@ -68,16 +66,15 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.scientists.happy.botanist.ui.ProfileActivity" />
         </activity>
-
         <activity
             android:name=".ui.DiseaseActivity"
             android:label="@string/title_activity_disease"
             android:parentActivityName=".ui.ProfileActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.scientists.happy.botanist.ui.ProfileActivity" />
+                android:value="com.scientists.happy.botanist.ui.ProfileActivity"
+                android:theme="@style/AppTheme.NoActionBar"/>
         </activity>
-
         <activity
             android:name=".ui.StatsActivity"
             android:label="@string/title_activity_stats"
@@ -86,7 +83,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.scientists.happy.botanist.ui.ProfileActivity" />
         </activity>
-
         <activity
             android:name=".ui.AddPlantActivity"
             android:label="@string/title_activity_add_plant"
@@ -96,7 +92,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.scientists.happy.botanist.ui.MainActivity" />
         </activity>
-
         <activity
             android:name=".ui.AccountActivity"
             android:label="@string/title_activity_account"
@@ -105,7 +100,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.scientists.happy.botanist.ui.MainActivity" />
         </activity>
-
         <activity
             android:name=".ui.SettingsActivity"
             android:label="@string/title_activity_settings"
@@ -114,7 +108,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.scientists.happy.botanist.ui.MainActivity" />
         </activity>
-
     </application>
 
 </manifest>

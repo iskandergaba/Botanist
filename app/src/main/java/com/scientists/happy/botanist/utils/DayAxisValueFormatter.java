@@ -12,7 +12,8 @@ public class DayAxisValueFormatter implements IAxisValueFormatter {
 
         // Getting the real day of the week from the offset value
         int diff = 7 - Calendar.getInstance().get(Calendar.DAY_OF_WEEK);
-        int dayOfTheWeek = ((int)value + diff) % 7 + 1;
+        int dayOfTheWeek = ((int)value - diff);
+        if(dayOfTheWeek < 1) dayOfTheWeek += 7;
 
         Calendar date = Calendar.getInstance();
         date.setTimeInMillis(System.currentTimeMillis());
