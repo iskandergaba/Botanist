@@ -1,32 +1,48 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.scientists.happy.botanist.ui.ProfileActivity">
 
     <item
-        android:id="@+id/action_similar_plants"
+        android:id="@+id/action_share"
         android:orderInCategory="1"
-        android:title="@string/similar"
-        app:showAsAction="never" />
+        android:title="@string/share"
+        app:showAsAction="ifRoom" />
+
     <item
-        android:id="@+id/action_diseases"
+        android:id="@+id/action_change_name"
         android:orderInCategory="2"
-        android:title="@string/diseases"
+        android:title="@string/update_name"
         app:showAsAction="never" />
-    <item
-        android:id="@+id/action_create_gif"
-        android:orderInCategory="3"
-        android:title="@string/create_gif"
-        app:showAsAction="never" />
+
     <item
         android:id="@+id/action_stats"
-        android:orderInCategory="4"
+        android:orderInCategory="3"
         android:title="@string/stats"
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/action_share"
+        android:id="@+id/action_export_gif"
         android:orderInCategory="4"
-        android:title="@string/share"
-        app:showAsAction="ifRoom" />
+        android:title="@string/create_gif"
+        app:showAsAction="never" />
+
+
+    <item
+        android:id="@+id/action_similar_plants"
+        android:orderInCategory="5"
+        android:title="@string/similar"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_diseases"
+        android:orderInCategory="6"
+        android:title="@string/diseases"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_delete"
+        android:orderInCategory="7"
+        android:title="@string/delete_dialog_title"
+        app:showAsAction="never" />
 </menu>

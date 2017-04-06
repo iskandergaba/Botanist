@@ -1,6 +1,7 @@
 // Plant profile
 // @author: Antonio Muscarella and Christopher Besser
 package com.scientists.happy.botanist.ui;
+
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -10,27 +11,32 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.CalendarContract;
+import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.method.LinkMovementMethod;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.bumptech.glide.Glide;
-import com.firebase.ui.storage.images.FirebaseImageLoader;
+
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.scientists.happy.botanist.R;
 import com.scientists.happy.botanist.data.DatabaseManager;
+import com.squareup.picasso.Picasso;
 import com.vansuita.pickimage.bean.PickResult;
 import com.vansuita.pickimage.bundle.PickSetup;
 import com.vansuita.pickimage.dialog.PickImageDialog;
 import com.vansuita.pickimage.listeners.IPickResult;
+
 import java.util.Calendar;
 import java.util.Locale;
 
@@ -61,6 +67,12 @@ public class ProfileActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+
         mDatabase = DatabaseManager.getInstance();
         // store individual plant information from the extras passed through the intent
         Intent i = getIntent();
@@ -73,9 +85,11 @@ public class ProfileActivity extends AppCompatActivity {
         mLastWatered = i.getExtras().getLong(WATER_KEY);
         mLastFertilized = i.getExtras().getLong(FERTILIZER_KEY);
         mGifLocation = i.getExtras().getString(GIF_LOCATION_KEY);
-        setTitle(mName + "\'s Profile");
+        setTitle(mName);
         mPicture = (ImageView) findViewById(R.id.plant_picture);
-        mPicture.setOnClickListener(new View.OnClickListener() {
+
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.camera_fab);
+        fab.setOnClickListener(new View.OnClickListener() {
             /**
              * Handle click event in the picture
              * @param v - the current view
@@ -92,30 +106,26 @@ public class ProfileActivity extends AppCompatActivity {
                     public void onPickResult(PickResult r) {
                         mBitmap = r.getBitmap();
                         mPicture.setImageBitmap(mBitmap);
-                        mDatabase.updatePlantImage(photoNum + 1, plantId, mBitmap);
-                        photoNum++;
+                        mDatabase.updatePlantImage(++photoNum, plantId, mBitmap);
                     }
                 }).show(getSupportFragmentManager());
             }
         });
+
         TextView fertilizationLink = (TextView)findViewById(R.id.fertilization_link);
         fertilizationLink.setMovementMethod(LinkMovementMethod.getInstance());
+
+        ActivityCompat.postponeEnterTransition(this);
         StorageReference storageReference = FirebaseStorage.getInstance().getReference()
                 .child(mDatabase.getUserId()).child(plantId + "_" + photoNum + ".jpg");
-        Glide.with(this).using(new FirebaseImageLoader()).load(storageReference).placeholder(R.drawable.flowey).into(mPicture);
-        TextView nameTextView = (TextView) findViewById(R.id.plant_name);
-        Button changeNameButton = (Button) findViewById(R.id.change_name_button);
-        changeNameButton.setOnClickListener(new View.OnClickListener() {
-            /**
-             * User clicked change name
-             * @param v - current view
-             */
+
+        storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
-            public void onClick(View v) {
-                buildChangeNameDialog().show();
+            public void onSuccess(Uri uri) {
+                Picasso.with(ProfileActivity.this).load(uri.toString()).placeholder(R.drawable.flowey)
+                        .into(mPicture);
             }
         });
-        nameTextView.setText(getString(R.string.name_fmt, mName));
         TextView speciesTextView = (TextView) findViewById(R.id.plant_species);
         speciesTextView.setText(getString(R.string.species_fmt, mSpecies));
         TextView gifTextView = (TextView) findViewById(R.id.gif_location);
@@ -123,7 +133,7 @@ public class ProfileActivity extends AppCompatActivity {
         mHeightTextView = (TextView) findViewById(R.id.plant_height);
         mHeightTextView.setText(getString(R.string.height_fmt, height));
         mGroup = (TextView) findViewById(R.id.group_holder);
-        Button heightButton = (Button) findViewById(R.id.height_button);
+        View heightButton = findViewById(R.id.height_button);
         heightButton.setOnClickListener(new View.OnClickListener() {
             /**
              * User clicked update height
@@ -134,7 +144,7 @@ public class ProfileActivity extends AppCompatActivity {
                 buildHeightInputDialog().show();
             }
         });
-        Button poopButton = (Button) findViewById(R.id.poop_button);
+        View poopButton = findViewById(R.id.poop_button);
         poopButton.setOnClickListener(new View.OnClickListener() {
             /**
              * User clicked update height
@@ -145,7 +155,7 @@ public class ProfileActivity extends AppCompatActivity {
                 buildFertilizedDialog().show();
             }
         });
-        Button waterButton = (Button) findViewById(R.id.water_button);
+        View waterButton = findViewById(R.id.water_button);
         waterButton.setOnClickListener(new View.OnClickListener() {
             /**
              * User clicked update height
@@ -156,7 +166,7 @@ public class ProfileActivity extends AppCompatActivity {
                 buildWateredDialog().show();
             }
         });
-        Button calendarButton = (Button) findViewById(R.id.calendar_button);
+        View calendarButton = findViewById(R.id.calendar_button);
         calendarButton.setOnClickListener(new View.OnClickListener() {
             /**
              * Delete plant from PlantArray when delete button is pressed
@@ -164,23 +174,18 @@ public class ProfileActivity extends AppCompatActivity {
              */
             @Override
             public void onClick(View v) {
-                AlertDialog dialog = buildCalendarDialog();
-                dialog.show();
-            }
-        });
-        Button deleteButton = (Button) findViewById(R.id.delete_button);
-        deleteButton.setOnClickListener(new View.OnClickListener() {
-            /**
-             * Delete plant from PlantArray when delete button is pressed
-             * @param v - the button view
-             */
-            @Override
-            public void onClick(View v) {
-                AlertDialog dialog = buildDeleteDialog();
-                dialog.show();
+                buildCalendarDialog().show();
             }
         });
         mDatabase.editProfile(this.findViewById(android.R.id.content), mSpecies);
+
+        overridePendingTransition(R.anim.appear_from_bottom, R.anim.hold);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        overridePendingTransition(R.anim.hold, R.anim.disappear_to_bottom);
     }
 
     /**
@@ -201,7 +206,26 @@ public class ProfileActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if (id == R.id.action_similar_plants) {
+
+        if (id == R.id.action_share) {
+            sharePlant();
+            return true;
+        }
+        else if (id == R.id.action_change_name) {
+            buildChangeNameDialog().show();
+            return true;
+        }
+        else if (id == R.id.action_stats) {
+            Intent i = new Intent(this, StatsActivity.class);
+            i.putExtra("plant_id", plantId);
+            startActivity(i);
+            return true;
+        }
+        else if (id == R.id.action_export_gif) {
+            mDatabase.makePlantGif(this, plantId, photoNum);
+            return true;
+        }
+        else if (id == R.id.action_similar_plants) {
             Intent i = new Intent(this, SimilarPlantsActivity.class);
             i.putExtra("species", mSpecies);
             i.putExtra("group", mGroup.getText().toString());
@@ -214,18 +238,9 @@ public class ProfileActivity extends AppCompatActivity {
             startActivity(i);
             return true;
         }
-        else if (id == R.id.action_create_gif) {
-            mDatabase.makePlantGif(this, plantId, photoNum);
+        else if (id == R.id.action_delete) {
+            buildDeleteDialog().show();
             return true;
-        }
-        else if (id == R.id.action_share) {
-            sharePlant();
-            return true;
-        }
-        else if (id == R.id.action_stats) {
-            Intent i = new Intent(this, StatsActivity.class);
-            i.putExtra("plant_id", plantId);
-            startActivity(i);
         }
         return super.onOptionsItemSelected(item);
     }
@@ -361,9 +376,7 @@ public class ProfileActivity extends AppCompatActivity {
                     changeNameText = inputEditText.getText().toString();
                     mDatabase.setPlantName(plantId, changeNameText);
                     mName = changeNameText;
-                    TextView nameTextView = (TextView) findViewById(R.id.plant_name);
-                    nameTextView.setText(getString(R.string.name_fmt, mName));
-                    setTitle(mName + "\'s Profile");
+                    setTitle(mName);
                 }
             }
         });
@@ -379,6 +392,11 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
         return builder.create();
+    }
+
+    private void setTitle(String title) {
+        CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.toolbar_layout);
+        collapsingToolbarLayout.setTitle(title);
     }
 
     /**

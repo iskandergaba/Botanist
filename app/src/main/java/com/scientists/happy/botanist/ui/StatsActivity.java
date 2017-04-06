@@ -52,7 +52,7 @@ public class StatsActivity extends AppCompatActivity {
         YAxis rightAxis = chart.getAxisRight();
         rightAxis.setEnabled(false);
         chart.getDescription().setText("Plant Growth");
-        chart.getDescription().setTextSize(10f);
+        chart.getDescription().setTextSize(11f);
 
         mDatabase.populateHeightChart(plantId, chart);
     }
@@ -66,10 +66,11 @@ public class StatsActivity extends AppCompatActivity {
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         xAxis.setValueFormatter(new DayAxisValueFormatter());
         xAxis.setDrawGridLines(false);
+        xAxis.setTextSize(9f);
         YAxis rightAxis = chart.getAxisRight();
         rightAxis.setEnabled(false);
         chart.getDescription().setText("Weekly Watering Summary");
-        chart.getDescription().setTextSize(10f);
+        chart.getDescription().setTextSize(11f);
         mDatabase.populateWaterChart(plantId, chart);
     }
 }

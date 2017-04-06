@@ -12,10 +12,12 @@ import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.View;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.google.android.gms.auth.api.Auth;
@@ -33,9 +35,10 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.scientists.happy.botanist.R;
 import com.scientists.happy.botanist.data.DatabaseManager;
+
 import java.text.SimpleDateFormat;
 import java.util.Locale;
-public class AccountActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, View.OnClickListener {
+public class AccountActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
     private static final String TAG = "AccountActivity";
     private static final int RC_SIGN_IN = 9001;
     private GoogleApiClient mGoogleApiClient;
@@ -65,9 +68,6 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
         TextView levelTextView = (TextView) findViewById(R.id.level_text_view);
         ImageView badge = (ImageView) findViewById(R.id.user_badge);
         ProgressBar levelProgressBar = (ProgressBar) findViewById(R.id.level_progress_bar);
-        // Button listeners
-        findViewById(R.id.sign_out_button).setOnClickListener(this);
-        findViewById(R.id.revoke_access_button).setOnClickListener(this);
         mAuth = FirebaseAuth.getInstance();
         mDatabase = DatabaseManager.getInstance();
         mAuthListener = new FirebaseAuth.AuthStateListener() {
@@ -116,6 +116,36 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
             levelTextView.setText(getString(R.string.level_3));
             levelProgressBar.setProgress(100);
         }
+    }
+
+    /**
+     * Create Action Overflow menu
+     * @param menu - actions
+     * @return Returns success code
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_account, menu);
+        return true;
+    }
+
+    /**
+     * Action overflow menu
+     * @param item - selected item
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.action_sign_out) {
+            buildSignOutDialog().show();
+            return true;
+        }
+        else if (id == R.id.action_delete_account) {
+            buildRevokeAccessDialog().show();
+
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     /**
@@ -384,24 +414,6 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
     private void hideProgressDialog() {
         if ((mProgressDialog != null) && mProgressDialog.isShowing()) {
             mProgressDialog.hide();
-        }
-    }
-
-    /**
-     * Handle click event
-     * @param v - the view the click belongs to
-     */
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.sign_out_button:
-                AlertDialog dialog = buildSignOutDialog();
-                dialog.show();
-                break;
-            case R.id.revoke_access_button:
-                dialog = buildRevokeAccessDialog();
-                dialog.show();
-                break;
         }
     }
 }

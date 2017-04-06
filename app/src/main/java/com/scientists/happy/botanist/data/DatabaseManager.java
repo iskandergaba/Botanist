@@ -3,7 +3,6 @@
 package com.scientists.happy.botanist.data;
 
 import android.app.Activity;
-import android.app.ActivityOptions;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
@@ -16,8 +15,6 @@ import android.graphics.Color;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
-import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -40,6 +37,7 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -59,6 +57,7 @@ import com.scientists.happy.botanist.services.WaterReceiver;
 import com.scientists.happy.botanist.ui.ProfileActivity;
 import com.scientists.happy.botanist.ui.SettingsActivity;
 import com.scientists.happy.botanist.utils.GifSequenceWriter;
+import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -182,7 +181,7 @@ public class DatabaseManager {
             gifWriter.finish();
             try {
                 // created gif files are written to pictures public external storage
-                File outputDir = getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+                File outputDir = getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES + "/Botanist");
                 // Apparently, the external storage public directory only sometimes exists?
                 if (!outputDir.exists()) {
                     //noinspection ResultOfMethodCallIgnored
@@ -506,14 +505,12 @@ public class DatabaseManager {
                             entries.add(new BarEntry(day, watering.get(timeStamp)));
                         }
 
-                        if (!entries.isEmpty()) {
-                            BarDataSet dataSet = new BarDataSet(entries, "Times Watered");
-                            BarData barData = new BarData(dataSet);
-                            barData.setBarWidth(0.9f);
-                            barData.setValueTextSize(10f);
-                            chart.setData(barData);
-                            chart.invalidate();
-                        }
+                        BarDataSet dataSet = new BarDataSet(entries, "Times Watered");
+                        BarData barData = new BarData(dataSet);
+                        barData.setBarWidth(0.9f);
+                        barData.setValueTextSize(10f);
+                        chart.setData(barData);
+                        chart.invalidate();
                     }
                 }
 
@@ -667,8 +664,14 @@ public class DatabaseManager {
                     StorageReference storageReference = mStorage.child(userId).child(plant.getId() + "_" + plant.getPhotoNum() + ".jpg");
                     ((TextView) view.findViewById(R.id.grid_item_nickname)).setText(plant.getName());
                     ((TextView) view.findViewById(R.id.grid_item_species)).setText(plant.getSpecies());
-                    ImageView picture = (ImageView) view.findViewById(R.id.grid_item_image_view);
-                    Glide.with(activity).using(new FirebaseImageLoader()).load(storageReference).placeholder(R.drawable.flowey).into(picture);
+                    final ImageView picture = (ImageView) view.findViewById(R.id.grid_item_image_view);
+                    storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(Uri uri) {
+                            Picasso.with(activity).load(uri.toString()).placeholder(R.drawable.flowey)
+                            .into(picture);
+                        }
+                    });
                     view.setOnClickListener(new View.OnClickListener() {
                         /**
                          * User clicked a plant
@@ -686,14 +689,7 @@ public class DatabaseManager {
                             i.putExtra("birthday", plant.getBirthday());
                             i.putExtra("last_watered", plant.getLastWaterNotification());
                             i.putExtra("last_fertilized", plant.getLastFertilizerNotification());
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                View sharedImageView = view.findViewById(R.id.grid_item_image_view);
-                                Bundle bundle = ActivityOptions.makeSceneTransitionAnimation(activity, sharedImageView, "image_main_to_profile_transition").toBundle();
-                                activity.startActivity(i, bundle);
-                            }
-                            else {
-                                activity.startActivity(i);
-                            }
+                            activity.startActivity(i);
                         }
                     });
                     setReminders(activity, plant, position, new WaterReceiver());
@@ -941,7 +937,9 @@ public class DatabaseManager {
      */
     public void makePlantGif(final Activity activity, String plantId, int photoNum) {
         final String userId = getUserId();
-        if ((photoNum > 1) && (userId != null)) {
+        // Iskander updated this because the photo counting is zero-index based
+        // I changed it to zero so that if the user uploaded 2 picture only, we will still generate a GIF for them
+        if ((photoNum > 0) && (userId != null)) {
             new LoadImages(photoNum, activity, plantId).execute();
         } else {
             Toast.makeText(activity, "Must take at least 2 pictures for a .gif", Toast.LENGTH_SHORT).show();
