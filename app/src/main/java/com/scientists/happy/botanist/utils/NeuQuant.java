@@ -22,13 +22,13 @@ package com.scientists.happy.botanist.utils;
 // Ported to Java 12/00 K Weiner
 class NeuQuant {
     // number of colours used
-    protected static final int netsize = 256;
+    private static final int netsize = 256;
     // four primes near 500 - assume no image has a length so large that it is divisible by all four primes
-    protected static final int prime1 = 499;
-    protected static final int prime2 = 491;
-    protected static final int prime3 = 487;
-    protected static final int prime4 = 503;
-    protected static final int minpicturebytes = (3 * prime4);
+    private static final int prime1 = 499;
+    private static final int prime2 = 491;
+    private static final int prime3 = 487;
+    private static final int prime4 = 503;
+    private static final int minpicturebytes = (3 * prime4);
     // minimum size for input image
     /**
      * Program Skeleton
@@ -43,60 +43,56 @@ class NeuQuant {
      * write output image using inxsearch(b, g, r)
      */
     // Network Definitions
-    protected static final int maxnetpos = (netsize - 1);
+    private static final int maxnetpos = (netsize - 1);
     // bias for colour values
-    protected static final int netbiasshift = 4;
+    private static final int netbiasshift = 4;
     // no. of learning cycles
-    protected static final int ncycles = 100;
+    private static final int ncycles = 100;
     // defs for freq and bias. bias for fractions
-    protected static final int intbiasshift = 16;
-    protected static final int intbias = (1 << intbiasshift);
-    // gamma = 1024
-    protected static final int gammashift = 10;
-    protected static final int gamma = (1 << gammashift);
-    protected static final int betashift = 10;
+    private static final int intbiasshift = 16;
+    private static final int intbias = (1 << intbiasshift);
+    private static final int gammashift = 10;
+    private static final int betashift = 10;
     // beta = 1 / 1024
-    protected static final int beta = (intbias >> betashift);
-    protected static final int betagamma = (intbias << (gammashift - betashift));
+    private static final int beta = (intbias >> betashift);
+    private static final int betagamma = (intbias);
     // defs for decreasing radius factor. for 256 cols, radius starts at 32.0 biased by 6 bits
-    protected static final int initrad = (netsize >> 3);
-    protected static final int radiusbiasshift = 6;
-    protected static final int radiusbias = (1 << radiusbiasshift);
-    protected static final int initradius = (initrad * radiusbias);
+    private static final int initrad = (netsize >> 3);
+    private static final int radiusbiasshift = 6;
+    private static final int radiusbias = (1 << radiusbiasshift);
+    private static final int initradius = (initrad * radiusbias);
     // and decreases by a factor of 1/30 each cycle
-    protected static final int radiusdec = 30;
+    private static final int radiusdec = 30;
     // defs for decreasing alpha factor. alpha starts at 1.0
-    protected static final int alphabiasshift = 10;
-    protected static final int initalpha = (1 << alphabiasshift);
-    // biased by 10 bits
-    protected int alphadec;
+    private static final int alphabiasshift = 10;
+    private static final int initalpha = (1 << alphabiasshift);
     // radbias and alpharadbias used for radpower calculation
-    protected static final int radbiasshift = 8;
-    protected static final int radbias = (1 << radbiasshift);
-    protected static final int alpharadbshift = (alphabiasshift + radbiasshift);
-    protected static final int alpharadbias = (1 << alpharadbshift);
+    private static final int radbiasshift = 8;
+    private static final int radbias = (1 << radbiasshift);
+    private static final int alpharadbshift = (alphabiasshift + radbiasshift);
+    private static final int alpharadbias = (1 << alpharadbshift);
     // Types and Global Variables. the input image itself
-    protected byte[] thepicture;
+    private byte[] thepicture;
     // lengthcount = H * W * 3
-    protected int lengthcount;
+    private int lengthcount;
     // sampling factor 1..30
-    protected int samplefac;
+    private int samplefac;
     // typedef int pixel[4]; BGRc. the network itself - [netsize][4]
-    protected int[][] network;
+    private int[][] network;
     // for network lookup - really 256
-    protected int[] netindex = new int[256];
+    private int[] netindex = new int[256];
     // bias and freq arrays for learning
-    protected int[] bias = new int[netsize];
-    protected int[] freq = new int[netsize];
+    private int[] bias = new int[netsize];
+    private int[] freq = new int[netsize];
     // radpower for precomputation
-    protected int[] radpower = new int[initrad];
+    private int[] radpower = new int[initrad];
     /**
      * Initialise network in range (0, 0, 0) to (255, 255, 255) and set parameters
      * @param thepic - image to recognize
      * @param len - the length of the image
      * @param sample - the offset of the convolutional layers
      */
-    public NeuQuant(byte[] thepic, int len, int sample) {
+    NeuQuant(byte[] thepic, int len, int sample) {
         int i;
         int[] p;
         thepicture = thepic;
@@ -117,7 +113,7 @@ class NeuQuant {
      * Returns the image color map
      * @return - Returns the image colormap
      */
-    public byte[] colorMap() {
+    private byte[] colorMap() {
         byte[] map = new byte[3 * netsize];
         int[] index = new int[netsize];
         for (int i = 0; i < netsize; i++) {
@@ -136,7 +132,7 @@ class NeuQuant {
     /**
      * Insertion sort of network and building of netindex[0..255] (to do after unbias)
      */
-    public void inxbuild() {
+    private void inxbuild() {
         int i, j, smallpos, smallval;
         int[] p;
         int[] q;
@@ -194,7 +190,7 @@ class NeuQuant {
     /**
      * Main Learning Loop ------------------
      */
-    public void learn() {
+    private void learn() {
         int i, j, b, g, r;
         int radius, rad, alpha, step, delta, samplepixels;
         byte[] p;
@@ -202,7 +198,7 @@ class NeuQuant {
         if (lengthcount < minpicturebytes) {
             samplefac = 1;
         }
-        alphadec = 30 + ((samplefac - 1) / 3);
+        int alphadec = 30 + ((samplefac - 1) / 3);
         p = thepicture;
         pix = 0;
         lim = lengthcount;
@@ -239,7 +235,7 @@ class NeuQuant {
         }
         i = 0;
         while (i < samplepixels) {
-            b = (p[pix + 0] & 0xff) << netbiasshift;
+            b = (p[pix] & 0xff) << netbiasshift;
             g = (p[pix + 1] & 0xff) << netbiasshift;
             r = (p[pix + 2] & 0xff) << netbiasshift;
             j = contest(b, g, r);
@@ -278,7 +274,7 @@ class NeuQuant {
      * @param r - red value
      * @return Returns the index of the color
      */
-    public int map(int b, int g, int r) {
+    int map(int b, int g, int r) {
         int i, j, dist, a, bestd;
         int[] p;
         int best;
@@ -360,7 +356,7 @@ class NeuQuant {
      * Returns the colormap of the image
      * @return - Returns the colormap best fitting the image
      */
-    public byte[] process() {
+    byte[] process() {
         learn();
         unbiasnet();
         inxbuild();
@@ -370,7 +366,7 @@ class NeuQuant {
     /**
      * Unbias network to give byte values 0..255 and record position i to prepare for sort
      */
-    public void unbiasnet() {
+    private void unbiasnet() {
         int i;
         for (i = 0; i < netsize; i++) {
             network[i][0] >>= netbiasshift;
@@ -389,7 +385,7 @@ class NeuQuant {
      * @param g - green value
      * @param r - red value
      */
-    protected void alterneigh(int rad, int i, int b, int g, int r) {
+    private void alterneigh(int rad, int i, int b, int g, int r) {
         int j, k, lo, hi, a, m;
         int[] p;
         lo = i - rad;
@@ -413,7 +409,7 @@ class NeuQuant {
                     p[2] -= (a * (p[2] - r)) / alpharadbias;
                 }
                 // prevents 1.3 miscompilation
-                catch (Exception e) {
+                catch (Exception ignored) {
                 }
             }
             if (k > lo) {
@@ -423,7 +419,7 @@ class NeuQuant {
                     p[1] -= (a * (p[1] - g)) / alpharadbias;
                     p[2] -= (a * (p[2] - r)) / alpharadbias;
                 }
-                catch (Exception e) {
+                catch (Exception ignored) {
                 }
             }
         }
@@ -437,7 +433,7 @@ class NeuQuant {
      * @param g - green value
      * @param r - red value
      */
-    protected void altersingle(int alpha, int i, int b, int g, int r) {
+    private void altersingle(int alpha, int i, int b, int g, int r) {
 	    // alter hit neuron
         int[] n = network[i];
         n[0] -= (alpha * (n[0] - b)) / initalpha;
@@ -451,10 +447,9 @@ class NeuQuant {
      * @param g - green value
      * @param r - red value
      */
-    protected int contest(int b, int g, int r) {
+    private int contest(int b, int g, int r) {
 	    // finds closest neuron (min dist) and updates freq. finds best neuron (min dist - bias)
         // and returns position. for frequently chosen neurons, freq[i] is high and bias[i] is
-        // negative. bias[i] = gamma * ((1 / netsize) - freq[i])
         int i, dist, a, biasdist, betafreq;
         int bestpos, bestbiaspos, bestd, bestbiasd;
         int[] n;

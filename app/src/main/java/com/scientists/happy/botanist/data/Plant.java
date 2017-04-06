@@ -4,7 +4,8 @@ package com.scientists.happy.botanist.data;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-class Plant {
+@SuppressWarnings({"WeakerAccess", "unused"})
+public class Plant {
     private static final String DELIMITER = "\t";
     private int photoNum;
     private long birthday, lastWaterNotification, lastMeasureNotification, lastFertilizerNotification, lastPhotoNotification;
@@ -15,6 +16,7 @@ class Plant {
     /**
      * Required by Firebase, this useless constructor must remain
      */
+
     private Plant() {
     }
 
@@ -54,7 +56,7 @@ class Plant {
      * Get the plant's species
      * @return Returns the plant's species
      */
-    String getSpecies() {
+    public String getSpecies() {
         return species;
     }
 
@@ -70,7 +72,7 @@ class Plant {
      * Get the plant's birthday
      * @return Returns the plant's birthday
      */
-    long getBirthday() {
+    public long getBirthday() {
         return birthday;
     }
 

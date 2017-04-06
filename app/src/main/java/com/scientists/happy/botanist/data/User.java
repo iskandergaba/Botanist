@@ -1,14 +1,16 @@
 // User object
 // @author: Iskander Gaba
 package com.scientists.happy.botanist.data;
-class User {
+@SuppressWarnings({"WeakerAccess", "unused"})
+public class User {
     private String userName, email, userId;
     private double rating;
     private long botanistSince;
     private int plantsAdded, plantsDeleted, plantsNumber;
     private int waterCount, measureCount, photoCount;
+
     /**
-     * Create a new user
+     * Required by Firebase, this useless constructor must remain
      */
     protected User() {
     }
