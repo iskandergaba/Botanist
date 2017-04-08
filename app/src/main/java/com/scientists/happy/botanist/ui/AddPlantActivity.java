@@ -10,6 +10,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import com.scientists.happy.botanist.R;
 import com.scientists.happy.botanist.data.DatabaseManager;
 import com.vansuita.pickimage.bean.PickResult;
@@ -17,7 +18,7 @@ import com.vansuita.pickimage.bundle.PickSetup;
 import com.vansuita.pickimage.dialog.PickImageDialog;
 import com.vansuita.pickimage.listeners.IPickResult;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
-import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -29,7 +30,6 @@ public class AddPlantActivity extends AppCompatActivity {
     protected EditText mBirthdayEditText;
     protected AutoCompleteTextView mSpeciesAutoCompleteText;
     protected EditText mHeightEditText;
-    protected EditText mWaterEditText;
     protected Button mAddPlantButton;
     protected DatabaseManager mDatabase;
     protected Bitmap mBitmap;
@@ -113,6 +113,24 @@ public class AddPlantActivity extends AppCompatActivity {
         mBirthday = new GregorianCalendar();
         mWaterHour = mBirthday.get(Calendar.HOUR);
         mWaterMin = mBirthday.get(Calendar.MINUTE);
+
+        overridePendingTransition(R.anim.slide_up, R.anim.hold);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        overridePendingTransition(R.anim.hold, R.anim.slide_down);
+    }
+
+    /**
+     * Handle back button press
+     * @return Returns a success code
+     */
+    @Override
+    public boolean onSupportNavigateUp() {
+        super.onBackPressed();
+        return true;
     }
 
     /**
@@ -143,31 +161,5 @@ public class AddPlantActivity extends AppCompatActivity {
         datePickerDialog.dismissOnPause(true);
         datePickerDialog.setOnDateSetListener(listener);
         datePickerDialog.show(getFragmentManager(), "date_picker");
-    }
-
-    /**
-     * Show the clock. later on will be implemented, ignore for now
-     */
-    private void showTimePicker() {
-        TimePickerDialog.OnTimeSetListener listener = new TimePickerDialog.OnTimeSetListener() {
-            /**
-             * Handle time set
-             * @param view - current app view
-             * @param hourOfDay - selected hour
-             * @param minute - selected minute
-             * @param second - selected second
-             */
-            @Override
-            public void onTimeSet(TimePickerDialog view, int hourOfDay, int minute, int second) {
-                mWaterHour = hourOfDay;
-                mWaterMin = minute;
-                mWaterEditText.setText(mWaterHour < 13 ? mWaterHour + "" : "");
-            }
-        };
-        TimePickerDialog timePickerDialog = TimePickerDialog.newInstance(listener, mWaterHour, mWaterMin, false);
-        timePickerDialog.setVersion(TimePickerDialog.Version.VERSION_2);
-        timePickerDialog.vibrate(false);
-        timePickerDialog.dismissOnPause(true);
-        timePickerDialog.show(getFragmentManager(), "time_picker");
     }
 }

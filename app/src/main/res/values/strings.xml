@@ -173,5 +173,9 @@
         "For example, position the FAB to one side of stream of a cards so the FAB won’t interfere "
         "when a user tries to pick up one of cards.\n\n"
     </string>
+    <string name="action_about">About</string>
+    <string name="title_activity_about">About</string>
+    <string name="desc_water_chart">Weekly Watering Summary</string>
+    <string name="desc_height_chart">Plant Growth</string>
 </resources>
 

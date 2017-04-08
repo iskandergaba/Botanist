@@ -1,52 +1,53 @@
 // Encoder to store sequence of .jpeg images as .gif
 // @author: https://github.com/nbadal/android-gif-encoder
 package com.scientists.happy.botanist.utils;
-import java.io.IOException;
-import java.io.OutputStream;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+
+import java.io.IOException;
+import java.io.OutputStream;
 public class GifSequenceWriter {
     // image size
-    protected int width;
-    protected int height;
-    protected int x = 0;
-    protected int y = 0;
+    private int width;
+    private int height;
+    private int x = 0;
+    private int y = 0;
     // transparent color if given
-    protected int transparent = -1;
+    private int transparent = -1;
     // transparent index in color table
-    protected int transIndex;
+    private int transIndex;
     // no repeat
-    protected int repeat = -1;
+    private int repeat = -1;
     // frame delay (hundredths)
-    protected int delay = 0;
+    private int delay = 0;
     // ready to output frames
-    protected boolean started = false;
-    protected OutputStream out;
+    private boolean started = false;
+    private OutputStream out;
     // current frame
-    protected Bitmap image;
+    private Bitmap image;
     // RGB byte array from frame
-    protected byte[] pixels;
+    private byte[] pixels;
     // converted frame indexed to palette
-    protected byte[] indexedPixels;
+    private byte[] indexedPixels;
     // number of bit planes
-    protected int colorDepth;
+    private int colorDepth;
     // RGB palette
-    protected byte[] colorTab;
+    private byte[] colorTab;
     // active palette entries
-    protected boolean[] usedEntry = new boolean[256];
+    private boolean[] usedEntry = new boolean[256];
     // color table size (bits - 1)
-    protected int palSize = 7;
+    private int palSize = 7;
     // disposal code (-1 = use default)
-    protected int dispose = -1;
+    private int dispose = -1;
     // close stream when finished
-    protected boolean closeStream = false;
-    protected boolean firstFrame = true;
+    private boolean closeStream = false;
+    private boolean firstFrame = true;
     // if false, get size from first frame
-    protected boolean sizeSet = false;
+    private boolean sizeSet = false;
     // default sample interval for quantizer
-    protected int sample = 10;
+    private int sample = 10;
     /**
      * Sets the delay time between each frame, or changes it for subsequent frames (applies to last frame added).
      * @param ms - delay time in milliseconds
@@ -250,7 +251,7 @@ public class GifSequenceWriter {
     /**
      * Analyzes image colors and creates color map.
      */
-    protected void analyzePixels() {
+    private void analyzePixels() {
         int len = pixels.length;
         int nPix = len / 3;
         indexedPixels = new byte[nPix];
@@ -285,13 +286,13 @@ public class GifSequenceWriter {
      * @param c - color to compare to
      * @return Returns the index of the closest color palette
      */
-    protected int findClosest(int c) {
+    private int findClosest(int c) {
         if (colorTab == null) {
             return -1;
         }
         int r = (c >> 16) & 0xff;
         int g = (c >> 8) & 0xff;
-        int b = (c >> 0) & 0xff;
+        int b = (c) & 0xff;
         int minpos = 0;
         int dmin = 256 * 256 * 256;
         int len = colorTab.length;
@@ -313,7 +314,7 @@ public class GifSequenceWriter {
     /**
      * Extracts image pixels into byte array "pixels"
      */
-    protected void getImagePixels() {
+    private void getImagePixels() {
         int w = image.getWidth();
         int h = image.getHeight();
         if ((w != width) || (h != height)) {
@@ -328,7 +329,7 @@ public class GifSequenceWriter {
         for (int i = 0; i < data.length; i++) {
             int td = data[i];
             int tind = i * 3;
-            pixels[tind++] = (byte) ((td >> 0) & 0xFF);
+            pixels[tind++] = (byte) ((td) & 0xFF);
             pixels[tind++] = (byte) ((td >> 8) & 0xFF);
             pixels[tind] = (byte) ((td >> 16) & 0xFF);
         }
@@ -339,7 +340,7 @@ public class GifSequenceWriter {
      * @param img - image to convert
      * @return - Returns the array representation of the bitmap
      */
-    protected int[] getImageData(Bitmap img) {
+    private int[] getImageData(Bitmap img) {
         int w = img.getWidth();
         int h = img.getHeight();
         int[] data = new int[w * h];
@@ -351,7 +352,7 @@ public class GifSequenceWriter {
      * Writes Graphic Control Extension
      * @throws IOException if the write operation fails
      */
-    protected void writeGraphicCtrlExt() throws IOException {
+    private void writeGraphicCtrlExt() throws IOException {
         // extension introducer
         out.write(0x21);
         // GCE label
@@ -387,7 +388,7 @@ public class GifSequenceWriter {
      * Writes Image Descriptor
      * @throws IOException if the write fails
      */
-    protected void writeImageDesc() throws IOException {
+    private void writeImageDesc() throws IOException {
         // image separator
         out.write(0x2c);
         // image position x, y = 0, 0
@@ -411,7 +412,7 @@ public class GifSequenceWriter {
      * Writes Logical Screen Descriptor
      * @throws IOException if the write fails
      */
-    protected void writeLSD() throws IOException {
+    private void writeLSD() throws IOException {
         // logical screen size
         writeShort(width);
         writeShort(height);
@@ -427,7 +428,7 @@ public class GifSequenceWriter {
      * Writes Netscape application extension to define repeat count.
      * @throws IOException if the write fails
      */
-    protected void writeNetscapeExt() throws IOException {
+    private void writeNetscapeExt() throws IOException {
         // extension introducer
         out.write(0x21);
         // app extension label
@@ -450,7 +451,7 @@ public class GifSequenceWriter {
      * Writes color table
      * @throws IOException if the write fails
      */
-    protected void writePalette() throws IOException {
+    private void writePalette() throws IOException {
         out.write(colorTab, 0, colorTab.length);
         int n = (3 * 256) - colorTab.length;
         for (int i = 0; i < n; i++) {
@@ -462,7 +463,7 @@ public class GifSequenceWriter {
      * Encodes and writes pixel data
      * @throws IOException if the write fails
      */
-    protected void writePixels() throws IOException {
+    private void writePixels() throws IOException {
         LZWEncoder encoder = new LZWEncoder(width, height, indexedPixels, colorDepth);
         encoder.encode(out);
     }
@@ -471,7 +472,7 @@ public class GifSequenceWriter {
      * Write 16-bit value to output stream, LSB first
      * @throws IOException if the write fails
      */
-    protected void writeShort(int value) throws IOException {
+    private void writeShort(int value) throws IOException {
         out.write(value & 0xff);
         out.write((value >> 8) & 0xff);
     }
@@ -480,7 +481,7 @@ public class GifSequenceWriter {
      * Writes string to output stream
      * @throws IOException if the write fails
      */
-    protected void writeString(String s) throws IOException {
+    private void writeString(String s) throws IOException {
         for (int i = 0; i < s.length(); i++) {
             out.write((byte) s.charAt(i));
         }

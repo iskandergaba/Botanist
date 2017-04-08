@@ -28,7 +28,8 @@ public class UpdatePhotoReceiver extends BroadcastReceiver {
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(context).setSmallIcon(R.mipmap.ic_launcher)
                         .setDefaults(Notification.DEFAULT_SOUND).setContentTitle("Update " + name + "'s Picture")
-                        .setContentText("Tap " + name + "'s picture on its profile").setContentIntent(resultPendingIntent);
+                        .setContentText("Tap " + name + "'s picture on its profile").setAutoCancel(true)
+                        .setContentIntent(resultPendingIntent);
         NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
         mNotifyMgr.notify(notificationId, mBuilder.build());
         DatabaseManager database = DatabaseManager.getInstance();

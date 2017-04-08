@@ -2,6 +2,7 @@
 // @author: Christopher Besser and Antonio Muscarella
 package com.scientists.happy.botanist.data;
 import java.util.List;
+@SuppressWarnings({"WeakerAccess", "unused"})
 public class PlantEntry {
     private String commonName, group, duration, growthHabit, endangered, active, afterHarvest;
     private String flowerColor, foliageColor, fruitColor, growthRate, matureHeight, life, toxicity;
@@ -10,8 +11,9 @@ public class PlantEntry {
     private String pruningReq, wildAnimalPalate, grazeAnimalPalate, humanPalate, fertility;
     private List<String> noxious;
     private String baseHeight, minRain, maxRain, minDepth, minTemp;
+
     /**
-     * MUDA MUDA MUDA MUDA MUDA MUDA
+     * Required by Firebase, this useless constructor must remain
      */
     public PlantEntry() {
     }
@@ -739,10 +741,7 @@ public class PlantEntry {
      * @return true if toxic, false otherwise
      */
     public boolean isToxic() {
-        if (toxicity == null) {
-            return false;
-        }
-        return toxicity.equals("Slight") || toxicity.equals("Moderate") || toxicity.equals("Severe");
+        return toxicity != null && (toxicity.equals("Slight") || toxicity.equals("Moderate") || toxicity.equals("Severe"));
     }
 
     /**
@@ -772,7 +771,7 @@ public class PlantEntry {
         if (!hasMeaningfulData(fineSoil) && !hasMeaningfulData(mediumSoil) && !hasMeaningfulData(coarseSoil)) {
             return "NA";
         }
-        StringBuilder output = new StringBuilder(new String());
+        StringBuilder output = new StringBuilder("");
         if (fineSoil.equals("Yes")) {
             output.append("fine");
             if ((coarseSoil.equals("No") || !hasMeaningfulData(coarseSoil)) ^
@@ -809,85 +808,84 @@ public class PlantEntry {
      * @return Returns caretips
      */
     public String generateCareTips() {
-        StringBuilder careTips = new StringBuilder(new String());
+        StringBuilder careTips = new StringBuilder("");
         if (hasMeaningfulData(commonName)) {
-            careTips.append("• This plant's common name is " + commonName + ".\n");
+            careTips.append("• This plant's common name is ").append(commonName).append(".\n");
         }
         if (hasMeaningfulData(group)) {
-            careTips.append("• This plant belongs to the " + group + ".\n");
+            careTips.append("• This plant belongs to the ").append(group).append(".\n");
         }
         if (!inferSunRequirements().equals("NA")) {
             careTips.append(inferSunRequirements());
         }
         if (hasMeaningfulData(moisture)) {
-            careTips.append("• This plant has " + moisture + " use.\n");
+            careTips.append("• This plant has ").append(moisture).append(" use.\n");
         }
         if (hasMeaningfulData(minTemp)) {
-            careTips.append("• This plant will not survive at temperatures below " + minTemp + "°F.\n");
+            careTips.append("• This plant will not survive at temperatures below ").append(minTemp).append("°F.\n");
         }
         if (hasMeaningfulData(pruningReq)) {
-            careTips.append("• " + pruningReq + " for this plant\n");
+            careTips.append("• ").append(pruningReq).append(" for this plant\n");
         }
         if (!inferSoilRequirements().equals("NA")) {
-            careTips.append("• This plant is adapted to grow in " + inferSoilRequirements() + "soil(s).\n");
+            careTips.append("• This plant is adapted to grow in ").append(inferSoilRequirements()).append("soil(s).\n");
         }
         if (hasMeaningfulData(minDepth)) {
-            careTips.append("• Be sure that this plant has at least " + minDepth + " inches of soil to spread its roots.\n");
+            careTips.append("• Be sure that this plant has at least ").append(minDepth).append(" inches of soil to spread its roots.\n");
         }
         if (hasMeaningfulData(duration)) {
-            careTips.append("• This plant's duration class is " + duration + ".\n");
+            careTips.append("• This plant's duration class is ").append(duration).append(".\n");
         }
         if (hasMeaningfulData(growthHabit)) {
-            careTips.append("• This plant's growth habit is " + growthHabit + ".\n");
+            careTips.append("• This plant's growth habit is ").append(growthHabit).append(".\n");
         }
         if (hasMeaningfulData(active)) {
-            careTips.append("• This plant grows actively during " + active + ".\n");
+            careTips.append("• This plant grows actively during ").append(active).append(".\n");
         }
         if (hasMeaningfulData(life)) {
-            careTips.append("• This plant has a " + life + " lifespan.\n");
+            careTips.append("• This plant has a ").append(life).append(" lifespan.\n");
         }
         if (hasMeaningfulData(afterHarvest)) {
-            careTips.append("• After harvesting, this plant grows back at a " + afterHarvest + " rate.\n");
+            careTips.append("• After harvesting, this plant grows back at a ").append(afterHarvest).append(" rate.\n");
         }
         if (hasMeaningfulData(flowerColor)) {
-            careTips.append("• This plant has " + flowerColor + " flowers.\n");
+            careTips.append("• This plant has ").append(flowerColor).append(" flowers.\n");
         }
         if (hasMeaningfulData(foliageColor)) {
-            careTips.append("• This plant has " + foliageColor + " foliage.\n");
+            careTips.append("• This plant has ").append(foliageColor).append(" foliage.\n");
         }
         if (hasMeaningfulData(fruitColor)) {
-            careTips.append("• This plant bears " + fruitColor + " fruit.\n");
+            careTips.append("• This plant bears ").append(fruitColor).append(" fruit.\n");
         }
         if (hasMeaningfulData(growthRate)) {
-            careTips.append("• This plant's growth rate is " + growthRate + ".\n");
+            careTips.append("• This plant's growth rate is ").append(growthRate).append(".\n");
         }
         if (hasMeaningfulData(matureHeight)) {
-            careTips.append("• This plant's mature height is " + matureHeight + " feet.\n");
+            careTips.append("• This plant's mature height is ").append(matureHeight).append(" feet.\n");
         }
         if (isToxic()) {
             careTips.append("• This plant is considered TOXIC. Handle with care.\n");
         }
         if (hasMeaningfulData(anaerobic)) {
-            careTips.append("• This plant has " + anaerobic + " tolerance to low-oxygen environments.\n");
+            careTips.append("• This plant has ").append(anaerobic).append(" tolerance to low-oxygen environments.\n");
         }
         if (hasMeaningfulData(pHRange)) {
-            careTips.append("• This plant's soil pH should be " + pHRange + ".\n");
+            careTips.append("• This plant's soil pH should be ").append(pHRange).append(".\n");
         }
         if (hasMeaningfulData(pHRange)) {
-            careTips.append("• This plant's has a " + salinity + "tolerance for salty soil.\n");
+            careTips.append("• This plant's has a ").append(salinity).append("tolerance for salty soil.\n");
         }
         if (hasMeaningfulData(bloomPeriod)) {
-            careTips.append("• This plant blooms in " + bloomPeriod + ".\n");
+            careTips.append("• This plant blooms in ").append(bloomPeriod).append(".\n");
         }
         if (hasMeaningfulData(availability)) {
-            careTips.append("• This plant's commercial availability is " + availability + ".\n");
+            careTips.append("• This plant's commercial availability is ").append(availability).append(".\n");
         }
         if (hasMeaningfulData(bloomPeriod)) {
-            careTips.append("• This plant blooms in " + bloomPeriod + ".\n");
+            careTips.append("• This plant blooms in ").append(bloomPeriod).append(".\n");
         }
         if (hasMeaningfulData(seedBegin) && hasMeaningfulData(seedEnd)) {
-            careTips.append("• This plant produces seeds starting in " + seedBegin +
-                            " and ending in " + seedEnd + ".\n");
+            careTips.append("• This plant produces seeds starting in ").append(seedBegin).append(" and ending in ").append(seedEnd).append(".\n");
         }
         if (hasMeaningfulData(seedPersistence)) {
             careTips.append("• This plant's seeds are ");
@@ -899,16 +897,16 @@ public class PlantEntry {
             }
         }
         if (hasMeaningfulData(bloomPeriod)) {
-            careTips.append("• This plant blooms in " + bloomPeriod + ".\n");
+            careTips.append("• This plant blooms in ").append(bloomPeriod).append(".\n");
         }
         if (hasMeaningfulData(vigor)) {
-            careTips.append("• Seeds of this plant have a " + vigor + " probability of survival.\n");
+            careTips.append("• Seeds of this plant have a ").append(vigor).append(" probability of survival.\n");
         }
         if (hasMeaningfulData(wildAnimalPalate)) {
-            careTips.append("• Wild animals find this plant " + wildAnimalPalate + "ly palatable to eat.\n");
+            careTips.append("• Wild animals find this plant ").append(wildAnimalPalate).append("ly palatable to eat.\n");
         }
         if (hasMeaningfulData(grazeAnimalPalate)) {
-            careTips.append("• Domestic (grazing) animals find this plant " + grazeAnimalPalate + "ly palatable to eat.\n");
+            careTips.append("• Domestic (grazing) animals find this plant ").append(grazeAnimalPalate).append("ly palatable to eat.\n");
         }
         if (hasMeaningfulData(humanPalate)) {
             if (humanPalate.equals("Yes")) {
@@ -927,29 +925,29 @@ public class PlantEntry {
             }
         }
         if (hasMeaningfulData(endangered)) {
-            careTips.append("• U.S. Law lists this plant as " + endangered + "\n");
+            careTips.append("• U.S. Law lists this plant as ").append(endangered).append("\n");
         }
         if (noxious != null && !noxious.isEmpty()) {
             careTips.append("• By U.S. Law, this plant is listed as ");
             for (int i = 0; i < noxious.size(); i++) {
                 if (i == noxious.size() - 1) {
                     if (noxious.size() > 1) {
-                        careTips.append(" and " + noxious.get(i) + ".\n");
+                        careTips.append(" and ").append(noxious.get(i)).append(".\n");
                     }
                     else {
-                        careTips.append(noxious.get(i) + ".\n");
+                        careTips.append(noxious.get(i)).append(".\n");
                     }
                 }
                 else {
-                    careTips.append(noxious.get(i) + ",");
+                    careTips.append(noxious.get(i)).append(",");
                 }
             }
         }
         if (hasMeaningfulData(baseHeight)) {
-            careTips.append("• This plant's height at base age is " + baseHeight + " feet.\n");
+            careTips.append("• This plant's height at base age is ").append(baseHeight).append(" feet.\n");
         }
         if (hasMeaningfulData(minRain) && hasMeaningfulData(maxRain)) {
-            careTips.append("• In the wild, this plant receives " + minRain + " to " + maxRain + " inches of precipitation per year.\n");
+            careTips.append("• In the wild, this plant receives ").append(minRain).append(" to ").append(maxRain).append(" inches of precipitation per year.\n");
         }
         return careTips.toString();
     }

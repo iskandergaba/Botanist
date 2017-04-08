@@ -1,6 +1,7 @@
 // User's account page
 // @author: Iskander Gaba
 package com.scientists.happy.botanist.ui;
+
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -119,17 +120,6 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
     }
 
     /**
-     * Create Action Overflow menu
-     * @param menu - actions
-     * @return Returns success code
-     */
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_account, menu);
-        return true;
-    }
-
-    /**
      * Action overflow menu
      * @param item - selected item
      */
@@ -146,6 +136,17 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
 
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * Create Action Overflow menu
+     * @param menu - actions
+     * @return Returns success code
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_account, menu);
+        return true;
     }
 
     /**

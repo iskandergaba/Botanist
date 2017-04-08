@@ -19,19 +19,19 @@ public class DayAxisValueFormatter implements IAxisValueFormatter {
         date.setTimeInMillis(System.currentTimeMillis());
 
         if (dayOfTheWeek == Calendar.MONDAY) {
-            return (date.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY) ? "Today" : "Monday";
+            return (date.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY) ? "Today" : "Mon.";
         } else if (dayOfTheWeek == Calendar.TUESDAY) {
-            return (date.get(Calendar.DAY_OF_WEEK) == Calendar.TUESDAY) ? "Today" : "Tuesday";
+            return (date.get(Calendar.DAY_OF_WEEK) == Calendar.TUESDAY) ? "Today" : "Tue.";
         } else if (dayOfTheWeek == Calendar.WEDNESDAY) {
-            return (date.get(Calendar.DAY_OF_WEEK) == Calendar.WEDNESDAY) ? "Today" : "Wednesday";
+            return (date.get(Calendar.DAY_OF_WEEK) == Calendar.WEDNESDAY) ? "Today" : "Wed.";
         } else if (dayOfTheWeek == Calendar.THURSDAY) {
-            return (date.get(Calendar.DAY_OF_WEEK) == Calendar.THURSDAY) ? "Today" : "Thursday";
+            return (date.get(Calendar.DAY_OF_WEEK) == Calendar.THURSDAY) ? "Today" : "Thu.";
         } else if (dayOfTheWeek == Calendar.FRIDAY) {
-            return (date.get(Calendar.DAY_OF_WEEK) == Calendar.FRIDAY) ? "Today" : "Friday";
+            return (date.get(Calendar.DAY_OF_WEEK) == Calendar.FRIDAY) ? "Today" : "Fri.";
         }  else if (dayOfTheWeek == Calendar.SATURDAY) {
-            return (date.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY) ? "Today" : "Saturday";
+            return (date.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY) ? "Today" : "Sat.";
         } else if (dayOfTheWeek == Calendar.SUNDAY) {
-            return (date.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY) ? "Today" : "Sunday";
+            return (date.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY) ? "Today" : "Sun.";
         }
 
         return "";
