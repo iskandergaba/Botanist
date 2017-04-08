@@ -37,7 +37,6 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -57,7 +56,6 @@ import com.scientists.happy.botanist.services.WaterReceiver;
 import com.scientists.happy.botanist.ui.ProfileActivity;
 import com.scientists.happy.botanist.ui.SettingsActivity;
 import com.scientists.happy.botanist.utils.GifSequenceWriter;
-import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -128,11 +126,13 @@ public class DatabaseManager {
     }
 
     private class LoadImages extends AsyncTask<Void, Void, Boolean> {
-        int numPhotos;
-        Activity parent;
-        String userId;
-        String plantId;
-        File outFile;
+        int mPhotoCount;
+        String mPlantId;
+        String mUserId;
+        String mName;
+        String mSpecies;
+        Context mContext;
+        File mOutFile;
 
         /**
          * Prepare to launch task
@@ -140,21 +140,24 @@ public class DatabaseManager {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            TextView location = (TextView) parent.findViewById(R.id.gif_location);
-            location.setText(parent.getString(R.string.gif_fmt, parent.getString(R.string.gif_loading)));
+            showProgressDialog(mContext, mContext.getString(R.string.gif_loading));
         }
 
         /**
          * Create the background process for loading images
-         * @param numPhotos - number of images taken of the plant
-         * @param activity - calling activity
+         * @param context - calling activity's context
+         * @param photoCount - number of images taken of the plant
          * @param plantId - id of plant to make gif of
+         * @param name - name of plant to make gif of
+         * @param species - species of plant to make gif of
          */
-        private LoadImages(int numPhotos, Activity activity, String plantId) {
-            parent = activity;
-            this.numPhotos = numPhotos;
-            userId = getUserId();
-            this.plantId = plantId;
+        private LoadImages(Context context, int photoCount, String plantId, String name, String species) {
+            this.mContext = context;
+            this.mPhotoCount = photoCount;
+            this.mPlantId = plantId;
+            this.mName = name;
+            this.mSpecies = species;
+            this.mUserId = getUserId();
         }
 
         /**
@@ -169,10 +172,10 @@ public class DatabaseManager {
             gifWriter.start(out);
             // 500 ms frame
             gifWriter.setDelay(500);
-            for (int i = 0; i <= numPhotos; i++) {
-                StorageReference storageReference = mStorage.child(userId).child(plantId + "_" + i + ".jpg");
+            for (int i = 0; i <= mPhotoCount; i++) {
+                StorageReference storageReference = mStorage.child(mUserId).child(mPlantId + "_" + i + ".jpg");
                 try {
-                    Bitmap bmp = Glide.with(parent).using(new FirebaseImageLoader()).load(storageReference).asBitmap().into(-1, -1).get();
+                    Bitmap bmp = Glide.with(mContext).using(new FirebaseImageLoader()).load(storageReference).asBitmap().into(-1, -1).get();
                     gifWriter.addFrame(bmp);
                 } catch (InterruptedException | ExecutionException e) {
                     return false;
@@ -187,8 +190,9 @@ public class DatabaseManager {
                     //noinspection ResultOfMethodCallIgnored
                     outputDir.mkdir();
                 }
-                outFile = new File(outputDir, plantId + ".gif");
-                FileOutputStream output = new FileOutputStream(outFile);
+                // Iskander was here, we want to save gifs with the newest plant name which the plant id might not contain
+                mOutFile = new File(outputDir, mName + "_" + mSpecies + ".gif");
+                FileOutputStream output = new FileOutputStream(mOutFile);
                 output.write(out.toByteArray());
                 output.flush();
                 output.close();
@@ -204,13 +208,15 @@ public class DatabaseManager {
          */
         @Override
         protected void onPostExecute(Boolean success) {
-            TextView location = (TextView) parent.findViewById(R.id.gif_location);
+            hideProgressDialog();
             String text = "Failure making GIF";
             if (success) {
-                text = outFile.getAbsolutePath();
+                text = mOutFile.getAbsolutePath();
+                mDatabase.child("users").child(mUserId).child("plants").child(mPlantId).child("gifLocation")
+                        .setValue(text);
+                text = "Image saved in: " + text;
             }
-            location.setText(parent.getString(R.string.gif_fmt, text));
-            mDatabase.child("users").child(userId).child("plants").child(plantId).child("gifLocation").setValue(text);
+            Toast.makeText(mContext, text, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -218,7 +224,8 @@ public class DatabaseManager {
      * Singleton DatabaseManager constructor
      */
     private DatabaseManager() {
-//        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+        // Just in case we want to add offline caching to the app
+        // FirebaseDatabase.getInstance().setPersistenceEnabled(true);
         mAutoCompleteCache = new HashMap<>();
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mStorage = FirebaseStorage.getInstance().getReference();
@@ -289,7 +296,7 @@ public class DatabaseManager {
      * @param bmp - the plant's picture
      */
     public void addPlant(Context context, String name, String species, long birthday, double height, final Bitmap bmp) {
-        showProgressDialog(context);
+        showProgressDialog(context, context.getString(R.string.loading));
         final Plant plant;
         // reject plant addition if species is null
         if ((species == null) || species.equals("")) {
@@ -547,7 +554,7 @@ public class DatabaseManager {
      * @param heightInInches - the height of the plant
      */
     public void updatePlantHeight(final Context context, final String plantId, double heightInInches) {
-        showProgressDialog(context);
+        showProgressDialog(context, context.getString(R.string.loading));
         final String userId = getUserId();
         String now = Long.toString(System.currentTimeMillis());
         if (userId != null) {
@@ -594,7 +601,7 @@ public class DatabaseManager {
      * @param plantId - the id of the plant (species_name)
      */
     public void updatePlantWatering(final Context context, final String plantId) {
-        showProgressDialog(context);
+        showProgressDialog(context, context.getString(R.string.loading));
         final String userId = getUserId();
         String now = Long.toString(System.currentTimeMillis());
         if (userId != null) {
@@ -665,13 +672,8 @@ public class DatabaseManager {
                     ((TextView) view.findViewById(R.id.grid_item_nickname)).setText(plant.getName());
                     ((TextView) view.findViewById(R.id.grid_item_species)).setText(plant.getSpecies());
                     final ImageView picture = (ImageView) view.findViewById(R.id.grid_item_image_view);
-                    storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                        @Override
-                        public void onSuccess(Uri uri) {
-                            Picasso.with(activity).load(uri.toString()).placeholder(R.drawable.flowey)
-                            .into(picture);
-                        }
-                    });
+                    Glide.with(activity).using(new FirebaseImageLoader()).load(storageReference).dontAnimate()
+                            .placeholder(R.drawable.flowey).into(picture);
                     view.setOnClickListener(new View.OnClickListener() {
                         /**
                          * User clicked a plant
@@ -807,17 +809,17 @@ public class DatabaseManager {
                     PlantEntry entry = dataSnapshot.getValue(PlantEntry.class);
                     ((TextView) view.findViewById(R.id.group_holder)).setText(entry.getGroup());
                     ((TextView) view.findViewById(R.id.care_tips)).setText(entry.generateCareTips());
-                    TextView toxicWarningTextView = (TextView) view.findViewById(R.id.toxic_warning);
+                    View toxicWarning = view.findViewById(R.id.toxic_warning);
                     if (entry.isToxic()) {
-                        toxicWarningTextView.setVisibility(View.VISIBLE);
+                        toxicWarning.setVisibility(View.VISIBLE);
+                    } else {
+                        toxicWarning.setVisibility(View.GONE);
                     }
-                    else {
-                        toxicWarningTextView.setVisibility(View.GONE);
-                    }
-                    TextView noxiousWarningTextView = (TextView) view.findViewById(R.id.noxious_warning);
+                    View noxiousWarning = view.findViewById(R.id.noxious_warning);
                     List<String> noxious = entry.getNoxious();
                     if (noxious != null) {
-                        noxiousWarningTextView.setVisibility(View.VISIBLE);
+                        noxiousWarning.setVisibility(View.VISIBLE);
+                        TextView noxiousWarningTextView = (TextView) view.findViewById(R.id.noxious_warning_text_view);
                         if (noxious.contains("Noxious")) {
                             noxiousWarningTextView.setText(R.string.noxious_warning);
                         }
@@ -931,18 +933,18 @@ public class DatabaseManager {
 
     /**
      * Create a gif of the plant
-     * @param activity - calling activity
+     * @param context - calling activity
      * @param plantId - the id of the plant to form a gif of
-     * @param photoNum - the number of pictures of the plant that were taken
+     * @param photoCount - the number of pictures of the plant that were taken
      */
-    public void makePlantGif(final Activity activity, String plantId, int photoNum) {
+    public void makePlantGif(final Context context, int photoCount, String plantId, String name, String species) {
         final String userId = getUserId();
         // Iskander updated this because the photo counting is zero-index based
         // I changed it to zero so that if the user uploaded 2 picture only, we will still generate a GIF for them
-        if ((photoNum > 0) && (userId != null)) {
-            new LoadImages(photoNum, activity, plantId).execute();
+        if ((photoCount > 0) && (userId != null)) {
+            new LoadImages(context, photoCount, plantId, name, species).execute();
         } else {
-            Toast.makeText(activity, "Must take at least 2 pictures for a .gif", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "You must take at least 2 pictures to make a GIF", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -1347,22 +1349,21 @@ public class DatabaseManager {
      * Show the loading progress
      * @param context - the current app context
      */
-    private void showProgressDialog(Context context) {
-        if (mProgressDialog == null) {
-            mProgressDialog = new ProgressDialog(context);
-            mProgressDialog.setMessage(context.getString(R.string.loading));
-            mProgressDialog.setIndeterminate(true);
-            mProgressDialog.setCancelable(false);
-        }
+    private void showProgressDialog(Context context, String message) {
+        mProgressDialog = new ProgressDialog(context);
+        mProgressDialog.setMessage(message);
+        mProgressDialog.setIndeterminate(true);
+        mProgressDialog.setCancelable(false);
         mProgressDialog.show();
     }
 
     /**
-     * Hide the loading progress
+     * Dismiss the loading progress
      */
     private void hideProgressDialog() {
         if ((mProgressDialog != null) && mProgressDialog.isShowing()) {
-            mProgressDialog.hide();
+            mProgressDialog.dismiss();
+            mProgressDialog = null;
         }
     }
 }

@@ -28,8 +28,10 @@ public class BirthdayReceiver extends BroadcastReceiver {
         Intent resultIntent = new Intent(context, LoginActivity.class);
         PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(context).setSmallIcon(R.mipmap.ic_launcher).setDefaults(Notification.DEFAULT_SOUND).setContentTitle("It's " + name + "'s birthday!")
-                        .setContentText(name + " (" + species + ") turns " + ageInYears + " years today!").setContentIntent(resultPendingIntent);
+                new NotificationCompat.Builder(context).setSmallIcon(R.mipmap.ic_launcher)
+                        .setDefaults(Notification.DEFAULT_SOUND).setContentTitle("It's " + name + "'s birthday!")
+                        .setContentText(name + " (" + species + ") turns " + ageInYears + " years today!")
+                        .setAutoCancel(true).setContentIntent(resultPendingIntent);
         NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
         // Builds the notification and issues it.
         mNotifyMgr.notify(notificationId, mBuilder.build());

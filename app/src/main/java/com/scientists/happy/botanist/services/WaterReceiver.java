@@ -28,7 +28,7 @@ public class WaterReceiver extends BroadcastReceiver {
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(context).setSmallIcon(R.mipmap.ic_launcher)
                         .setDefaults(Notification.DEFAULT_SOUND).setContentTitle(name + " needs watering.")
-                        .setContentText("Tap \"I watered this plant\" once you water " + name)
+                        .setContentText("Tap \"I watered this plant\" once you water " + name).setAutoCancel(true)
                         .setContentIntent(resultPendingIntent);
         NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
         mNotifyMgr.notify(notificationId, mBuilder.build());

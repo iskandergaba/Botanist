@@ -28,7 +28,8 @@ public class HeightMeasureReceiver extends BroadcastReceiver {
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(context).setSmallIcon(R.mipmap.ic_launcher)
                         .setDefaults(Notification.DEFAULT_SOUND).setContentTitle("Keep track of " + name + "'s height record!")
-                        .setContentText("Tap update " + name + "'s height record").setContentIntent(resultPendingIntent);
+                        .setContentText("Tap update " + name + "'s height record").setAutoCancel(true)
+                        .setContentIntent(resultPendingIntent);
         NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
         // Builds the notification and issues it.
         mNotifyMgr.notify(notificationId, mBuilder.build());

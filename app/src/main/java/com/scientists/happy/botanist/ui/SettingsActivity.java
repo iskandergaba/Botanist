@@ -23,6 +23,8 @@ import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+
 import com.scientists.happy.botanist.R;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
@@ -44,6 +46,7 @@ public class SettingsActivity extends AppCompatActivity {
         getFragmentManager().beginTransaction().replace(android.R.id.content, new SettingsFragment()).commit();
         mPreferences = PreferenceManager.getDefaultSharedPreferences(this);
     }
+
 
     public static class SettingsFragment extends PreferenceFragment implements OnSharedPreferenceChangeListener{
         /**

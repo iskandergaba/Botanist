@@ -26,12 +26,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnSuccessListener;
+import com.bumptech.glide.Glide;
+import com.firebase.ui.storage.images.FirebaseImageLoader;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.scientists.happy.botanist.R;
 import com.scientists.happy.botanist.data.DatabaseManager;
-import com.squareup.picasso.Picasso;
 import com.vansuita.pickimage.bean.PickResult;
 import com.vansuita.pickimage.bundle.PickSetup;
 import com.vansuita.pickimage.dialog.PickImageDialog;
@@ -118,18 +118,10 @@ public class ProfileActivity extends AppCompatActivity {
         ActivityCompat.postponeEnterTransition(this);
         StorageReference storageReference = FirebaseStorage.getInstance().getReference()
                 .child(mDatabase.getUserId()).child(plantId + "_" + photoNum + ".jpg");
-
-        storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-            @Override
-            public void onSuccess(Uri uri) {
-                Picasso.with(ProfileActivity.this).load(uri.toString()).placeholder(R.drawable.flowey)
-                        .into(mPicture);
-            }
-        });
+        Glide.with(this).using(new FirebaseImageLoader()).load(storageReference).dontAnimate().placeholder(R.drawable.flowey)
+                .into(mPicture);
         TextView speciesTextView = (TextView) findViewById(R.id.plant_species);
         speciesTextView.setText(getString(R.string.species_fmt, mSpecies));
-        TextView gifTextView = (TextView) findViewById(R.id.gif_location);
-        gifTextView.setText(getString(R.string.gif_fmt, mGifLocation));
         mHeightTextView = (TextView) findViewById(R.id.plant_height);
         mHeightTextView.setText(getString(R.string.height_fmt, height));
         mGroup = (TextView) findViewById(R.id.group_holder);
@@ -179,13 +171,13 @@ public class ProfileActivity extends AppCompatActivity {
         });
         mDatabase.editProfile(this.findViewById(android.R.id.content), mSpecies);
 
-        overridePendingTransition(R.anim.appear_from_bottom, R.anim.hold);
+        overridePendingTransition(R.anim.slide_up, R.anim.hold);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        overridePendingTransition(R.anim.hold, R.anim.disappear_to_bottom);
+        overridePendingTransition(R.anim.hold, R.anim.slide_down);
     }
 
     /**
@@ -222,7 +214,7 @@ public class ProfileActivity extends AppCompatActivity {
             return true;
         }
         else if (id == R.id.action_export_gif) {
-            mDatabase.makePlantGif(this, plantId, photoNum);
+            mDatabase.makePlantGif(this, photoNum, plantId, mName, mSpecies);
             return true;
         }
         else if (id == R.id.action_similar_plants) {

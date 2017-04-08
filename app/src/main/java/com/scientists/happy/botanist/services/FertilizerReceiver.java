@@ -28,7 +28,8 @@ public class FertilizerReceiver extends BroadcastReceiver {
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(context).setSmallIcon(R.mipmap.ic_launcher)
                         .setDefaults(Notification.DEFAULT_SOUND).setContentTitle(name + " may need fertilizer.")
-                        .setContentText("Tap \"I fertilized this plant\" once you fertilize " + name).setContentIntent(resultPendingIntent);
+                        .setContentText("Tap \"I fertilized this plant\" once you fertilize " + name)
+                        .setAutoCancel(true).setContentIntent(resultPendingIntent);
         NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
         mNotifyMgr.notify(notificationId, mBuilder.build());
         DatabaseManager.getInstance().updateNotificationTime(plantId, "lastFertilizerNotification");
