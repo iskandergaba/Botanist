@@ -72,6 +72,10 @@ public class MainActivity extends AppCompatActivity {
             startActivityForResult(new Intent(MainActivity.this, AccountActivity.class), VIEW_ACCOUNT);
             return true;
         }
+        else if (id == R.id.action_shop) {
+            startActivity(new Intent(MainActivity.this, AboutActivity.class));
+            return true;
+        }
         else if (id == R.id.action_about) {
             startActivity(new Intent(MainActivity.this, AboutActivity.class));
             return true;
