@@ -102,15 +102,27 @@ public class Plant {
 
     /**
      * Get the last time the plant was watered
-     * @return Returns the last time the plant was watered
+     * @return Returns the last time the plant water notification was issued
      */
     public long getLastWaterNotification() {
         return lastWaterNotification;
     }
 
     /**
+     * Get the last time the plant was watered in millis
+     * @return Returns the last time the plant was watered in millis
+     */
+    public long getLastWatered() {
+        long lastWatered = birthday;
+        for (String key : watering.keySet()) {
+            lastWatered = Math.max(lastWatered, Long.parseLong(watering.get(key)));
+        }
+        return lastWatered;
+    }
+
+    /**
      * retrieve the last time the user measured the plant
-     * @return Returns when the plant was last measured
+     * @return Returns the last time the plant height notification was issued
      */
     public long getLastMeasureNotification() {
         return lastMeasureNotification;
@@ -142,7 +154,7 @@ public class Plant {
 
     /**
      * Get gif location
-     * @return Get the location of the plant gif
+     * @return Returns the location of the plant gif
      */
     public String getGifLocation() {
         return gifLocation;
