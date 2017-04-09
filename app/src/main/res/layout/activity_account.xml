@@ -60,7 +60,7 @@
             android:layout_width="wrap_content"
             android:layout_height="360dp"
             android:contentDescription="@string/user_badge_desc"
-            android:src="@drawable/badge_level1"
+            android:src="@drawable/badge_level_1"
             android:layout_marginBottom="@dimen/activity_vertical_margin" />
 
         <TextView

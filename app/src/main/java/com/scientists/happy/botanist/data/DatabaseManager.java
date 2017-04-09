@@ -22,6 +22,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -568,8 +569,8 @@ public class DatabaseManager {
                 public void onComplete(@NonNull Task<Void> task) {
                     if (!task.isSuccessful()) {
                         Toast.makeText(context, "Height update failed, try again", Toast.LENGTH_SHORT).show();
-                    }
-                    else {
+                    } else {
+                        updateNotificationTime(plantId, "lastMeasureNotification");
                         setMeasureCount(getMeasureCount() + 1);
                         updateUserRating();
                     }
@@ -585,9 +586,6 @@ public class DatabaseManager {
                         public void onComplete(@NonNull Task<Void> task) {
                             if (!task.isSuccessful()) {
                                 Toast.makeText(context, "Height update failed, try again", Toast.LENGTH_SHORT).show();
-                            }
-                            else {
-                                updateNotificationTime(plantId, "lastMeasureNotification");
                             }
                             hideProgressDialog();
                         }
@@ -674,6 +672,26 @@ public class DatabaseManager {
                     final ImageView picture = (ImageView) view.findViewById(R.id.grid_item_image_view);
                     Glide.with(activity).using(new FirebaseImageLoader()).load(storageReference).dontAnimate()
                             .placeholder(R.drawable.flowey).into(picture);
+
+                    SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(activity);
+                    int reminderSetting;
+                    reminderSetting = Integer.parseInt(preferences.getString(SettingsActivity.WATER_REMINDER_KEY, "1"));
+                    long interval = getReminderIntervalInMillis(reminderSetting);
+                    long diff = System.currentTimeMillis() - plant.getLastWaterNotification();
+                    float progress = 100;
+                    if (reminderSetting != 0) {
+                        progress -= (float) (100.0 * diff / interval);
+                    }
+                    ((ProgressBar) view.findViewById(R.id.progress)).setProgress(Math.round(progress));
+
+                    Calendar now = Calendar.getInstance();
+                    Calendar birthday = Calendar.getInstance();
+                    birthday.setTimeInMillis(plant.getBirthday());
+                    if (now.get(Calendar.MONTH) == birthday.get(Calendar.MONTH)
+                            && now.get(Calendar.DAY_OF_MONTH) == birthday.get(Calendar.DAY_OF_MONTH)
+                            && now.get(Calendar.YEAR) != birthday.get(Calendar.YEAR)) {
+                        view.findViewById(R.id.birthday_image_view).setVisibility(View.VISIBLE);
+                    }
                     view.setOnClickListener(new View.OnClickListener() {
                         /**
                          * User clicked a plant
@@ -1314,10 +1332,6 @@ public class DatabaseManager {
             Calendar nextMeasure = Calendar.getInstance();
             long interval = getReminderIntervalInMillis(reminderSetting);
             nextMeasure.setTimeInMillis(calendar.getTimeInMillis() + interval);
-            // photo updates happen bi-daily, others update daily.
-            if (receiver instanceof UpdatePhotoReceiver) {
-                nextMeasure.add(Calendar.DAY_OF_MONTH, 2);
-            }
             nextMeasure.set(Calendar.HOUR, hour);
             nextMeasure.set(Calendar.MINUTE, minute);
             AlarmManager am = (AlarmManager) context.getSystemService(ALARM_SERVICE);
