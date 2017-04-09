@@ -98,22 +98,22 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso).build();
         double rating = mDatabase.getUserRating();
         if (rating < 0) {
-            badge.setImageResource(R.drawable.badge_level0);
+            badge.setImageResource(R.drawable.badge_level_0);
             levelTextView.setText(getString(R.string.level_0));
             levelProgressBar.setProgress(0);
         }
         else if (rating < 0.35) {
-            badge.setImageResource(R.drawable.badge_level1);
+            badge.setImageResource(R.drawable.badge_level_1);
             levelTextView.setText(getString(R.string.level_1));
             levelProgressBar.setProgress(35);
         }
         else if (rating < 0.75) {
-            badge.setImageResource(R.drawable.badge_level2);
+            badge.setImageResource(R.drawable.badge_level_2);
             levelTextView.setText(getString(R.string.level_2));
             levelProgressBar.setProgress(75);
         }
         else {
-            badge.setImageResource(R.drawable.badge_level3);
+            badge.setImageResource(R.drawable.badge_level_3);
             levelTextView.setText(getString(R.string.level_3));
             levelProgressBar.setProgress(100);
         }
