@@ -673,15 +673,12 @@ public class DatabaseManager {
                     Glide.with(activity).using(new FirebaseImageLoader()).load(storageReference).dontAnimate()
                             .placeholder(R.drawable.flowey).into(picture);
 
-                    SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(activity);
-                    int reminderSetting;
-                    reminderSetting = Integer.parseInt(preferences.getString(SettingsActivity.WATER_REMINDER_KEY, "1"));
-                    long interval = getReminderIntervalInMillis(reminderSetting);
+                    // One day, before the progress bar becomes empty
+                    long interval = getReminderIntervalInMillis(1);
                     long diff = System.currentTimeMillis() - plant.getLastWaterNotification();
-                    float progress = 100;
-                    if (reminderSetting != 0) {
-                        progress -= (float) (100.0 * diff / interval);
-                    }
+                    float progress = 100 - (float) (100.0 * diff / interval);
+                    // The minimum value is one, just to make sure it's visible to the user
+                    if (progress < 1) progress = 1;
                     ((ProgressBar) view.findViewById(R.id.progress)).setProgress(Math.round(progress));
 
                     Calendar now = Calendar.getInstance();
