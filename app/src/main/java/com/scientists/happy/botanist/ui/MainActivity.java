@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
         else if (id == R.id.action_shop) {
-            startActivity(new Intent(MainActivity.this, AboutActivity.class));
+            startActivity(new Intent(MainActivity.this, ShopActivity.class));
             return true;
         }
         else if (id == R.id.action_about) {
