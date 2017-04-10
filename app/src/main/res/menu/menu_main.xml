@@ -19,7 +19,7 @@
     <item
         android:id="@+id/action_shop"
         android:orderInCategory="3"
-        android:title="Shop"
+        android:title="@string/shop"
         app:showAsAction="never" />
 
     <item
