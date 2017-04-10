@@ -1,7 +1,6 @@
 // Singleton Database manager for Firebase
 // @author: Christopher Besser, Antonio Muscarella, and Iskander Gaba
 package com.scientists.happy.botanist.data;
-
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -25,7 +24,6 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.bumptech.glide.Glide;
 import com.firebase.ui.database.FirebaseListAdapter;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
@@ -57,7 +55,6 @@ import com.scientists.happy.botanist.services.WaterReceiver;
 import com.scientists.happy.botanist.ui.ProfileActivity;
 import com.scientists.happy.botanist.ui.SettingsActivity;
 import com.scientists.happy.botanist.utils.GifSequenceWriter;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -69,7 +66,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
-
 import static android.content.Context.ALARM_SERVICE;
 import static android.os.Environment.getExternalStoragePublicDirectory;
 public class DatabaseManager {
@@ -87,7 +83,7 @@ public class DatabaseManager {
     private DatabaseReference mDatabase;
     private String mDiseaseUrl;
     private static DatabaseManager mDatabaseManager;
-
+    private boolean showTutorial = false;
     private class PrepareAutocompleteTask extends AsyncTask<Void, Void, Void> {
         /**
          * Background asynchronous update
@@ -134,7 +130,6 @@ public class DatabaseManager {
         String mSpecies;
         Context mContext;
         File mOutFile;
-
         /**
          * Prepare to launch task
          */
@@ -178,7 +173,8 @@ public class DatabaseManager {
                 try {
                     Bitmap bmp = Glide.with(mContext).using(new FirebaseImageLoader()).load(storageReference).asBitmap().into(-1, -1).get();
                     gifWriter.addFrame(bmp);
-                } catch (InterruptedException | ExecutionException e) {
+                }
+                catch (InterruptedException | ExecutionException e) {
                     return false;
                 }
             }
@@ -198,7 +194,8 @@ public class DatabaseManager {
                 output.flush();
                 output.close();
                 return true;
-            } catch (IOException e) {
+            }
+            catch (IOException e) {
                 return false;
             }
         }
@@ -213,8 +210,7 @@ public class DatabaseManager {
             String text = "Failure making GIF";
             if (success) {
                 text = mOutFile.getAbsolutePath();
-                mDatabase.child("users").child(mUserId).child("plants").child(mPlantId).child("gifLocation")
-                        .setValue(text);
+                mDatabase.child("users").child(mUserId).child("plants").child(mPlantId).child("gifLocation").setValue(text);
                 text = "Image saved in: " + text;
             }
             Toast.makeText(mContext, text, Toast.LENGTH_SHORT).show();
@@ -261,6 +257,7 @@ public class DatabaseManager {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 if (!snapshot.exists()) {
+                    showTutorial = true;
                     User user = new User(userId, name, email, 0);
                     mDatabase.child("users").child(userId).setValue(user);
                 }
@@ -274,6 +271,14 @@ public class DatabaseManager {
             public void onCancelled(DatabaseError databaseError) {
             }
         });
+    }
+
+    /**
+     * Was the last call to addUserRecords for a new user?
+     * @return Returns whether the user was new
+     */
+    public boolean wasUserNew() {
+        return showTutorial;
     }
 
     /**
@@ -416,14 +421,14 @@ public class DatabaseManager {
     private void updateGallery(Context context) {
         MediaScannerConnection.scanFile(context, new String[]{Environment.getExternalStorageDirectory().toString()}, null,
                 new MediaScannerConnection.OnScanCompletedListener() {
-                    /**
-                     * Gallery scan completed
-                     * @param path - path of the deleted image
-                     * @param uri of the deleted image
-                     */
-                    public void onScanCompleted(String path, Uri uri) {
-                    }
-                });
+            /**
+             * Gallery scan completed
+             * @param path - path of the deleted image
+             * @param uri of the deleted image
+             */
+            public void onScanCompleted(String path, Uri uri) {
+            }
+        });
     }
 
     /**
@@ -431,7 +436,6 @@ public class DatabaseManager {
      * @param plantId - plant unique id
      */
     public void populateHeightChart(String plantId, final LineChart chart) {
-
         final String userId = getUserId();
         if (userId != null) {
             mDatabase.child("users").child(userId).child("plants").child(plantId)
@@ -444,12 +448,11 @@ public class DatabaseManager {
                 public void onDataChange(DataSnapshot snapshot) {
                     if (snapshot.exists()) {
                         List<Entry> entries = new ArrayList<>();
-                        for (DataSnapshot record : snapshot.getChildren()) {
+                        for (DataSnapshot record: snapshot.getChildren()) {
                             long time = Long.parseLong(record.getKey());
                             float height = record.getValue(Float.class);
                             entries.add(new Entry(time, height));
                         }
-
                         if (!entries.isEmpty()) {
                             LineDataSet dataSet = new LineDataSet(entries, "Height in inches");
                             dataSet.setLineWidth(1.5f);
@@ -478,7 +481,6 @@ public class DatabaseManager {
      * @param plantId - plant unique id
      */
     public void populateWaterChart(String plantId, final BarChart chart) {
-
         final String userId = getUserId();
         if (userId != null) {
             mDatabase.child("users").child(userId).child("plants").child(plantId)
@@ -501,7 +503,6 @@ public class DatabaseManager {
                         for (DataSnapshot record : snapshot.getChildren()) {
                             processTime(Long.parseLong(record.getValue(String.class)));
                         }
-
                         List<BarEntry> entries = new ArrayList<>();
                         int diff = 7 - today.get(Calendar.DAY_OF_WEEK);
                         for (long timeStamp : watering.keySet()) {
@@ -512,7 +513,6 @@ public class DatabaseManager {
                             if (day > 7) day %= 7;
                             entries.add(new BarEntry(day, watering.get(timeStamp)));
                         }
-
                         BarDataSet dataSet = new BarDataSet(entries, "Times Watered");
                         BarData barData = new BarData(dataSet);
                         barData.setBarWidth(0.9f);
@@ -530,10 +530,14 @@ public class DatabaseManager {
                 public void onCancelled(DatabaseError databaseError) {
                 }
 
+                /**
+                 * Process the current time
+                 * @param time - the time to process
+                 */
                 private void processTime(long time) {
                     Calendar date = Calendar.getInstance();
                     date.setTimeInMillis(time);
-                    for (long timeStamp : watering.keySet()) {
+                    for (long timeStamp: watering.keySet()) {
                         Calendar day = Calendar.getInstance();
                         day.setTimeInMillis(timeStamp);
                         if (date.get(Calendar.YEAR) == day.get(Calendar.YEAR)
@@ -569,27 +573,28 @@ public class DatabaseManager {
                 public void onComplete(@NonNull Task<Void> task) {
                     if (!task.isSuccessful()) {
                         Toast.makeText(context, "Height update failed, try again", Toast.LENGTH_SHORT).show();
-                    } else {
+                    }
+                    else {
                         updateNotificationTime(plantId, "lastMeasureNotification");
                         setMeasureCount(getMeasureCount() + 1);
                         updateUserRating();
                     }
                 }
             });
-            mDatabase.child("users").child(userId).child("plants").child(plantId).child("height").setValue(heightInInches)
-                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                        /**
-                         * Update current plant height
-                         * @param task - update task
-                         */
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            if (!task.isSuccessful()) {
-                                Toast.makeText(context, "Height update failed, try again", Toast.LENGTH_SHORT).show();
-                            }
-                            hideProgressDialog();
-                        }
-                    });
+            mDatabase.child("users").child(userId).child("plants").child(plantId).child("height")
+                    .setValue(heightInInches).addOnCompleteListener(new OnCompleteListener<Void>() {
+                /**
+                 * Update current plant height
+                 * @param task - update task
+                 */
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if (!task.isSuccessful()) {
+                        Toast.makeText(context, "Height update failed, try again", Toast.LENGTH_SHORT).show();
+                    }
+                    hideProgressDialog();
+                }
+            });
         }
     }
 
@@ -654,6 +659,8 @@ public class DatabaseManager {
      * @return Returns an adapter for the plants
      */
     public FirebaseListAdapter<Plant> getPlantsAdapter(final Activity activity) {
+        // Upon starting the MainActivity from the Tutorial, this method is called
+        showTutorial = false;
         final String userId = getUserId();
         if (userId != null) {
             DatabaseReference databaseRef = mDatabase.child("users").child(userId).child("plants");
@@ -672,15 +679,15 @@ public class DatabaseManager {
                     final ImageView picture = (ImageView) view.findViewById(R.id.grid_item_image_view);
                     Glide.with(activity).using(new FirebaseImageLoader()).load(storageReference).dontAnimate()
                             .placeholder(R.drawable.flowey).into(picture);
-
                     // One day, before the progress bar becomes empty
                     long interval = getReminderIntervalInMillis(1);
                     long diff = System.currentTimeMillis() - plant.getLastWaterNotification();
                     float progress = 100 - (float) (100.0 * diff / interval);
                     // The minimum value is one, just to make sure it's visible to the user
-                    if (progress < 1) progress = 1;
+                    if (progress < 1) {
+                        progress = 1;
+                    }
                     ((ProgressBar) view.findViewById(R.id.progress)).setProgress(Math.round(progress));
-
                     Calendar now = Calendar.getInstance();
                     Calendar birthday = Calendar.getInstance();
                     birthday.setTimeInMillis(plant.getBirthday());
@@ -827,7 +834,8 @@ public class DatabaseManager {
                     View toxicWarning = view.findViewById(R.id.toxic_warning);
                     if (entry.isToxic()) {
                         toxicWarning.setVisibility(View.VISIBLE);
-                    } else {
+                    }
+                    else {
                         toxicWarning.setVisibility(View.GONE);
                     }
                     View noxiousWarning = view.findViewById(R.id.noxious_warning);
@@ -958,7 +966,8 @@ public class DatabaseManager {
         // I changed it to zero so that if the user uploaded 2 picture only, we will still generate a GIF for them
         if ((photoCount > 0) && (userId != null)) {
             new LoadImages(context, photoCount, plantId, name, species).execute();
-        } else {
+        }
+        else {
             Toast.makeText(context, "You must take at least 2 pictures to make a GIF", Toast.LENGTH_SHORT).show();
         }
     }
@@ -1014,15 +1023,15 @@ public class DatabaseManager {
         return mRating;
     }
 
+    /**
+     * Update the user's rating
+     */
     private void updateUserRating() {
         String userId = getUserId();
         long added = getAddedNumber();
         long deleted = getDeletedNumber();
-
-
         mRating = ((1.3 * added - deleted / 100))
                 * (getWaterCount() + getMeasureCount() + getPhotoCount() + 1) / (10 * (added + deleted + 1));
-
         if (userId != null) {
             mDatabase.child("users").child(userId).child("rating").setValue(mRating);
         }

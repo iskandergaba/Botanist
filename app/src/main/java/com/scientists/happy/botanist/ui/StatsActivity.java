@@ -1,10 +1,8 @@
-// View diseases a plant can get
-// @author: Antonio Muscarella
+// View plant statistics and diseases
+// @author: Antonio Muscarella and Iskander Gaba
 package com.scientists.happy.botanist.ui;
-
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
@@ -13,7 +11,6 @@ import com.scientists.happy.botanist.R;
 import com.scientists.happy.botanist.data.DatabaseManager;
 import com.scientists.happy.botanist.utils.DateAxisValueFormatter;
 import com.scientists.happy.botanist.utils.DayAxisValueFormatter;
-
 public class StatsActivity extends AppCompatActivity {
     private DatabaseManager mDatabase;
     /**
@@ -40,6 +37,10 @@ public class StatsActivity extends AppCompatActivity {
         return true;
     }
 
+    /**
+     * Make the height chart
+     * @param plantId - plant to chart
+     */
     private void populateHeightChart(String plantId) {
         LineChart chart = (LineChart) findViewById(R.id.height_chart);
         chart.setTouchEnabled(false);
@@ -55,6 +56,10 @@ public class StatsActivity extends AppCompatActivity {
         mDatabase.populateHeightChart(plantId, chart);
     }
 
+    /**
+     * Make the water chart
+     * @param plantId - plant to chart
+     */
     private void populateWaterChart(String plantId) {
         BarChart chart = (BarChart) findViewById(R.id.water_chart);
         chart.setTouchEnabled(false);

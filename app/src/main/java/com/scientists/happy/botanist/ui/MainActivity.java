@@ -10,7 +10,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.GridView;
 import android.widget.ListAdapter;
-
 import com.scientists.happy.botanist.R;
 import com.scientists.happy.botanist.data.DatabaseManager;
 public class MainActivity extends AppCompatActivity {
@@ -86,6 +85,9 @@ public class MainActivity extends AppCompatActivity {
         else if (id == R.id.action_about) {
             startActivity(new Intent(MainActivity.this, AboutActivity.class));
             return true;
+        }
+        else if (id == R.id.action_help) {
+            startActivity(new Intent(MainActivity.this, TutorialActivity.class));
         }
         return super.onOptionsItemSelected(item);
     }

@@ -10,7 +10,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import com.scientists.happy.botanist.R;
 import com.scientists.happy.botanist.data.DatabaseManager;
 import com.vansuita.pickimage.bean.PickResult;
@@ -18,7 +17,6 @@ import com.vansuita.pickimage.bundle.PickSetup;
 import com.vansuita.pickimage.dialog.PickImageDialog;
 import com.vansuita.pickimage.listeners.IPickResult;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
-
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -113,10 +111,12 @@ public class AddPlantActivity extends AppCompatActivity {
         mBirthday = new GregorianCalendar();
         mWaterHour = mBirthday.get(Calendar.HOUR);
         mWaterMin = mBirthday.get(Calendar.MINUTE);
-
         overridePendingTransition(R.anim.slide_up, R.anim.hold);
     }
 
+    /**
+     * The activity was paused
+     */
     @Override
     protected void onPause() {
         super.onPause();

@@ -1,7 +1,6 @@
 // User's account page
 // @author: Iskander Gaba
 package com.scientists.happy.botanist.ui;
-
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -18,7 +17,6 @@ import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.google.android.gms.auth.api.Auth;
@@ -36,7 +34,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.scientists.happy.botanist.R;
 import com.scientists.happy.botanist.data.DatabaseManager;
-
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 public class AccountActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
@@ -126,14 +123,12 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-
         if (id == R.id.action_sign_out) {
             buildSignOutDialog().show();
             return true;
         }
         else if (id == R.id.action_delete_account) {
             buildRevokeAccessDialog().show();
-
         }
         return super.onOptionsItemSelected(item);
     }

@@ -1,7 +1,6 @@
 // Plant profile
 // @author: Antonio Muscarella and Christopher Besser
 package com.scientists.happy.botanist.ui;
-
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -25,7 +24,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.bumptech.glide.Glide;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
 import com.google.firebase.storage.FirebaseStorage;
@@ -36,10 +34,8 @@ import com.vansuita.pickimage.bean.PickResult;
 import com.vansuita.pickimage.bundle.PickSetup;
 import com.vansuita.pickimage.dialog.PickImageDialog;
 import com.vansuita.pickimage.listeners.IPickResult;
-
 import java.util.Calendar;
 import java.util.Locale;
-
 public class ProfileActivity extends AppCompatActivity {
     private static final String ID_KEY = "plant_id";
     private static final String NAME_KEY = "name";
@@ -72,7 +68,6 @@ public class ProfileActivity extends AppCompatActivity {
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
-
         mDatabase = DatabaseManager.getInstance();
         // store individual plant information from the extras passed through the intent
         Intent i = getIntent();
@@ -87,7 +82,6 @@ public class ProfileActivity extends AppCompatActivity {
         mGifLocation = i.getExtras().getString(GIF_LOCATION_KEY);
         setTitle(mName);
         mPicture = (ImageView) findViewById(R.id.plant_picture);
-
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.camera_fab);
         fab.setOnClickListener(new View.OnClickListener() {
             /**
@@ -111,10 +105,8 @@ public class ProfileActivity extends AppCompatActivity {
                 }).show(getSupportFragmentManager());
             }
         });
-
         TextView fertilizationLink = (TextView)findViewById(R.id.fertilization_link);
         fertilizationLink.setMovementMethod(LinkMovementMethod.getInstance());
-
         ActivityCompat.postponeEnterTransition(this);
         StorageReference storageReference = FirebaseStorage.getInstance().getReference()
                 .child(mDatabase.getUserId()).child(plantId + "_" + photoNum + ".jpg");
@@ -170,7 +162,6 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
         mDatabase.editProfile(this.findViewById(android.R.id.content), mSpecies);
-
         overridePendingTransition(R.anim.slide_up, R.anim.hold);
     }
 
@@ -198,7 +189,6 @@ public class ProfileActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-
         if (id == R.id.action_share) {
             sharePlant();
             return true;
@@ -386,6 +376,10 @@ public class ProfileActivity extends AppCompatActivity {
         return builder.create();
     }
 
+    /**
+     * Set the page title
+     * @param title - te new title
+     */
     private void setTitle(String title) {
         CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.toolbar_layout);
         collapsingToolbarLayout.setTitle(title);
@@ -510,7 +504,8 @@ public class ProfileActivity extends AppCompatActivity {
         shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         if (mGifLocation.equals("No Gif made (yet!)")) {
             shareIntent.setType("plain/text");
-        } else {
+        }
+        else {
             Uri gifUri = Uri.parse("file://" + mGifLocation);
             shareIntent.putExtra(Intent.EXTRA_STREAM, gifUri);
             shareIntent.setType("image/*");

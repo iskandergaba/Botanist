@@ -84,6 +84,10 @@
     <string name="title_activity_stats">Statistics</string>
     <string name="stats">Statistics</string>
     <string name="title_activity_scrolling">ScrollingActivity</string>
+    <string name="title_activity_tutorial">TutorialActivity</string>
+    <string name="action_help">Help</string>
+    <string name="ready">Ready to begin?</string>
+    <string name="find_tutorial">Click the Help option under the main screen menu to view these instructions again.</string>
     <string name="large_text">
         "Material is the metaphor.\n\n"
 
