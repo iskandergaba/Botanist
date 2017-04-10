@@ -9,7 +9,6 @@ import android.view.View;
 
 import com.scientists.happy.botanist.R;
 
-
 public class ShopActivity extends AppCompatActivity {
 
     @Override
