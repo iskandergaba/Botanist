@@ -1,7 +1,6 @@
 // Plant profile
 // @author: Antonio Muscarella and Christopher Besser
 package com.scientists.happy.botanist.ui;
-
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -25,7 +24,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.bumptech.glide.Glide;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
 import com.google.firebase.storage.FirebaseStorage;
@@ -36,10 +34,11 @@ import com.vansuita.pickimage.bean.PickResult;
 import com.vansuita.pickimage.bundle.PickSetup;
 import com.vansuita.pickimage.dialog.PickImageDialog;
 import com.vansuita.pickimage.listeners.IPickResult;
-
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
-
+import za.co.riggaroo.materialhelptutorial.TutorialItem;
+import za.co.riggaroo.materialhelptutorial.tutorial.MaterialTutorialActivity;
 public class ProfileActivity extends AppCompatActivity {
     private static final String ID_KEY = "plant_id";
     private static final String NAME_KEY = "name";
@@ -59,6 +58,7 @@ public class ProfileActivity extends AppCompatActivity {
     private ImageView mPicture;
     private String changeNameText = "";
     private long mBirthday, mLastWatered, mLastFertilized;
+    private static int REQUEST_CODE = 1234;
     /**
      * Launch the activity
      * @param savedInstanceState - current view state
@@ -72,7 +72,6 @@ public class ProfileActivity extends AppCompatActivity {
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
-
         mDatabase = DatabaseManager.getInstance();
         // store individual plant information from the extras passed through the intent
         Intent i = getIntent();
@@ -87,7 +86,6 @@ public class ProfileActivity extends AppCompatActivity {
         mGifLocation = i.getExtras().getString(GIF_LOCATION_KEY);
         setTitle(mName);
         mPicture = (ImageView) findViewById(R.id.plant_picture);
-
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.camera_fab);
         fab.setOnClickListener(new View.OnClickListener() {
             /**
@@ -111,10 +109,8 @@ public class ProfileActivity extends AppCompatActivity {
                 }).show(getSupportFragmentManager());
             }
         });
-
         TextView fertilizationLink = (TextView)findViewById(R.id.fertilization_link);
         fertilizationLink.setMovementMethod(LinkMovementMethod.getInstance());
-
         ActivityCompat.postponeEnterTransition(this);
         StorageReference storageReference = FirebaseStorage.getInstance().getReference()
                 .child(mDatabase.getUserId()).child(plantId + "_" + photoNum + ".jpg");
@@ -170,7 +166,6 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
         mDatabase.editProfile(this.findViewById(android.R.id.content), mSpecies);
-
         overridePendingTransition(R.anim.slide_up, R.anim.hold);
     }
 
@@ -198,7 +193,6 @@ public class ProfileActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-
         if (id == R.id.action_share) {
             sharePlant();
             return true;
@@ -233,6 +227,9 @@ public class ProfileActivity extends AppCompatActivity {
         else if (id == R.id.action_delete) {
             buildDeleteDialog().show();
             return true;
+        }
+        else if (id == R.id.action_help) {
+            loadTutorial();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -386,6 +383,10 @@ public class ProfileActivity extends AppCompatActivity {
         return builder.create();
     }
 
+    /**
+     * Set the page title
+     * @param title - te new title
+     */
     private void setTitle(String title) {
         CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.toolbar_layout);
         collapsingToolbarLayout.setTitle(title);
@@ -510,7 +511,8 @@ public class ProfileActivity extends AppCompatActivity {
         shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         if (mGifLocation.equals("No Gif made (yet!)")) {
             shareIntent.setType("plain/text");
-        } else {
+        }
+        else {
             Uri gifUri = Uri.parse("file://" + mGifLocation);
             shareIntent.putExtra(Intent.EXTRA_STREAM, gifUri);
             shareIntent.setType("image/*");
@@ -525,5 +527,33 @@ public class ProfileActivity extends AppCompatActivity {
      */
     private double getAgeInDays(long birthday) {
         return (System.currentTimeMillis() - birthday) / 86400000.0;
+    }
+
+    /**
+     * Load the tutorial
+     */
+    public void loadTutorial() {
+        Intent mainAct = new Intent(this, MaterialTutorialActivity.class);
+        mainAct.putParcelableArrayListExtra(MaterialTutorialActivity.MATERIAL_TUTORIAL_ARG_TUTORIAL_ITEMS, getTutorialItems(this));
+        startActivityForResult(mainAct, REQUEST_CODE);
+    }
+
+    /**
+     * Fetch assets for the tutorial
+     * @param context - current app context
+     * @return - Returns the list of tutorial items
+     */
+    private ArrayList<TutorialItem> getTutorialItems(Context context) {
+        TutorialItem tutorialItem1 = new TutorialItem(context.getString(R.string.tutorial_title_0), context.getString(R.string.tutorial_contents_0),
+                R.color.colorPrimary, R.drawable.tutorial_0,  R.drawable.tutorial_0);
+        TutorialItem tutorialItem2 = new TutorialItem(context.getString(R.string.tutorial_title_1), context.getString(R.string.tutorial_contents_1),
+                R.color.colorPrimary, R.drawable.tutorial_1,  R.drawable.tutorial_1);
+        TutorialItem tutorialItem3 = new TutorialItem(context.getString(R.string.tutorial_title_2), context.getString(R.string.tutorial_contents_2),
+                R.color.colorPrimary, R.drawable.tutorial_2,  R.drawable.tutorial_2);
+        ArrayList<TutorialItem> tutorialItems = new ArrayList<>();
+        tutorialItems.add(tutorialItem1);
+        tutorialItems.add(tutorialItem2);
+        tutorialItems.add(tutorialItem3);
+        return tutorialItems;
     }
 }

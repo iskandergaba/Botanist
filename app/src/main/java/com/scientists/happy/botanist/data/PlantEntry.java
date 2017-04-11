@@ -11,7 +11,6 @@ public class PlantEntry {
     private String pruningReq, wildAnimalPalate, grazeAnimalPalate, humanPalate, fertility;
     private List<String> noxious;
     private String baseHeight, minRain, maxRain, minDepth, minTemp;
-
     /**
      * Required by Firebase, this useless constructor must remain
      */

@@ -1,7 +1,6 @@
 // Asynchronous birthday receiver
 // @author: Iskander Gaba
 package com.scientists.happy.botanist.services;
-
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -11,12 +10,9 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.v4.app.NotificationCompat;
-
 import com.scientists.happy.botanist.R;
 import com.scientists.happy.botanist.ui.LoginActivity;
-
 import java.util.Calendar;
-
 import static android.content.Context.NOTIFICATION_SERVICE;
 public class BirthdayReceiver extends BroadcastReceiver {
     /**

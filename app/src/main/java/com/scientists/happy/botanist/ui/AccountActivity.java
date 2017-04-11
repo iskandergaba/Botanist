@@ -1,8 +1,8 @@
 // User's account page
 // @author: Iskander Gaba
 package com.scientists.happy.botanist.ui;
-
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -18,7 +18,6 @@ import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.github.mikephil.charting.charts.BarChart;
@@ -41,12 +40,15 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.scientists.happy.botanist.R;
 import com.scientists.happy.botanist.data.DatabaseManager;
-
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Locale;
+import za.co.riggaroo.materialhelptutorial.TutorialItem;
+import za.co.riggaroo.materialhelptutorial.tutorial.MaterialTutorialActivity;
 public class AccountActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
     private static final String TAG = "AccountActivity";
     private static final int RC_SIGN_IN = 9001;
+    private static final int REQUEST_CODE = 1234;
     private GoogleApiClient mGoogleApiClient;
     private ImageView mAccountImageView;
     private TextView mNameTextView;
@@ -133,14 +135,15 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-
         if (id == R.id.action_sign_out) {
             buildSignOutDialog().show();
             return true;
         }
         else if (id == R.id.action_delete_account) {
             buildRevokeAccessDialog().show();
-
+        }
+        else if (id == R.id.action_help) {
+            loadTutorial();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -425,6 +428,34 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
         }
     }
 
+    /**
+     * Load the tutorial
+     */
+    public void loadTutorial() {
+        Intent mainAct = new Intent(this, MaterialTutorialActivity.class);
+        mainAct.putParcelableArrayListExtra(MaterialTutorialActivity.MATERIAL_TUTORIAL_ARG_TUTORIAL_ITEMS, getTutorialItems(this));
+        startActivityForResult(mainAct, REQUEST_CODE);
+    }
+
+    /**
+     * Fetch assets for the tutorial
+     * @param context - current app context
+     * @return - Returns the list of tutorial items
+     */
+    private ArrayList<TutorialItem> getTutorialItems(Context context) {
+        TutorialItem tutorialItem1 = new TutorialItem(context.getString(R.string.tutorial_title_0), context.getString(R.string.tutorial_contents_0),
+                R.color.colorPrimary, R.drawable.tutorial_0,  R.drawable.tutorial_0);
+        TutorialItem tutorialItem2 = new TutorialItem(context.getString(R.string.tutorial_title_1), context.getString(R.string.tutorial_contents_1),
+                R.color.colorPrimary, R.drawable.tutorial_1,  R.drawable.tutorial_1);
+        TutorialItem tutorialItem3 = new TutorialItem(context.getString(R.string.tutorial_title_2), context.getString(R.string.tutorial_contents_2),
+                R.color.colorPrimary, R.drawable.tutorial_2,  R.drawable.tutorial_2);
+        ArrayList<TutorialItem> tutorialItems = new ArrayList<>();
+        tutorialItems.add(tutorialItem1);
+        tutorialItems.add(tutorialItem2);
+        tutorialItems.add(tutorialItem3);
+        return tutorialItems;
+    }
+  
     /**
      * Show user stats graph
      */

@@ -8,7 +8,6 @@ public class User {
     private long botanistSince;
     private int plantsAdded, plantsDeleted, plantsNumber;
     private int waterCount, measureCount, photoCount;
-
     /**
      * Required by Firebase, this useless constructor must remain
      */
