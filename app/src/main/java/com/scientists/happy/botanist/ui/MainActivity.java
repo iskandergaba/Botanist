@@ -9,14 +9,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.GridView;
-import android.widget.ListAdapter;
 
 import com.scientists.happy.botanist.R;
 import com.scientists.happy.botanist.data.DatabaseManager;
 public class MainActivity extends AppCompatActivity {
     private static final int VIEW_ACCOUNT = 1;
-    private DatabaseManager mDatabase;
-//    private ProgressDialog mProgressDialog;
+
     /**
      * Launch app
      * @param savedInstanceState - app state
@@ -25,7 +23,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //showProgressDialog();
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             /**
@@ -37,18 +34,10 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(MainActivity.this, AddPlantActivity.class));
             }
         });
-        mDatabase = DatabaseManager.getInstance();
+        DatabaseManager database = DatabaseManager.getInstance();
         GridView gridView = (GridView) findViewById(R.id.gridview);
         gridView.setEmptyView(findViewById(R.id.empty_grid_view));
-        ListAdapter adapter = mDatabase.getPlantsAdapter(this);
-//        adapter.registerDataSetObserver(new DataSetObserver() {
-//            @Override
-//            public void onChanged() {
-//                super.onChanged();
-//                hideProgressDialog();
-//            }
-//        });
-        gridView.setAdapter(adapter);
+        database.populatePlantGrid(this, gridView);
     }
 
     /**
@@ -83,6 +72,10 @@ public class MainActivity extends AppCompatActivity {
             startActivityForResult(new Intent(MainActivity.this, AccountActivity.class), VIEW_ACCOUNT);
             return true;
         }
+        else if (id == R.id.action_shop) {
+            startActivity(new Intent(MainActivity.this, ShopActivity.class));
+            return true;
+        }
         else if (id == R.id.action_about) {
             startActivity(new Intent(MainActivity.this, AboutActivity.class));
             return true;
@@ -103,21 +96,4 @@ public class MainActivity extends AppCompatActivity {
             finish();
         }
     }
-
-//    private void showProgressDialog() {
-//        if (mProgressDialog == null) {
-//            mProgressDialog = new ProgressDialog(this);
-//            mProgressDialog.setMessage(getString(R.string.loading));
-//            mProgressDialog.setIndeterminate(true);
-//            mProgressDialog.setCancelable(false);
-//        }
-//
-//        mProgressDialog.show();
-//    }
-//
-//    private void hideProgressDialog() {
-//        if (mProgressDialog != null && mProgressDialog.isShowing()) {
-//            mProgressDialog.hide();
-//        }
-//    }
 }
