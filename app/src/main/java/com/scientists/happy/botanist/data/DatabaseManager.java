@@ -278,7 +278,15 @@ public class DatabaseManager {
      * @return Returns whether the user was new
      */
     public boolean wasUserNew() {
+        System.out.println("showTutorial? " + showTutorial);
         return showTutorial;
+    }
+
+    /**
+     * Reset showTutorial
+     */
+    public void disableTutorial() {
+        showTutorial = false;
     }
 
     /**
@@ -659,8 +667,6 @@ public class DatabaseManager {
      * @return Returns an adapter for the plants
      */
     public FirebaseListAdapter<Plant> getPlantsAdapter(final Activity activity) {
-        // Upon starting the MainActivity from the Tutorial, this method is called
-        showTutorial = false;
         final String userId = getUserId();
         if (userId != null) {
             DatabaseReference databaseRef = mDatabase.child("users").child(userId).child("plants");

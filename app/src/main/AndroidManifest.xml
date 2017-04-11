@@ -113,16 +113,8 @@
                 android:theme="@style/AppTheme.NoActionBar"
                 android:value="com.scientists.happy.botanist.ui.ProfileActivity" />
         </activity>
-        <activity
-            android:name=".ui.TutorialActivity"
-            android:label="@string/title_activity_tutorial"
-            android:parentActivityName=".ui.MainActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:theme="@style/AppTheme.NoActionBar"
-                android:windowActionBar="false"
-                android:value="com.scientists.happy.botanist.ui.TutorialActivity" />
-        </activity>
+        <activity android:name="za.co.riggaroo.materialhelptutorial.tutorial.MaterialTutorialActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
     </application>
 
 </manifest>

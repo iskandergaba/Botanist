@@ -183,12 +183,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                 else {
                     mDatabase.addUserRecords(user.getUid(), acct.getDisplayName(), acct.getEmail());
                     Toast.makeText(LoginActivity.this, "Authentication successful.", Toast.LENGTH_SHORT).show();
-                    if (!mDatabase.wasUserNew()) {
-                        startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                    }
-                    else {
-                        startActivity(new Intent(LoginActivity.this, TutorialActivity.class));
-                    }
+                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
                     finish();
                 }
                 hideProgressBar();

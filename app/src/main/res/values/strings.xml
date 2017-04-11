@@ -88,6 +88,12 @@
     <string name="action_help">Help</string>
     <string name="ready">Ready to begin?</string>
     <string name="find_tutorial">Click the Help option under the main screen menu to view these instructions again.</string>
+    <string name="tutorial_title_0">Title 0</string>
+    <string name="tutorial_contents_0">Contents 0</string>
+    <string name="tutorial_title_1">Title 1</string>
+    <string name="tutorial_contents_1">Contents 1</string>
+    <string name="tutorial_title_2">Title 2</string>
+    <string name="tutorial_contents_2">Contents 2</string>
     <string name="large_text">
         "Material is the metaphor.\n\n"
 
