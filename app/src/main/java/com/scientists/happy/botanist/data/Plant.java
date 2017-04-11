@@ -114,8 +114,10 @@ public class Plant {
      */
     public long getLastWatered() {
         long lastWatered = birthday;
-        for (String key : watering.keySet()) {
-            lastWatered = Math.max(lastWatered, Long.parseLong(watering.get(key)));
+        if (watering != null) {
+            for (String key : watering.keySet()) {
+                lastWatered = Math.max(lastWatered, Long.parseLong(watering.get(key)));
+            }
         }
         return lastWatered;
     }

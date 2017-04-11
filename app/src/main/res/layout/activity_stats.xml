@@ -18,8 +18,7 @@
             android:layout_height="wrap_content"
             android:textAppearance="?android:textAppearanceMedium"
             android:fontFamily="sans-serif-condensed"
-            android:text="@string/desc_height_chart"
-            android:layout_marginBottom="@dimen/activity_vertical_margin"/>
+            android:text="@string/desc_height_chart" />
 
         <com.github.mikephil.charting.charts.LineChart
             android:id="@+id/height_chart"
@@ -33,7 +32,7 @@
             android:textAppearance="?android:textAppearanceMedium"
             android:fontFamily="sans-serif-condensed"
             android:text="@string/desc_water_chart"
-            android:layout_marginBottom="@dimen/activity_vertical_margin"/>
+/>
 
         <com.github.mikephil.charting.charts.BarChart
             android:id="@+id/water_chart"
