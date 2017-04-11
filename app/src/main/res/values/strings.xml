@@ -178,6 +178,7 @@
     <string name="title_activity_about">About</string>
     <string name="desc_water_chart">Weekly Watering Summary</string>
     <string name="desc_height_chart">Plant Growth</string>
+    <string name="user_account_stats_title">User Statistics</string>
     <string name="msg_network_error">Unable to reach the server. Check your connection settings and try again</string>
     <string name="msg_unexpected_error">Unexpected error</string>
 </resources>
