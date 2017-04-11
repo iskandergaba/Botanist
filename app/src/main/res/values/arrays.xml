@@ -14,4 +14,31 @@
         <item>3</item>
     </string-array>
 
+    <string-array name="user_stats_x_axis_labels">
+        <item>Add</item>
+        <item>Delete</item>
+        <item>Water</item>
+        <item>Measure</item>
+        <item>Picture</item>
+    </string-array>
+
+    <string-array name="day_x_axis_labels">
+        <item>Today</item>
+        <item>Sun.</item>
+        <item>Mon.</item>
+        <item>Tue.</item>
+        <item>Wed.</item>
+        <item>Thu.</item>
+        <item>Fri.</item>
+        <item>Sat.</item>
+    </string-array>
+
+    <array name="user_stats_chart_colors">
+        <item>@color/material_green_accent_200</item>
+        <item>@color/material_red_accent_200</item>
+        <item>@color/material_cyan_200</item>
+        <item>@color/material_purple_200</item>
+        <item>@color/material_orange_200</item>
+    </array>
+
 </resources>

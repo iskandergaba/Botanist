@@ -233,8 +233,14 @@ public class DatabaseManager {
         mAutoCompleteCache = new HashMap<>();
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mStorage = FirebaseStorage.getInstance().getReference();
-        mPlantsNumber = getPlantsNumber();
         mBotanistSince = getBotanistSince();
+        mPlantsNumber = getPlantsNumber();
+        mPlantsAdded = getAddedCount();
+        mPlantsDeleted = getDeletedCount();
+        mWaterCount = getWaterCount();
+        mMeasureCount = getMeasureCount();
+        mPhotoCount = getPhotoCount();
+        mRating = getUserRating();
         new PrepareAutocompleteTask().execute();
     }
 
@@ -331,7 +337,7 @@ public class DatabaseManager {
                         mDatabase.child("users").child(userId).child("plants").child(plantId).setValue(plant);
                         setPlantsNumber(++mPlantsNumber);
                         updatePlantImage(0, plantId, bmp);
-                        setAddedNumber(getAddedNumber() + 1);
+                        setAddedNumber(getAddedCount() + 1);
                         updateUserRating();
                     }
                 }
@@ -392,7 +398,7 @@ public class DatabaseManager {
                         for (int i = 0; i <= photoNum; i++) {
                             mStorage.child(userId).child(plantId + "_" + i + ".jpg").delete();
                         }
-                        setDeletedNumber(getDeletedNumber() + 1);
+                        setDeletedNumber(getDeletedCount() + 1);
                         updateUserRating();
                     }
                     File gif = new File(getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), plantId + ".gif");
@@ -553,27 +559,26 @@ public class DatabaseManager {
 
     /**
      * populate the user's account statistics
-     * @param userId - the ID of the user
      * @param chart - the chart to populate
      */
-    public void populateUserStatsChart(String userId, final BarChart chart) {
+    public void populateUserStatsChart(Context context, final BarChart chart) {
+        String userId = getUserId();
         if (userId != null) {
+            int[] colors = context.getResources().getIntArray(R.array.user_stats_chart_colors);
             List<BarEntry> entries = new ArrayList<>();
-            entries.add(new BarEntry(0f, getAddedNumber()));
-            entries.add(new BarEntry(1f, getDeletedNumber()));
+            entries.add(new BarEntry(0f, getAddedCount()));
+            entries.add(new BarEntry(1f, getDeletedCount()));
             entries.add(new BarEntry(2f, getWaterCount()));
             entries.add(new BarEntry(3f, getMeasureCount()));
             entries.add(new BarEntry(4f, getPhotoCount()));
 
-            BarDataSet barDataSet = new BarDataSet(entries, "User Statistics");
-            barDataSet.setColors(ColorTemplate.VORDIPLOM_COLORS);
+            BarDataSet barDataSet = new BarDataSet(entries, "Plant Operations");
+            barDataSet.setColors(ColorTemplate.createColors(colors));
             barDataSet.setValueTextSize(11f);
 
             BarData data = new BarData(barDataSet);
             data.setBarWidth(0.9f); // set custom bar width
             chart.setData(data);
-            chart.setFitBars(true); // make the x-axis fit exactly all bars
-            chart.getLegend().setEnabled(false);
             chart.invalidate(); // refresh
         }
     }
@@ -1084,8 +1089,8 @@ public class DatabaseManager {
 
     private void updateUserRating() {
         String userId = getUserId();
-        long added = getAddedNumber();
-        long deleted = getDeletedNumber();
+        long added = getAddedCount();
+        long deleted = getDeletedCount();
 
 
         mRating = ((1.3 * added - deleted / 100))
@@ -1100,7 +1105,7 @@ public class DatabaseManager {
      * Get the total number of plants watering
      * @return Returns the total number of times the user watered plants
      */
-    public long getWaterCount() {
+    private long getWaterCount() {
         final String userId = getUserId();
         if (userId != null) {
             mDatabase.child("users").child(userId).child("waterCount").addListenerForSingleValueEvent(new ValueEventListener() {
@@ -1131,7 +1136,7 @@ public class DatabaseManager {
      * Update the total number of plants watering
      * @param count - the new total number of time the user watered plants
      */
-    public void setWaterCount(long count) {
+    private void setWaterCount(long count) {
         String userId = getUserId();
         if (userId != null) {
             mDatabase.child("users").child(userId).child("waterCount").setValue(count);
@@ -1228,7 +1233,7 @@ public class DatabaseManager {
      * Get how long the user has been a botanist
      * @return Returns the total number of added plants
      */
-    private long getAddedNumber() {
+    private long getAddedCount() {
         final String userId = getUserId();
         if (userId != null) {
             mDatabase.child("users").child(userId).child("plantsAdded").addListenerForSingleValueEvent(new ValueEventListener() {
@@ -1271,7 +1276,7 @@ public class DatabaseManager {
      * Get how long the user has been a botanist
      * @return Returns the total number of deleted plants
      */
-    private long getDeletedNumber() {
+    private long getDeletedCount() {
         final String userId = getUserId();
         if (userId != null) {
             mDatabase.child("users").child(userId).child("plantsDeleted").addListenerForSingleValueEvent(new ValueEventListener() {

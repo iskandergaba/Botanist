@@ -41,7 +41,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.scientists.happy.botanist.R;
 import com.scientists.happy.botanist.data.DatabaseManager;
-import com.scientists.happy.botanist.utils.DayAxisValueFormatter;
 
 import java.text.SimpleDateFormat;
 import java.util.Locale;
@@ -58,7 +57,6 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
     private DatabaseManager mDatabase;
-    private static final String[] USER_STATS_GRAPH_X_LABELS = {"Added", "Deleted", "Waterings", "Heights", "Photos"};
     /**
      * Launch the activity
      * @param savedInstanceState - current app state
@@ -101,7 +99,8 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail().requestIdToken(getString(R.string.default_web_client_id)).build();
         // Build a GoogleApiClient with access to the Google Sign-In API and the options specified by gso.
-        mGoogleApiClient = new GoogleApiClient.Builder(this).enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso).build();
         double rating = mDatabase.getUserRating();
         if (rating < 0) {
@@ -124,8 +123,7 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
             levelTextView.setText(getString(R.string.level_3));
             levelProgressBar.setProgress(100);
         }
-        String userId = mDatabase.getUserId();
-        populateUserStatsChart(userId);
+        populateUserStatsChart();
     }
 
     /**
@@ -429,9 +427,9 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
 
     /**
      * Show user stats graph
-     * @param userId - the ID of the user
      */
-    public void populateUserStatsChart(String userId) {
+    private void populateUserStatsChart() {
+        final String[] userStatsChartXAxisLabel = getResources().getStringArray(R.array.user_stats_x_axis_labels);
         BarChart chart = (BarChart) findViewById(R.id.user_stats_chart);
         chart.setTouchEnabled(false);
         XAxis xAxis = chart.getXAxis();
@@ -441,7 +439,7 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
             @Override
             public String getFormattedValue(float value, AxisBase axis) {
                 int v = (int) value;
-                return USER_STATS_GRAPH_X_LABELS[v];
+                return userStatsChartXAxisLabel[v];
             }
         });
         xAxis.setDrawGridLines(false);
@@ -450,7 +448,6 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
         rightAxis.setEnabled(false);
         chart.getAxisLeft().setGranularity(1);
         chart.getDescription().setEnabled(false);
-        mDatabase.populateUserStatsChart(userId, chart);
-        chart.invalidate();
+        mDatabase.populateUserStatsChart(this, chart);
     }
 }
