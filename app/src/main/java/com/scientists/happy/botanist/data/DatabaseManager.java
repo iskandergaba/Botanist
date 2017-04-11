@@ -20,6 +20,7 @@ import android.support.annotation.NonNull;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -35,6 +36,7 @@ import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.utils.ColorTemplate;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -223,11 +225,18 @@ public class DatabaseManager {
     private DatabaseManager() {
         // Just in case we want to add offline caching to the app
         // FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+        DatabaseReference.goOnline();
         mAutoCompleteCache = new HashMap<>();
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mStorage = FirebaseStorage.getInstance().getReference();
-        mPlantsNumber = getPlantsNumber();
         mBotanistSince = getBotanistSince();
+        mPlantsNumber = getPlantsNumber();
+        mPlantsAdded = getAddedCount();
+        mPlantsDeleted = getDeletedCount();
+        mWaterCount = getWaterCount();
+        mMeasureCount = getMeasureCount();
+        mPhotoCount = getPhotoCount();
+        mRating = getUserRating();
         new PrepareAutocompleteTask().execute();
     }
 
@@ -341,7 +350,7 @@ public class DatabaseManager {
                         mDatabase.child("users").child(userId).child("plants").child(plantId).setValue(plant);
                         setPlantsNumber(++mPlantsNumber);
                         updatePlantImage(0, plantId, bmp);
-                        setAddedNumber(getAddedNumber() + 1);
+                        setAddedNumber(getAddedCount() + 1);
                         updateUserRating();
                     }
                 }
@@ -402,7 +411,7 @@ public class DatabaseManager {
                         for (int i = 0; i <= photoNum; i++) {
                             mStorage.child(userId).child(plantId + "_" + i + ".jpg").delete();
                         }
-                        setDeletedNumber(getDeletedNumber() + 1);
+                        setDeletedNumber(getDeletedCount() + 1);
                         updateUserRating();
                     }
                     File gif = new File(getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), plantId + ".gif");
@@ -561,6 +570,32 @@ public class DatabaseManager {
     }
 
     /**
+     * populate the user's account statistics
+     * @param chart - the chart to populate
+     */
+    public void populateUserStatsChart(Context context, final BarChart chart) {
+        String userId = getUserId();
+        if (userId != null) {
+            int[] colors = context.getResources().getIntArray(R.array.user_stats_chart_colors);
+            List<BarEntry> entries = new ArrayList<>();
+            entries.add(new BarEntry(0f, getAddedCount()));
+            entries.add(new BarEntry(1f, getDeletedCount()));
+            entries.add(new BarEntry(2f, getWaterCount()));
+            entries.add(new BarEntry(3f, getMeasureCount()));
+            entries.add(new BarEntry(4f, getPhotoCount()));
+
+            BarDataSet barDataSet = new BarDataSet(entries, "Plant Operations");
+            barDataSet.setColors(ColorTemplate.createColors(colors));
+            barDataSet.setValueTextSize(11f);
+
+            BarData data = new BarData(barDataSet);
+            data.setBarWidth(0.9f); // set custom bar width
+            chart.setData(data);
+            chart.invalidate(); // refresh
+        }
+    }
+
+    /**
      * Update plant's height
      * @param context - the current app context
      * @param plantId - the id of the plant (species_name)
@@ -662,17 +697,20 @@ public class DatabaseManager {
     }
 
     /**
-     * Get a plant adapter
+     * populate a grid with user plants
      * @param activity - the current activity
-     * @return Returns an adapter for the plants
+     * @param grid - the current grid
      */
-    public FirebaseListAdapter<Plant> getPlantsAdapter(final Activity activity) {
+    public void populatePlantGrid(final Activity activity, final GridView grid) {
         final String userId = getUserId();
+        final TextView emptyGridView = (TextView) activity.findViewById(R.id.empty_grid_view);
+        final ProgressBar loadingProgressBar = (ProgressBar) activity.findViewById(R.id.loading_indicator);
+        loadingProgressBar.setVisibility(View.VISIBLE);
         if (userId != null) {
             DatabaseReference databaseRef = mDatabase.child("users").child(userId).child("plants");
-            return new FirebaseListAdapter<Plant>(activity, Plant.class, R.layout.grid_item_view, databaseRef) {
+            final FirebaseListAdapter<Plant> adapter = new FirebaseListAdapter<Plant>(activity, Plant.class, R.layout.grid_item_view, databaseRef) {
                 /**
-                 * Show images in glide
+                 * Populate a grid item
                  * @param view - the current view
                  * @param plant - the plant to display
                  * @param position - the position in the menu
@@ -687,7 +725,7 @@ public class DatabaseManager {
                             .placeholder(R.drawable.flowey).into(picture);
                     // One day, before the progress bar becomes empty
                     long interval = getReminderIntervalInMillis(1);
-                    long diff = System.currentTimeMillis() - plant.getLastWaterNotification();
+                    long diff = System.currentTimeMillis() - plant.getLastWatered();
                     float progress = 100 - (float) (100.0 * diff / interval);
                     // The minimum value is one, just to make sure it's visible to the user
                     if (progress < 1) {
@@ -729,8 +767,43 @@ public class DatabaseManager {
                     setBirthdayReminder(activity, plant, position + BIRTHDAY_RECEIVER_ID_OFFSET);
                 }
             };
+
+            // After digging deep, I discovered that Firebase keeps some local information in ".info"
+            DatabaseReference connectedRef = mDatabase.child(".info/connected");
+            connectedRef.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot snapshot) {
+                    boolean connected = snapshot.getValue(Boolean.class);
+                    if (connected) {
+                        emptyGridView.setText(R.string.loading);
+                        loadingProgressBar.setVisibility(View.VISIBLE);
+                    } else {
+                        Toast.makeText(activity, R.string.msg_network_error, Toast.LENGTH_SHORT).show();
+                        emptyGridView.setText(R.string.msg_network_error);
+                        loadingProgressBar.setVisibility(View.GONE);
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError error) {
+                }
+            });
+
+            databaseRef.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    loadingProgressBar.setVisibility(View.GONE);
+                    emptyGridView.setText(R.string.no_plants);
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    emptyGridView.setText(R.string.msg_unexpected_error);
+                    loadingProgressBar.setVisibility(View.GONE);
+                }
+            });
+            grid.setAdapter(adapter);
         }
-        return null;
     }
 
     /**
@@ -1034,8 +1107,8 @@ public class DatabaseManager {
      */
     private void updateUserRating() {
         String userId = getUserId();
-        long added = getAddedNumber();
-        long deleted = getDeletedNumber();
+        long added = getAddedCount();
+        long deleted = getDeletedCount();
         mRating = ((1.3 * added - deleted / 100))
                 * (getWaterCount() + getMeasureCount() + getPhotoCount() + 1) / (10 * (added + deleted + 1));
         if (userId != null) {
@@ -1047,7 +1120,7 @@ public class DatabaseManager {
      * Get the total number of plants watering
      * @return Returns the total number of times the user watered plants
      */
-    public long getWaterCount() {
+    private long getWaterCount() {
         final String userId = getUserId();
         if (userId != null) {
             mDatabase.child("users").child(userId).child("waterCount").addListenerForSingleValueEvent(new ValueEventListener() {
@@ -1078,7 +1151,7 @@ public class DatabaseManager {
      * Update the total number of plants watering
      * @param count - the new total number of time the user watered plants
      */
-    public void setWaterCount(long count) {
+    private void setWaterCount(long count) {
         String userId = getUserId();
         if (userId != null) {
             mDatabase.child("users").child(userId).child("waterCount").setValue(count);
@@ -1175,7 +1248,7 @@ public class DatabaseManager {
      * Get how long the user has been a botanist
      * @return Returns the total number of added plants
      */
-    private long getAddedNumber() {
+    private long getAddedCount() {
         final String userId = getUserId();
         if (userId != null) {
             mDatabase.child("users").child(userId).child("plantsAdded").addListenerForSingleValueEvent(new ValueEventListener() {
@@ -1218,7 +1291,7 @@ public class DatabaseManager {
      * Get how long the user has been a botanist
      * @return Returns the total number of deleted plants
      */
-    private long getDeletedNumber() {
+    private long getDeletedCount() {
         final String userId = getUserId();
         if (userId != null) {
             mDatabase.child("users").child(userId).child("plantsDeleted").addListenerForSingleValueEvent(new ValueEventListener() {

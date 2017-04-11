@@ -46,17 +46,10 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(MainActivity.this, AddPlantActivity.class));
             }
         });
+        DatabaseManager database = DatabaseManager.getInstance();
         GridView gridView = (GridView) findViewById(R.id.gridview);
         gridView.setEmptyView(findViewById(R.id.empty_grid_view));
-        ListAdapter adapter = mDatabase.getPlantsAdapter(this);
-//        adapter.registerDataSetObserver(new DataSetObserver() {
-//            @Override
-//            public void onChanged() {
-//                super.onChanged();
-//                hideProgressDialog();
-//            }
-//        });
-        gridView.setAdapter(adapter);
+        database.populatePlantGrid(this, gridView);
     }
 
     /**
@@ -66,7 +59,6 @@ public class MainActivity extends AppCompatActivity {
      */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
@@ -78,9 +70,6 @@ public class MainActivity extends AppCompatActivity {
      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
@@ -89,6 +78,10 @@ public class MainActivity extends AppCompatActivity {
         }
         else if (id == R.id.action_account) {
             startActivityForResult(new Intent(MainActivity.this, AccountActivity.class), VIEW_ACCOUNT);
+            return true;
+        }
+        else if (id == R.id.action_shop) {
+            startActivity(new Intent(MainActivity.this, ShopActivity.class));
             return true;
         }
         else if (id == R.id.action_about) {

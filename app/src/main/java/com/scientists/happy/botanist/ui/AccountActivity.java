@@ -20,6 +20,11 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
+import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.components.AxisBase;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
+import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -96,7 +101,8 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail().requestIdToken(getString(R.string.default_web_client_id)).build();
         // Build a GoogleApiClient with access to the Google Sign-In API and the options specified by gso.
-        mGoogleApiClient = new GoogleApiClient.Builder(this).enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso).build();
         double rating = mDatabase.getUserRating();
         if (rating < 0) {
@@ -119,6 +125,7 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
             levelTextView.setText(getString(R.string.level_3));
             levelProgressBar.setProgress(100);
         }
+        populateUserStatsChart();
     }
 
     /**
@@ -447,5 +454,31 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
         tutorialItems.add(tutorialItem2);
         tutorialItems.add(tutorialItem3);
         return tutorialItems;
+    }
+  
+    /**
+     * Show user stats graph
+     */
+    private void populateUserStatsChart() {
+        final String[] userStatsChartXAxisLabel = getResources().getStringArray(R.array.user_stats_x_axis_labels);
+        BarChart chart = (BarChart) findViewById(R.id.user_stats_chart);
+        chart.setTouchEnabled(false);
+        XAxis xAxis = chart.getXAxis();
+        xAxis.setGranularity(1);
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxis.setValueFormatter(new IAxisValueFormatter() {
+            @Override
+            public String getFormattedValue(float value, AxisBase axis) {
+                int v = (int) value;
+                return userStatsChartXAxisLabel[v];
+            }
+        });
+        xAxis.setDrawGridLines(false);
+        xAxis.setTextSize(11f);
+        YAxis rightAxis = chart.getAxisRight();
+        rightAxis.setEnabled(false);
+        chart.getAxisLeft().setGranularity(1);
+        chart.getDescription().setEnabled(false);
+        mDatabase.populateUserStatsChart(this, chart);
     }
 }

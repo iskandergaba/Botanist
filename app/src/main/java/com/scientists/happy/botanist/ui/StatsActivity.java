@@ -75,7 +75,7 @@ public class StatsActivity extends AppCompatActivity {
         // Separate labels by one day
         xAxis.setGranularity(1);
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-        xAxis.setValueFormatter(new DayAxisValueFormatter());
+        xAxis.setValueFormatter(new DayAxisValueFormatter(this));
         xAxis.setDrawGridLines(false);
         xAxis.setTextSize(11f);
         YAxis rightAxis = chart.getAxisRight();
