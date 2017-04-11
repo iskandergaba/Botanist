@@ -177,5 +177,6 @@
     <string name="title_activity_about">About</string>
     <string name="desc_water_chart">Weekly Watering Summary</string>
     <string name="desc_height_chart">Plant Growth</string>
+    <string name="user_account_stats_title">User Statistics</string>
 </resources>
 

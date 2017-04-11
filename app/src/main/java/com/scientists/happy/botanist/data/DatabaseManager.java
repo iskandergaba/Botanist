@@ -37,6 +37,7 @@ import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.utils.ColorTemplate;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -545,6 +546,33 @@ public class DatabaseManager {
                     }
                 }
             });
+        }
+    }
+
+    /**
+     * populate the user's account statistics
+     * @param userId - the ID of the user
+     * @param chart - the chart to populate
+     */
+    public void populateUserStatsChart(String userId, final BarChart chart) {
+        if (userId != null) {
+            List<BarEntry> entries = new ArrayList<>();
+            entries.add(new BarEntry(0f, getAddedNumber()));
+            entries.add(new BarEntry(1f, getDeletedNumber()));
+            entries.add(new BarEntry(2f, getWaterCount()));
+            entries.add(new BarEntry(3f, getMeasureCount()));
+            entries.add(new BarEntry(4f, getPhotoCount()));
+
+            BarDataSet barDataSet = new BarDataSet(entries, "User Statistics");
+            barDataSet.setColors(ColorTemplate.VORDIPLOM_COLORS);
+            barDataSet.setValueTextSize(11f);
+
+            BarData data = new BarData(barDataSet);
+            data.setBarWidth(0.9f); // set custom bar width
+            chart.setData(data);
+            chart.setFitBars(true); // make the x-axis fit exactly all bars
+            chart.getLegend().setEnabled(false);
+            chart.invalidate(); // refresh
         }
     }
 
