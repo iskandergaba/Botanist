@@ -1,7 +1,6 @@
 // Main page
 // @author: Christopher Besser, Iskander Gaba, Antonio Muscarella, and Wendy Zhang
 package com.scientists.happy.botanist.ui;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -10,17 +9,16 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.GridView;
-import android.widget.ListAdapter;
+
 import com.scientists.happy.botanist.R;
 import com.scientists.happy.botanist.data.DatabaseManager;
+
 import java.util.ArrayList;
+
 import za.co.riggaroo.materialhelptutorial.TutorialItem;
-import za.co.riggaroo.materialhelptutorial.tutorial.MaterialTutorialActivity;
 public class MainActivity extends AppCompatActivity {
     private static final int VIEW_ACCOUNT = 1;
-    private static final int REQUEST_CODE = 1234;
     private DatabaseManager mDatabase;
-//    private ProgressDialog mProgressDialog;
     /**
      * Launch app
      * @param savedInstanceState - app state
@@ -30,11 +28,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mDatabase = DatabaseManager.getInstance();
-        if (mDatabase.wasUserNew()) {
-            mDatabase.disableTutorial();
-            loadTutorial();
-        }
-        //showProgressDialog();
+        mDatabase.showTutorial(this, loadTutorialItems(), false);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             /**
@@ -46,10 +40,9 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(MainActivity.this, AddPlantActivity.class));
             }
         });
-        DatabaseManager database = DatabaseManager.getInstance();
         GridView gridView = (GridView) findViewById(R.id.gridview);
         gridView.setEmptyView(findViewById(R.id.empty_grid_view));
-        database.populatePlantGrid(this, gridView);
+        mDatabase.populatePlantGrid(this, gridView);
     }
 
     /**
@@ -71,7 +64,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             startActivity(new Intent(this, SettingsActivity.class));
             return true;
@@ -89,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
         else if (id == R.id.action_help) {
-            loadTutorial();
+            mDatabase.showTutorial(this, loadTutorialItems(), false);
         }
         return super.onOptionsItemSelected(item);
     }
@@ -109,25 +101,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Load the tutorial
-     */
-    public void loadTutorial() {
-        Intent mainAct = new Intent(this, MaterialTutorialActivity.class);
-        mainAct.putParcelableArrayListExtra(MaterialTutorialActivity.MATERIAL_TUTORIAL_ARG_TUTORIAL_ITEMS, getTutorialItems(this));
-        startActivityForResult(mainAct, REQUEST_CODE);
-    }
-
-    /**
      * Fetch assets for the tutorial
-     * @param context - current app context
      * @return - Returns the list of tutorial items
      */
-    private ArrayList<TutorialItem> getTutorialItems(Context context) {
-        TutorialItem tutorialItem1 = new TutorialItem(context.getString(R.string.tutorial_title_0), context.getString(R.string.tutorial_contents_0),
+    private ArrayList<TutorialItem> loadTutorialItems() {
+        TutorialItem tutorialItem1 = new TutorialItem(getString(R.string.tutorial_title_0), getString(R.string.tutorial_contents_0),
                 R.color.colorPrimary, R.drawable.tutorial_0,  R.drawable.tutorial_0);
-        TutorialItem tutorialItem2 = new TutorialItem(context.getString(R.string.tutorial_title_1), context.getString(R.string.tutorial_contents_1),
+        TutorialItem tutorialItem2 = new TutorialItem(getString(R.string.tutorial_title_1), getString(R.string.tutorial_contents_1),
                 R.color.colorPrimary, R.drawable.tutorial_1,  R.drawable.tutorial_1);
-        TutorialItem tutorialItem3 = new TutorialItem(context.getString(R.string.tutorial_title_2), context.getString(R.string.tutorial_contents_2),
+        TutorialItem tutorialItem3 = new TutorialItem(getString(R.string.tutorial_title_2), getString(R.string.tutorial_contents_2),
                 R.color.colorPrimary, R.drawable.tutorial_2,  R.drawable.tutorial_2);
         ArrayList<TutorialItem> tutorialItems = new ArrayList<>();
         tutorialItems.add(tutorialItem1);

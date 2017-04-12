@@ -1,8 +1,6 @@
 // Add a plant
 // @author: Christopher Besser and Iskander Gaba
 package com.scientists.happy.botanist.ui;
-import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -14,6 +12,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import com.scientists.happy.botanist.R;
 import com.scientists.happy.botanist.data.DatabaseManager;
 import com.vansuita.pickimage.bean.PickResult;
@@ -21,13 +20,14 @@ import com.vansuita.pickimage.bundle.PickSetup;
 import com.vansuita.pickimage.dialog.PickImageDialog;
 import com.vansuita.pickimage.listeners.IPickResult;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Locale;
+
 import za.co.riggaroo.materialhelptutorial.TutorialItem;
-import za.co.riggaroo.materialhelptutorial.tutorial.MaterialTutorialActivity;
 public class AddPlantActivity extends AppCompatActivity {
     protected ImageView mPicture;
     protected TextView mPictureHint;
@@ -39,8 +39,8 @@ public class AddPlantActivity extends AppCompatActivity {
     protected DatabaseManager mDatabase;
     protected Bitmap mBitmap;
     protected GregorianCalendar mBirthday;
-    private static final int REQUEST_CODE = 1234;
     int mWaterHour, mWaterMin;
+
     /**
      * Launch the add plant screen
      * @param savedInstanceState - Current app state
@@ -50,6 +50,7 @@ public class AddPlantActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_plant);
         mDatabase = DatabaseManager.getInstance();
+        mDatabase.showTutorial(this, loadTutorialItems(), false);
         mPictureHint = (TextView) findViewById(R.id.picture_hint);
         mSpeciesAutoCompleteText = (AutoCompleteTextView) findViewById(R.id.species_edit_text);
         mDatabase.setSpeciesAutoComplete(this, mSpeciesAutoCompleteText);
@@ -190,31 +191,21 @@ public class AddPlantActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_help) {
-            loadTutorial();
+            mDatabase.showTutorial(this, loadTutorialItems(), true);
         }
         return super.onOptionsItemSelected(item);
     }
 
     /**
-     * Load the tutorial
-     */
-    public void loadTutorial() {
-        Intent mainAct = new Intent(this, MaterialTutorialActivity.class);
-        mainAct.putParcelableArrayListExtra(MaterialTutorialActivity.MATERIAL_TUTORIAL_ARG_TUTORIAL_ITEMS, getTutorialItems(this));
-        startActivityForResult(mainAct, REQUEST_CODE);
-    }
-
-    /**
      * Fetch assets for the tutorial
-     * @param context - current app context
      * @return - Returns the list of tutorial items
      */
-    private ArrayList<TutorialItem> getTutorialItems(Context context) {
-        TutorialItem tutorialItem1 = new TutorialItem(context.getString(R.string.tutorial_title_0), context.getString(R.string.tutorial_contents_0),
+    private ArrayList<TutorialItem> loadTutorialItems() {
+        TutorialItem tutorialItem1 = new TutorialItem(getString(R.string.tutorial_title_0), getString(R.string.tutorial_contents_0),
                 R.color.colorPrimary, R.drawable.tutorial_0,  R.drawable.tutorial_0);
-        TutorialItem tutorialItem2 = new TutorialItem(context.getString(R.string.tutorial_title_1), context.getString(R.string.tutorial_contents_1),
+        TutorialItem tutorialItem2 = new TutorialItem(getString(R.string.tutorial_title_1), getString(R.string.tutorial_contents_1),
                 R.color.colorPrimary, R.drawable.tutorial_1,  R.drawable.tutorial_1);
-        TutorialItem tutorialItem3 = new TutorialItem(context.getString(R.string.tutorial_title_2), context.getString(R.string.tutorial_contents_2),
+        TutorialItem tutorialItem3 = new TutorialItem(getString(R.string.tutorial_title_2), getString(R.string.tutorial_contents_2),
                 R.color.colorPrimary, R.drawable.tutorial_2,  R.drawable.tutorial_2);
         ArrayList<TutorialItem> tutorialItems = new ArrayList<>();
         tutorialItems.add(tutorialItem1);
