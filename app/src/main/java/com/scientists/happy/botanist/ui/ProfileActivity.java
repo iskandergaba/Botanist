@@ -24,6 +24,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.bumptech.glide.Glide;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
 import com.google.firebase.storage.FirebaseStorage;
@@ -34,11 +35,12 @@ import com.vansuita.pickimage.bean.PickResult;
 import com.vansuita.pickimage.bundle.PickSetup;
 import com.vansuita.pickimage.dialog.PickImageDialog;
 import com.vansuita.pickimage.listeners.IPickResult;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
+
 import za.co.riggaroo.materialhelptutorial.TutorialItem;
-import za.co.riggaroo.materialhelptutorial.tutorial.MaterialTutorialActivity;
 public class ProfileActivity extends AppCompatActivity {
     private static final String ID_KEY = "plant_id";
     private static final String NAME_KEY = "name";
@@ -58,7 +60,7 @@ public class ProfileActivity extends AppCompatActivity {
     private ImageView mPicture;
     private String changeNameText = "";
     private long mBirthday, mLastWatered, mLastFertilized;
-    private static int REQUEST_CODE = 1234;
+
     /**
      * Launch the activity
      * @param savedInstanceState - current view state
@@ -73,6 +75,7 @@ public class ProfileActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
         mDatabase = DatabaseManager.getInstance();
+        mDatabase.showTutorial(this, loadTutorialItems(), false);
         // store individual plant information from the extras passed through the intent
         Intent i = getIntent();
         plantId = i.getExtras().getString(ID_KEY);
@@ -229,7 +232,7 @@ public class ProfileActivity extends AppCompatActivity {
             return true;
         }
         else if (id == R.id.action_help) {
-            loadTutorial();
+            mDatabase.showTutorial(this, loadTutorialItems(), true);
         }
         return super.onOptionsItemSelected(item);
     }
@@ -530,25 +533,15 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     /**
-     * Load the tutorial
-     */
-    public void loadTutorial() {
-        Intent mainAct = new Intent(this, MaterialTutorialActivity.class);
-        mainAct.putParcelableArrayListExtra(MaterialTutorialActivity.MATERIAL_TUTORIAL_ARG_TUTORIAL_ITEMS, getTutorialItems(this));
-        startActivityForResult(mainAct, REQUEST_CODE);
-    }
-
-    /**
      * Fetch assets for the tutorial
-     * @param context - current app context
      * @return - Returns the list of tutorial items
      */
-    private ArrayList<TutorialItem> getTutorialItems(Context context) {
-        TutorialItem tutorialItem1 = new TutorialItem(context.getString(R.string.tutorial_title_0), context.getString(R.string.tutorial_contents_0),
+    private ArrayList<TutorialItem> loadTutorialItems() {
+        TutorialItem tutorialItem1 = new TutorialItem(getString(R.string.tutorial_title_0), getString(R.string.tutorial_contents_0),
                 R.color.colorPrimary, R.drawable.tutorial_0,  R.drawable.tutorial_0);
-        TutorialItem tutorialItem2 = new TutorialItem(context.getString(R.string.tutorial_title_1), context.getString(R.string.tutorial_contents_1),
+        TutorialItem tutorialItem2 = new TutorialItem(getString(R.string.tutorial_title_1), getString(R.string.tutorial_contents_1),
                 R.color.colorPrimary, R.drawable.tutorial_1,  R.drawable.tutorial_1);
-        TutorialItem tutorialItem3 = new TutorialItem(context.getString(R.string.tutorial_title_2), context.getString(R.string.tutorial_contents_2),
+        TutorialItem tutorialItem3 = new TutorialItem(getString(R.string.tutorial_title_2), getString(R.string.tutorial_contents_2),
                 R.color.colorPrimary, R.drawable.tutorial_2,  R.drawable.tutorial_2);
         ArrayList<TutorialItem> tutorialItems = new ArrayList<>();
         tutorialItems.add(tutorialItem1);

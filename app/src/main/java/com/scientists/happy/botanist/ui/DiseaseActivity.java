@@ -1,22 +1,22 @@
 // View diseases a plant can get
 // @author: Antonio Muscarella
 package com.scientists.happy.botanist.ui;
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+
 import com.scientists.happy.botanist.R;
 import com.scientists.happy.botanist.data.DatabaseManager;
+
 import java.util.ArrayList;
+
 import za.co.riggaroo.materialhelptutorial.TutorialItem;
-import za.co.riggaroo.materialhelptutorial.tutorial.MaterialTutorialActivity;
 public class DiseaseActivity extends AppCompatActivity {
     private DatabaseManager mDatabase;
-    private static final int REQUEST_CODE = 1234;
+
     /**
      * The activity is launched
      * @param savedInstanceState - current app state
@@ -26,6 +26,7 @@ public class DiseaseActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_disease);
         mDatabase = DatabaseManager.getInstance();
+        mDatabase.showTutorial(this, loadTutorialItems(), true);
         ListView list = (ListView) findViewById(R.id.diseases);
         list.setEmptyView(findViewById(R.id.empty_list_view));
         String group = (String) getIntent().getExtras().get("group");
@@ -62,31 +63,21 @@ public class DiseaseActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_help) {
-            loadTutorial();
+            mDatabase.showTutorial(this, loadTutorialItems(), true);
         }
         return super.onOptionsItemSelected(item);
     }
 
     /**
-     * Load the tutorial
-     */
-    public void loadTutorial() {
-        Intent mainAct = new Intent(this, MaterialTutorialActivity.class);
-        mainAct.putParcelableArrayListExtra(MaterialTutorialActivity.MATERIAL_TUTORIAL_ARG_TUTORIAL_ITEMS, getTutorialItems(this));
-        startActivityForResult(mainAct, REQUEST_CODE);
-    }
-
-    /**
      * Fetch assets for the tutorial
-     * @param context - current app context
      * @return - Returns the list of tutorial items
      */
-    private ArrayList<TutorialItem> getTutorialItems(Context context) {
-        TutorialItem tutorialItem1 = new TutorialItem(context.getString(R.string.tutorial_title_0), context.getString(R.string.tutorial_contents_0),
+    private ArrayList<TutorialItem> loadTutorialItems() {
+        TutorialItem tutorialItem1 = new TutorialItem(getString(R.string.tutorial_title_0), getString(R.string.tutorial_contents_0),
                 R.color.colorPrimary, R.drawable.tutorial_0,  R.drawable.tutorial_0);
-        TutorialItem tutorialItem2 = new TutorialItem(context.getString(R.string.tutorial_title_1), context.getString(R.string.tutorial_contents_1),
+        TutorialItem tutorialItem2 = new TutorialItem(getString(R.string.tutorial_title_1), getString(R.string.tutorial_contents_1),
                 R.color.colorPrimary, R.drawable.tutorial_1,  R.drawable.tutorial_1);
-        TutorialItem tutorialItem3 = new TutorialItem(context.getString(R.string.tutorial_title_2), context.getString(R.string.tutorial_contents_2),
+        TutorialItem tutorialItem3 = new TutorialItem(getString(R.string.tutorial_title_2), getString(R.string.tutorial_contents_2),
                 R.color.colorPrimary, R.drawable.tutorial_2,  R.drawable.tutorial_2);
         ArrayList<TutorialItem> tutorialItems = new ArrayList<>();
         tutorialItems.add(tutorialItem1);

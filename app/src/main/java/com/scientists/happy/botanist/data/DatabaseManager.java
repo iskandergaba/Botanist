@@ -25,6 +25,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.bumptech.glide.Glide;
 import com.firebase.ui.database.FirebaseListAdapter;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
@@ -57,6 +58,7 @@ import com.scientists.happy.botanist.services.WaterReceiver;
 import com.scientists.happy.botanist.ui.ProfileActivity;
 import com.scientists.happy.botanist.ui.SettingsActivity;
 import com.scientists.happy.botanist.utils.GifSequenceWriter;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -68,6 +70,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+
+import za.co.riggaroo.materialhelptutorial.TutorialItem;
+import za.co.riggaroo.materialhelptutorial.tutorial.MaterialTutorialActivity;
+
 import static android.content.Context.ALARM_SERVICE;
 import static android.os.Environment.getExternalStoragePublicDirectory;
 public class DatabaseManager {
@@ -75,17 +81,17 @@ public class DatabaseManager {
     private static final int FERTILIZER_RECEIVER_ID_OFFSET = 2000;
     private static final int UPDATE_PHOTO_RECEIVER_ID_OFFSET = 3000;
     private static final int BIRTHDAY_RECEIVER_ID_OFFSET = 4000;
+    private static final int TUTORIAL_REQUEST_CODE = 1234;
     private long mPlantsAdded, mPlantsDeleted, mPlantsNumber;
     private long mWaterCount, mMeasureCount, mPhotoCount;
     private long mBotanistSince;
     private double mRating;
     private ProgressDialog mProgressDialog;
-    private Map<String, String> mAutoCompleteCache;
+    private Map<String, String> mAutocompleteCache;
     private StorageReference mStorage;
     private DatabaseReference mDatabase;
     private String mDiseaseUrl;
     private static DatabaseManager mDatabaseManager;
-    private boolean showTutorial = false;
     private class PrepareAutocompleteTask extends AsyncTask<Void, Void, Void> {
         /**
          * Background asynchronous update
@@ -108,7 +114,7 @@ public class DatabaseManager {
                         String commonName = suggestionSnapshot.getKey();
                         String sciName = suggestionSnapshot.getValue(String.class);
                         // Add the retrieved string to the list
-                        mAutoCompleteCache.put(commonName, sciName);
+                        mAutocompleteCache.put(commonName, sciName);
                     }
                 }
 
@@ -124,7 +130,7 @@ public class DatabaseManager {
         }
     }
 
-    private class LoadImages extends AsyncTask<Void, Void, Boolean> {
+    private class CreateGifTask extends AsyncTask<Void, Void, Boolean> {
         int mPhotoCount;
         String mPlantId;
         String mUserId;
@@ -149,7 +155,7 @@ public class DatabaseManager {
          * @param name - name of plant to make gif of
          * @param species - species of plant to make gif of
          */
-        private LoadImages(Context context, int photoCount, String plantId, String name, String species) {
+        private CreateGifTask(Context context, int photoCount, String plantId, String name, String species) {
             this.mContext = context;
             this.mPhotoCount = photoCount;
             this.mPlantId = plantId;
@@ -226,17 +232,9 @@ public class DatabaseManager {
         // Just in case we want to add offline caching to the app
         // FirebaseDatabase.getInstance().setPersistenceEnabled(true);
         DatabaseReference.goOnline();
-        mAutoCompleteCache = new HashMap<>();
+        mAutocompleteCache = new HashMap<>();
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mStorage = FirebaseStorage.getInstance().getReference();
-        mBotanistSince = getBotanistSince();
-        mPlantsNumber = getPlantsNumber();
-        mPlantsAdded = getAddedCount();
-        mPlantsDeleted = getDeletedCount();
-        mWaterCount = getWaterCount();
-        mMeasureCount = getMeasureCount();
-        mPhotoCount = getPhotoCount();
-        mRating = getUserRating();
         new PrepareAutocompleteTask().execute();
     }
 
@@ -249,6 +247,34 @@ public class DatabaseManager {
             mDatabaseManager = new DatabaseManager();
         }
         return mDatabaseManager;
+    }
+
+    /**
+     * Set member counters when the user signs in
+     */
+    private void setMemberData() {
+        mBotanistSince = getBotanistSince();
+        mPlantsNumber = getPlantsNumber();
+        mPlantsAdded = getAddedCount();
+        mPlantsDeleted = getDeletedCount();
+        mWaterCount = getWaterCount();
+        mMeasureCount = getMeasureCount();
+        mPhotoCount = getPhotoCount();
+        mRating = getUserRating();
+    }
+
+    /**
+     * Reset member counters when the user signs out
+     */
+    public void resetMemberData() {
+        mBotanistSince = 0;
+        mPlantsNumber = 0;
+        mPlantsAdded = 0;
+        mPlantsDeleted = 0;
+        mWaterCount = 0;
+        mMeasureCount = 0;
+        mPhotoCount = 0;
+        mRating = 0;
     }
 
     /**
@@ -266,7 +292,6 @@ public class DatabaseManager {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 if (!snapshot.exists()) {
-                    showTutorial = true;
                     User user = new User(userId, name, email, 0);
                     mDatabase.child("users").child(userId).setValue(user);
                 }
@@ -280,22 +305,7 @@ public class DatabaseManager {
             public void onCancelled(DatabaseError databaseError) {
             }
         });
-    }
-
-    /**
-     * Was the last call to addUserRecords for a new user?
-     * @return Returns whether the user was new
-     */
-    public boolean wasUserNew() {
-        System.out.println("showTutorial? " + showTutorial);
-        return showTutorial;
-    }
-
-    /**
-     * Reset showTutorial
-     */
-    public void disableTutorial() {
-        showTutorial = false;
+        setMemberData();
     }
 
     /**
@@ -325,11 +335,11 @@ public class DatabaseManager {
         if ((species == null) || species.equals("")) {
             return;
         }
-        else if (mAutoCompleteCache.containsKey(species)) {
+        else if (mAutocompleteCache.containsKey(species)) {
             // If the user typed a common name, fetch the scientific name
-            plant = new Plant(name, mAutoCompleteCache.get(species), birthday, height);
+            plant = new Plant(name, mAutocompleteCache.get(species), birthday, height);
         }
-        else if (mAutoCompleteCache.containsValue(species)) {
+        else if (mAutocompleteCache.containsValue(species)) {
             // The user must have entered the correct scientific name
             plant = new Plant(name, species, birthday, height);
         }
@@ -955,8 +965,8 @@ public class DatabaseManager {
      */
     public void setSpeciesAutoComplete(Context context, AutoCompleteTextView autoCompleteTextView) {
         final ArrayAdapter<String> autoComplete = new ArrayAdapter<>(context, android.R.layout.simple_list_item_1);
-        autoComplete.addAll(mAutoCompleteCache.keySet());
-        autoComplete.addAll(mAutoCompleteCache.values());
+        autoComplete.addAll(mAutocompleteCache.keySet());
+        autoComplete.addAll(mAutocompleteCache.values());
         autoCompleteTextView.setAdapter(autoComplete);
     }
 
@@ -1044,7 +1054,7 @@ public class DatabaseManager {
         // Iskander updated this because the photo counting is zero-index based
         // I changed it to zero so that if the user uploaded 2 picture only, we will still generate a GIF for them
         if ((photoCount > 0) && (userId != null)) {
-            new LoadImages(context, photoCount, plantId, name, species).execute();
+            new CreateGifTask(context, photoCount, plantId, name, species).execute();
         }
         else {
             Toast.makeText(context, "You must take at least 2 pictures to make a GIF", Toast.LENGTH_SHORT).show();
@@ -1351,6 +1361,66 @@ public class DatabaseManager {
         String userId = getUserId();
         if (userId != null) {
             mDatabase.child("users").child(userId).child("plants").child(plantId).child("name").setValue(newName);
+        }
+    }
+
+    /**
+     * Show tutorial for given activity if it has never been shown before
+     * @param activity - the activity to show the tutorial
+     * @param tutorialItems - the items of the tutorial to show
+     * @param forceShow - Whether to check if tutorial was shown before or not
+     */
+    public void showTutorial(final Activity activity, final ArrayList<TutorialItem> tutorialItems, boolean forceShow) {
+        final String activityName = activity.getClass().getSimpleName();
+        if (forceShow) {
+            Intent tutorial = new Intent(activity, MaterialTutorialActivity.class);
+            tutorial.putParcelableArrayListExtra(MaterialTutorialActivity.MATERIAL_TUTORIAL_ARG_TUTORIAL_ITEMS, tutorialItems);
+            activity.startActivityForResult(tutorial, TUTORIAL_REQUEST_CODE);
+            setTutorialShown(activityName);
+        } else {
+            final String userId = getUserId();
+            if (userId != null) {
+                mDatabase.child("users").child(userId).child("tutorials").addListenerForSingleValueEvent(new ValueEventListener() {
+                    /**
+                     * Handle a change in the database contents
+                     * @param dataSnapshot - current database contents
+                     */
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        Map<String, Boolean> tutorials = new HashMap<>();
+                        // Basically, this says "For each DataSnapshot *Data* in dataSnapshot, do what's inside the method.
+                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                            String name = snapshot.getKey();
+                            boolean isTutorialShown = snapshot.getValue(Boolean.class);
+                            tutorials.put(name, isTutorialShown);
+                        }
+                        if (!tutorials.containsKey(activityName) || !tutorials.get(activityName)) {
+                            Intent tutorial = new Intent(activity, MaterialTutorialActivity.class);
+                            tutorial.putParcelableArrayListExtra(MaterialTutorialActivity.MATERIAL_TUTORIAL_ARG_TUTORIAL_ITEMS, tutorialItems);
+                            activity.startActivityForResult(tutorial, TUTORIAL_REQUEST_CODE);
+                            setTutorialShown(activityName);
+                        }
+                    }
+
+                    /**
+                     * Do nothing when the process is cancelled
+                     * @param databaseError - Ignored error
+                     */
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                    }
+                });
+            }
+        }
+    }
+
+    /**
+     * Set tutorial is shown for an activity
+     */
+    private void setTutorialShown(String activityName) {
+        final String userId = getUserId();
+        if (userId != null) {
+            mDatabase.child("users").child(userId).child("tutorials").child(activityName).setValue(true);
         }
     }
 
