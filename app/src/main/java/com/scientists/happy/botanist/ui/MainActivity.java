@@ -50,9 +50,9 @@ public class MainActivity extends AppCompatActivity {
         });
         GridView gridView = (GridView) findViewById(R.id.gridview);
         gridView.setEmptyView(findViewById(R.id.empty_grid_view));
-        database.populatePlantGrid(this, gridView);
-        database.getIndexOfLastDailyTip(this, getResources().getStringArray(R.array.daily_tips_values));
-        database.getDateOfLastDailyTip(this);
+        mDatabase.populatePlantGrid(this, gridView);
+        mDatabase.getIndexOfLastDailyTip(this, getResources().getStringArray(R.array.daily_tips_values));
+        mDatabase.getDateOfLastDailyTip(this);
     }
 
     /**
@@ -141,6 +141,7 @@ public class MainActivity extends AppCompatActivity {
         } else {
             findViewById(R.id.daily_tip_cardview).setVisibility(View.GONE);
         }
+    }
       
      /*
      * Fetch assets for the tutorial
