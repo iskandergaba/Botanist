@@ -14,21 +14,25 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
 import com.scientists.happy.botanist.R;
-
-
 public class AboutActivity extends AppCompatActivity {
-
+    /**
+     * The activity is launched
+     * @param savedInstanceState - current app state
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_about);
     }
 
+    /**
+     * User pressed back
+     * @return Returns true
+     */
     @Override
     public boolean onSupportNavigateUp() {
         super.onBackPressed();

@@ -1,7 +1,6 @@
 // Plant object
 // @author: Antonio Muscarella and Iskander Gaba
 package com.scientists.happy.botanist.data;
-
 import java.util.LinkedHashMap;
 import java.util.Map;
 @SuppressWarnings({"WeakerAccess", "unused"})
@@ -16,7 +15,6 @@ public class Plant {
     /**
      * Required by Firebase, this useless constructor must remain
      */
-
     private Plant() {
     }
 
@@ -114,8 +112,10 @@ public class Plant {
      */
     public long getLastWatered() {
         long lastWatered = birthday;
-        for (String key : watering.keySet()) {
-            lastWatered = Math.max(lastWatered, Long.parseLong(watering.get(key)));
+        if (watering != null) {
+            for (String key : watering.keySet()) {
+                lastWatered = Math.max(lastWatered, Long.parseLong(watering.get(key)));
+            }
         }
         return lastWatered;
     }
@@ -168,5 +168,4 @@ public class Plant {
     public String toString() {
         return name + DELIMITER + species + DELIMITER;
     }
-
 }

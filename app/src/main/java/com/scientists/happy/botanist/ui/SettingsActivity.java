@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 package com.scientists.happy.botanist.ui;
-
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
@@ -35,6 +34,7 @@ public class SettingsActivity extends AppCompatActivity {
     public static final String HEIGHT_REMINDER_KEY = "height_record_reminder";
     public static final String PHOTO_REMINDER_KEY = "photo_reminder";
     public static final String FERTILIZER_REMINDER_KEY = "fertilize_reminder";
+
     /**
      * Upon launching the activity
      * @param savedInstanceState - current app state
@@ -45,7 +45,6 @@ public class SettingsActivity extends AppCompatActivity {
         getFragmentManager().beginTransaction().replace(android.R.id.content, new SettingsFragment()).commit();
         mPreferences = PreferenceManager.getDefaultSharedPreferences(this);
     }
-
 
     public static class SettingsFragment extends PreferenceFragment implements OnSharedPreferenceChangeListener{
         /**

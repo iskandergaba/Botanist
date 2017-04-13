@@ -1,7 +1,6 @@
 // User's account page
 // @author: Iskander Gaba
 package com.scientists.happy.botanist.ui;
-
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -41,10 +40,12 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.scientists.happy.botanist.R;
 import com.scientists.happy.botanist.data.DatabaseManager;
-import com.scientists.happy.botanist.utils.DayAxisValueFormatter;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Locale;
+
+import za.co.riggaroo.materialhelptutorial.TutorialItem;
 public class AccountActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
     private static final String TAG = "AccountActivity";
     private static final int RC_SIGN_IN = 9001;
@@ -58,7 +59,6 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
     private DatabaseManager mDatabase;
-    private static final String[] USER_STATS_GRAPH_X_LABELS = {"Added", "Deleted", "Waterings", "Heights", "Photos"};
     /**
      * Launch the activity
      * @param savedInstanceState - current app state
@@ -78,6 +78,7 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
         ProgressBar levelProgressBar = (ProgressBar) findViewById(R.id.level_progress_bar);
         mAuth = FirebaseAuth.getInstance();
         mDatabase = DatabaseManager.getInstance();
+        mDatabase.showTutorial(this, loadTutorialItems(), false);
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             /**
              * Handle the authentication state change
@@ -101,7 +102,8 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail().requestIdToken(getString(R.string.default_web_client_id)).build();
         // Build a GoogleApiClient with access to the Google Sign-In API and the options specified by gso.
-        mGoogleApiClient = new GoogleApiClient.Builder(this).enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso).build();
         double rating = mDatabase.getUserRating();
         if (rating < 0) {
@@ -124,8 +126,7 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
             levelTextView.setText(getString(R.string.level_3));
             levelProgressBar.setProgress(100);
         }
-        String userId = mDatabase.getUserId();
-        populateUserStatsChart(userId);
+        populateUserStatsChart();
     }
 
     /**
@@ -135,14 +136,15 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-
         if (id == R.id.action_sign_out) {
             buildSignOutDialog().show();
             return true;
         }
         else if (id == R.id.action_delete_account) {
             buildRevokeAccessDialog().show();
-
+        }
+        else if (id == R.id.action_help) {
+            mDatabase.showTutorial(this, loadTutorialItems(), true);
         }
         return super.onOptionsItemSelected(item);
     }
@@ -273,6 +275,7 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
             public void onResult(@NonNull Status status) {
                 showProgressDialog();
                 mAuth.signOut();
+                mDatabase.resetMemberData();
                 mDatabase.deleteAllReminders(AccountActivity.this);
                 Intent resultIntent = new Intent();
                 setResult(RESULT_OK, resultIntent);
@@ -323,6 +326,7 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
                     }
                 }
             });
+            mDatabase.resetMemberData();
             mDatabase.deleteAllReminders(AccountActivity.this);
         }
     }
@@ -428,10 +432,28 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
     }
 
     /**
-     * Show user stats graph
-     * @param userId - the ID of the user
+     * Fetch assets for the tutorial
+     * @return - Returns the list of tutorial items
      */
-    public void populateUserStatsChart(String userId) {
+    private ArrayList<TutorialItem> loadTutorialItems() {
+        TutorialItem tutorialItem1 = new TutorialItem(getString(R.string.tutorial_title_0), getString(R.string.tutorial_contents_0),
+                R.color.colorPrimary, R.drawable.tutorial_0,  R.drawable.tutorial_0);
+        TutorialItem tutorialItem2 = new TutorialItem(getString(R.string.tutorial_title_1), getString(R.string.tutorial_contents_1),
+                R.color.colorPrimary, R.drawable.tutorial_1,  R.drawable.tutorial_1);
+        TutorialItem tutorialItem3 = new TutorialItem(getString(R.string.tutorial_title_2), getString(R.string.tutorial_contents_2),
+                R.color.colorPrimary, R.drawable.tutorial_2,  R.drawable.tutorial_2);
+        ArrayList<TutorialItem> tutorialItems = new ArrayList<>();
+        tutorialItems.add(tutorialItem1);
+        tutorialItems.add(tutorialItem2);
+        tutorialItems.add(tutorialItem3);
+        return tutorialItems;
+    }
+  
+    /**
+     * Show user stats graph
+     */
+    private void populateUserStatsChart() {
+        final String[] userStatsChartXAxisLabel = getResources().getStringArray(R.array.user_stats_x_axis_labels);
         BarChart chart = (BarChart) findViewById(R.id.user_stats_chart);
         chart.setTouchEnabled(false);
         XAxis xAxis = chart.getXAxis();
@@ -441,7 +463,7 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
             @Override
             public String getFormattedValue(float value, AxisBase axis) {
                 int v = (int) value;
-                return USER_STATS_GRAPH_X_LABELS[v];
+                return userStatsChartXAxisLabel[v];
             }
         });
         xAxis.setDrawGridLines(false);
@@ -450,7 +472,6 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
         rightAxis.setEnabled(false);
         chart.getAxisLeft().setGranularity(1);
         chart.getDescription().setEnabled(false);
-        mDatabase.populateUserStatsChart(userId, chart);
-        chart.invalidate();
+        mDatabase.populateUserStatsChart(this, chart);
     }
 }

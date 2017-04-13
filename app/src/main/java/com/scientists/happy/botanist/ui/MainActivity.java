@@ -20,9 +20,13 @@ import android.widget.TextView;
 
 import com.scientists.happy.botanist.R;
 import com.scientists.happy.botanist.data.DatabaseManager;
+
+import java.util.ArrayList;
+
+import za.co.riggaroo.materialhelptutorial.TutorialItem;
 public class MainActivity extends AppCompatActivity {
     private static final int VIEW_ACCOUNT = 1;
-
+    private DatabaseManager mDatabase;
     /**
      * Launch app
      * @param savedInstanceState - app state
@@ -31,6 +35,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mDatabase = DatabaseManager.getInstance();
+        mDatabase.showTutorial(this, loadTutorialItems(), false);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             /**
@@ -42,7 +48,6 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(MainActivity.this, AddPlantActivity.class));
             }
         });
-        DatabaseManager database = DatabaseManager.getInstance();
         GridView gridView = (GridView) findViewById(R.id.gridview);
         gridView.setEmptyView(findViewById(R.id.empty_grid_view));
         database.populatePlantGrid(this, gridView);
@@ -57,7 +62,6 @@ public class MainActivity extends AppCompatActivity {
      */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
@@ -69,11 +73,7 @@ public class MainActivity extends AppCompatActivity {
      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             startActivity(new Intent(this, SettingsActivity.class));
             return true;
@@ -89,6 +89,9 @@ public class MainActivity extends AppCompatActivity {
         else if (id == R.id.action_about) {
             startActivity(new Intent(MainActivity.this, AboutActivity.class));
             return true;
+        }
+        else if (id == R.id.action_help) {
+            mDatabase.showTutorial(this, loadTutorialItems(), false);
         }
         return super.onOptionsItemSelected(item);
     }
@@ -108,6 +111,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
+
      * Generate the daily tip card view
      * @param dailyTip - the text to be displayed in the daily tip card view
      */
@@ -137,5 +141,22 @@ public class MainActivity extends AppCompatActivity {
         } else {
             findViewById(R.id.daily_tip_cardview).setVisibility(View.GONE);
         }
+      
+     /*
+     * Fetch assets for the tutorial
+     * @return - Returns the list of tutorial items
+     */
+    private ArrayList<TutorialItem> loadTutorialItems() {
+        TutorialItem tutorialItem1 = new TutorialItem(getString(R.string.tutorial_title_0), getString(R.string.tutorial_contents_0),
+                R.color.colorPrimary, R.drawable.tutorial_0,  R.drawable.tutorial_0);
+        TutorialItem tutorialItem2 = new TutorialItem(getString(R.string.tutorial_title_1), getString(R.string.tutorial_contents_1),
+                R.color.colorPrimary, R.drawable.tutorial_1,  R.drawable.tutorial_1);
+        TutorialItem tutorialItem3 = new TutorialItem(getString(R.string.tutorial_title_2), getString(R.string.tutorial_contents_2),
+                R.color.colorPrimary, R.drawable.tutorial_2,  R.drawable.tutorial_2);
+        ArrayList<TutorialItem> tutorialItems = new ArrayList<>();
+        tutorialItems.add(tutorialItem1);
+        tutorialItems.add(tutorialItem2);
+        tutorialItems.add(tutorialItem3);
+        return tutorialItems;
     }
 }

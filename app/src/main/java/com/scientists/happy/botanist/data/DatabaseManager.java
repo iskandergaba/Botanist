@@ -1,7 +1,6 @@
 // Singleton Database manager for Firebase
 // @author: Christopher Besser, Antonio Muscarella, and Iskander Gaba
 package com.scientists.happy.botanist.data;
-
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -74,6 +73,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
+import za.co.riggaroo.materialhelptutorial.TutorialItem;
+import za.co.riggaroo.materialhelptutorial.tutorial.MaterialTutorialActivity;
+
 import static android.content.Context.ALARM_SERVICE;
 import static android.os.Environment.getExternalStoragePublicDirectory;
 public class DatabaseManager {
@@ -81,17 +83,17 @@ public class DatabaseManager {
     private static final int FERTILIZER_RECEIVER_ID_OFFSET = 2000;
     private static final int UPDATE_PHOTO_RECEIVER_ID_OFFSET = 3000;
     private static final int BIRTHDAY_RECEIVER_ID_OFFSET = 4000;
+    private static final int TUTORIAL_REQUEST_CODE = 1234;
     private long mPlantsAdded, mPlantsDeleted, mPlantsNumber;
     private long mWaterCount, mMeasureCount, mPhotoCount;
     private long mBotanistSince;
     private double mRating;
     private ProgressDialog mProgressDialog;
-    private Map<String, String> mAutoCompleteCache;
+    private Map<String, String> mAutocompleteCache;
     private StorageReference mStorage;
     private DatabaseReference mDatabase;
     private String mDiseaseUrl;
     private static DatabaseManager mDatabaseManager;
-
     private class PrepareAutocompleteTask extends AsyncTask<Void, Void, Void> {
         /**
          * Background asynchronous update
@@ -114,7 +116,7 @@ public class DatabaseManager {
                         String commonName = suggestionSnapshot.getKey();
                         String sciName = suggestionSnapshot.getValue(String.class);
                         // Add the retrieved string to the list
-                        mAutoCompleteCache.put(commonName, sciName);
+                        mAutocompleteCache.put(commonName, sciName);
                     }
                 }
 
@@ -130,7 +132,7 @@ public class DatabaseManager {
         }
     }
 
-    private class LoadImages extends AsyncTask<Void, Void, Boolean> {
+    private class CreateGifTask extends AsyncTask<Void, Void, Boolean> {
         int mPhotoCount;
         String mPlantId;
         String mUserId;
@@ -138,7 +140,6 @@ public class DatabaseManager {
         String mSpecies;
         Context mContext;
         File mOutFile;
-
         /**
          * Prepare to launch task
          */
@@ -156,7 +157,7 @@ public class DatabaseManager {
          * @param name - name of plant to make gif of
          * @param species - species of plant to make gif of
          */
-        private LoadImages(Context context, int photoCount, String plantId, String name, String species) {
+        private CreateGifTask(Context context, int photoCount, String plantId, String name, String species) {
             this.mContext = context;
             this.mPhotoCount = photoCount;
             this.mPlantId = plantId;
@@ -182,7 +183,8 @@ public class DatabaseManager {
                 try {
                     Bitmap bmp = Glide.with(mContext).using(new FirebaseImageLoader()).load(storageReference).asBitmap().into(-1, -1).get();
                     gifWriter.addFrame(bmp);
-                } catch (InterruptedException | ExecutionException e) {
+                }
+                catch (InterruptedException | ExecutionException e) {
                     return false;
                 }
             }
@@ -202,7 +204,8 @@ public class DatabaseManager {
                 output.flush();
                 output.close();
                 return true;
-            } catch (IOException e) {
+            }
+            catch (IOException e) {
                 return false;
             }
         }
@@ -217,8 +220,7 @@ public class DatabaseManager {
             String text = "Failure making GIF";
             if (success) {
                 text = mOutFile.getAbsolutePath();
-                mDatabase.child("users").child(mUserId).child("plants").child(mPlantId).child("gifLocation")
-                        .setValue(text);
+                mDatabase.child("users").child(mUserId).child("plants").child(mPlantId).child("gifLocation").setValue(text);
                 text = "Image saved in: " + text;
             }
             Toast.makeText(mContext, text, Toast.LENGTH_SHORT).show();
@@ -232,11 +234,9 @@ public class DatabaseManager {
         // Just in case we want to add offline caching to the app
         // FirebaseDatabase.getInstance().setPersistenceEnabled(true);
         DatabaseReference.goOnline();
-        mAutoCompleteCache = new HashMap<>();
+        mAutocompleteCache = new HashMap<>();
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mStorage = FirebaseStorage.getInstance().getReference();
-        mPlantsNumber = getPlantsNumber();
-        mBotanistSince = getBotanistSince();
         new PrepareAutocompleteTask().execute();
     }
 
@@ -249,6 +249,34 @@ public class DatabaseManager {
             mDatabaseManager = new DatabaseManager();
         }
         return mDatabaseManager;
+    }
+
+    /**
+     * Set member counters when the user signs in
+     */
+    private void setMemberData() {
+        mBotanistSince = getBotanistSince();
+        mPlantsNumber = getPlantsNumber();
+        mPlantsAdded = getAddedCount();
+        mPlantsDeleted = getDeletedCount();
+        mWaterCount = getWaterCount();
+        mMeasureCount = getMeasureCount();
+        mPhotoCount = getPhotoCount();
+        mRating = getUserRating();
+    }
+
+    /**
+     * Reset member counters when the user signs out
+     */
+    public void resetMemberData() {
+        mBotanistSince = 0;
+        mPlantsNumber = 0;
+        mPlantsAdded = 0;
+        mPlantsDeleted = 0;
+        mWaterCount = 0;
+        mMeasureCount = 0;
+        mPhotoCount = 0;
+        mRating = 0;
     }
 
     /**
@@ -279,6 +307,7 @@ public class DatabaseManager {
             public void onCancelled(DatabaseError databaseError) {
             }
         });
+        setMemberData();
     }
 
     /**
@@ -308,11 +337,11 @@ public class DatabaseManager {
         if ((species == null) || species.equals("")) {
             return;
         }
-        else if (mAutoCompleteCache.containsKey(species)) {
+        else if (mAutocompleteCache.containsKey(species)) {
             // If the user typed a common name, fetch the scientific name
-            plant = new Plant(name, mAutoCompleteCache.get(species), birthday, height);
+            plant = new Plant(name, mAutocompleteCache.get(species), birthday, height);
         }
-        else if (mAutoCompleteCache.containsValue(species)) {
+        else if (mAutocompleteCache.containsValue(species)) {
             // The user must have entered the correct scientific name
             plant = new Plant(name, species, birthday, height);
         }
@@ -333,7 +362,7 @@ public class DatabaseManager {
                         mDatabase.child("users").child(userId).child("plants").child(plantId).setValue(plant);
                         setPlantsNumber(++mPlantsNumber);
                         updatePlantImage(0, plantId, bmp);
-                        setAddedNumber(getAddedNumber() + 1);
+                        setAddedNumber(getAddedCount() + 1);
                         updateUserRating();
                     }
                 }
@@ -394,7 +423,7 @@ public class DatabaseManager {
                         for (int i = 0; i <= photoNum; i++) {
                             mStorage.child(userId).child(plantId + "_" + i + ".jpg").delete();
                         }
-                        setDeletedNumber(getDeletedNumber() + 1);
+                        setDeletedNumber(getDeletedCount() + 1);
                         updateUserRating();
                     }
                     File gif = new File(getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), plantId + ".gif");
@@ -421,14 +450,14 @@ public class DatabaseManager {
     private void updateGallery(Context context) {
         MediaScannerConnection.scanFile(context, new String[]{Environment.getExternalStorageDirectory().toString()}, null,
                 new MediaScannerConnection.OnScanCompletedListener() {
-                    /**
-                     * Gallery scan completed
-                     * @param path - path of the deleted image
-                     * @param uri of the deleted image
-                     */
-                    public void onScanCompleted(String path, Uri uri) {
-                    }
-                });
+            /**
+             * Gallery scan completed
+             * @param path - path of the deleted image
+             * @param uri of the deleted image
+             */
+            public void onScanCompleted(String path, Uri uri) {
+            }
+        });
     }
 
     /**
@@ -436,7 +465,6 @@ public class DatabaseManager {
      * @param plantId - plant unique id
      */
     public void populateHeightChart(String plantId, final LineChart chart) {
-
         final String userId = getUserId();
         if (userId != null) {
             mDatabase.child("users").child(userId).child("plants").child(plantId)
@@ -449,12 +477,11 @@ public class DatabaseManager {
                 public void onDataChange(DataSnapshot snapshot) {
                     if (snapshot.exists()) {
                         List<Entry> entries = new ArrayList<>();
-                        for (DataSnapshot record : snapshot.getChildren()) {
+                        for (DataSnapshot record: snapshot.getChildren()) {
                             long time = Long.parseLong(record.getKey());
                             float height = record.getValue(Float.class);
                             entries.add(new Entry(time, height));
                         }
-
                         if (!entries.isEmpty()) {
                             LineDataSet dataSet = new LineDataSet(entries, "Height in inches");
                             dataSet.setLineWidth(1.5f);
@@ -483,7 +510,6 @@ public class DatabaseManager {
      * @param plantId - plant unique id
      */
     public void populateWaterChart(String plantId, final BarChart chart) {
-
         final String userId = getUserId();
         if (userId != null) {
             mDatabase.child("users").child(userId).child("plants").child(plantId)
@@ -506,7 +532,6 @@ public class DatabaseManager {
                         for (DataSnapshot record : snapshot.getChildren()) {
                             processTime(Long.parseLong(record.getValue(String.class)));
                         }
-
                         List<BarEntry> entries = new ArrayList<>();
                         int diff = 7 - today.get(Calendar.DAY_OF_WEEK);
                         for (long timeStamp : watering.keySet()) {
@@ -517,7 +542,6 @@ public class DatabaseManager {
                             if (day > 7) day %= 7;
                             entries.add(new BarEntry(day, watering.get(timeStamp)));
                         }
-
                         BarDataSet dataSet = new BarDataSet(entries, "Times Watered");
                         BarData barData = new BarData(dataSet);
                         barData.setBarWidth(0.9f);
@@ -535,10 +559,14 @@ public class DatabaseManager {
                 public void onCancelled(DatabaseError databaseError) {
                 }
 
+                /**
+                 * Process the current time
+                 * @param time - the time to process
+                 */
                 private void processTime(long time) {
                     Calendar date = Calendar.getInstance();
                     date.setTimeInMillis(time);
-                    for (long timeStamp : watering.keySet()) {
+                    for (long timeStamp: watering.keySet()) {
                         Calendar day = Calendar.getInstance();
                         day.setTimeInMillis(timeStamp);
                         if (date.get(Calendar.YEAR) == day.get(Calendar.YEAR)
@@ -555,27 +583,26 @@ public class DatabaseManager {
 
     /**
      * populate the user's account statistics
-     * @param userId - the ID of the user
      * @param chart - the chart to populate
      */
-    public void populateUserStatsChart(String userId, final BarChart chart) {
+    public void populateUserStatsChart(Context context, final BarChart chart) {
+        String userId = getUserId();
         if (userId != null) {
+            int[] colors = context.getResources().getIntArray(R.array.user_stats_chart_colors);
             List<BarEntry> entries = new ArrayList<>();
-            entries.add(new BarEntry(0f, getAddedNumber()));
-            entries.add(new BarEntry(1f, getDeletedNumber()));
+            entries.add(new BarEntry(0f, getAddedCount()));
+            entries.add(new BarEntry(1f, getDeletedCount()));
             entries.add(new BarEntry(2f, getWaterCount()));
             entries.add(new BarEntry(3f, getMeasureCount()));
             entries.add(new BarEntry(4f, getPhotoCount()));
 
-            BarDataSet barDataSet = new BarDataSet(entries, "User Statistics");
-            barDataSet.setColors(ColorTemplate.VORDIPLOM_COLORS);
+            BarDataSet barDataSet = new BarDataSet(entries, "Plant Operations");
+            barDataSet.setColors(ColorTemplate.createColors(colors));
             barDataSet.setValueTextSize(11f);
 
             BarData data = new BarData(barDataSet);
             data.setBarWidth(0.9f); // set custom bar width
             chart.setData(data);
-            chart.setFitBars(true); // make the x-axis fit exactly all bars
-            chart.getLegend().setEnabled(false);
             chart.invalidate(); // refresh
         }
     }
@@ -601,27 +628,28 @@ public class DatabaseManager {
                 public void onComplete(@NonNull Task<Void> task) {
                     if (!task.isSuccessful()) {
                         Toast.makeText(context, "Height update failed, try again", Toast.LENGTH_SHORT).show();
-                    } else {
+                    }
+                    else {
                         updateNotificationTime(plantId, "lastMeasureNotification");
                         setMeasureCount(getMeasureCount() + 1);
                         updateUserRating();
                     }
                 }
             });
-            mDatabase.child("users").child(userId).child("plants").child(plantId).child("height").setValue(heightInInches)
-                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                        /**
-                         * Update current plant height
-                         * @param task - update task
-                         */
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            if (!task.isSuccessful()) {
-                                Toast.makeText(context, "Height update failed, try again", Toast.LENGTH_SHORT).show();
-                            }
-                            hideProgressDialog();
-                        }
-                    });
+            mDatabase.child("users").child(userId).child("plants").child(plantId).child("height")
+                    .setValue(heightInInches).addOnCompleteListener(new OnCompleteListener<Void>() {
+                /**
+                 * Update current plant height
+                 * @param task - update task
+                 */
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if (!task.isSuccessful()) {
+                        Toast.makeText(context, "Height update failed, try again", Toast.LENGTH_SHORT).show();
+                    }
+                    hideProgressDialog();
+                }
+            });
         }
     }
 
@@ -707,15 +735,15 @@ public class DatabaseManager {
                     final ImageView picture = (ImageView) view.findViewById(R.id.grid_item_image_view);
                     Glide.with(activity).using(new FirebaseImageLoader()).load(storageReference).dontAnimate()
                             .placeholder(R.drawable.flowey).into(picture);
-
                     // One day, before the progress bar becomes empty
                     long interval = getReminderIntervalInMillis(1);
                     long diff = System.currentTimeMillis() - plant.getLastWatered();
                     float progress = 100 - (float) (100.0 * diff / interval);
                     // The minimum value is one, just to make sure it's visible to the user
-                    if (progress < 1) progress = 1;
+                    if (progress < 1) {
+                        progress = 1;
+                    }
                     ((ProgressBar) view.findViewById(R.id.progress)).setProgress(Math.round(progress));
-
                     Calendar now = Calendar.getInstance();
                     Calendar birthday = Calendar.getInstance();
                     birthday.setTimeInMillis(plant.getBirthday());
@@ -897,7 +925,8 @@ public class DatabaseManager {
                     View toxicWarning = view.findViewById(R.id.toxic_warning);
                     if (entry.isToxic()) {
                         toxicWarning.setVisibility(View.VISIBLE);
-                    } else {
+                    }
+                    else {
                         toxicWarning.setVisibility(View.GONE);
                     }
                     View noxiousWarning = view.findViewById(R.id.noxious_warning);
@@ -938,8 +967,8 @@ public class DatabaseManager {
      */
     public void setSpeciesAutoComplete(Context context, AutoCompleteTextView autoCompleteTextView) {
         final ArrayAdapter<String> autoComplete = new ArrayAdapter<>(context, android.R.layout.simple_list_item_1);
-        autoComplete.addAll(mAutoCompleteCache.keySet());
-        autoComplete.addAll(mAutoCompleteCache.values());
+        autoComplete.addAll(mAutocompleteCache.keySet());
+        autoComplete.addAll(mAutocompleteCache.values());
         autoCompleteTextView.setAdapter(autoComplete);
     }
 
@@ -1027,8 +1056,9 @@ public class DatabaseManager {
         // Iskander updated this because the photo counting is zero-index based
         // I changed it to zero so that if the user uploaded 2 picture only, we will still generate a GIF for them
         if ((photoCount > 0) && (userId != null)) {
-            new LoadImages(context, photoCount, plantId, name, species).execute();
-        } else {
+            new CreateGifTask(context, photoCount, plantId, name, species).execute();
+        }
+        else {
             Toast.makeText(context, "You must take at least 2 pictures to make a GIF", Toast.LENGTH_SHORT).show();
         }
     }
@@ -1084,15 +1114,15 @@ public class DatabaseManager {
         return mRating;
     }
 
+    /**
+     * Update the user's rating
+     */
     private void updateUserRating() {
         String userId = getUserId();
-        long added = getAddedNumber();
-        long deleted = getDeletedNumber();
-
-
+        long added = getAddedCount();
+        long deleted = getDeletedCount();
         mRating = ((1.3 * added - deleted / 100))
                 * (getWaterCount() + getMeasureCount() + getPhotoCount() + 1) / (10 * (added + deleted + 1));
-
         if (userId != null) {
             mDatabase.child("users").child(userId).child("rating").setValue(mRating);
         }
@@ -1102,7 +1132,7 @@ public class DatabaseManager {
      * Get the total number of plants watering
      * @return Returns the total number of times the user watered plants
      */
-    public long getWaterCount() {
+    private long getWaterCount() {
         final String userId = getUserId();
         if (userId != null) {
             mDatabase.child("users").child(userId).child("waterCount").addListenerForSingleValueEvent(new ValueEventListener() {
@@ -1133,7 +1163,7 @@ public class DatabaseManager {
      * Update the total number of plants watering
      * @param count - the new total number of time the user watered plants
      */
-    public void setWaterCount(long count) {
+    private void setWaterCount(long count) {
         String userId = getUserId();
         if (userId != null) {
             mDatabase.child("users").child(userId).child("waterCount").setValue(count);
@@ -1230,7 +1260,7 @@ public class DatabaseManager {
      * Get how long the user has been a botanist
      * @return Returns the total number of added plants
      */
-    private long getAddedNumber() {
+    private long getAddedCount() {
         final String userId = getUserId();
         if (userId != null) {
             mDatabase.child("users").child(userId).child("plantsAdded").addListenerForSingleValueEvent(new ValueEventListener() {
@@ -1273,7 +1303,7 @@ public class DatabaseManager {
      * Get how long the user has been a botanist
      * @return Returns the total number of deleted plants
      */
-    private long getDeletedNumber() {
+    private long getDeletedCount() {
         final String userId = getUserId();
         if (userId != null) {
             mDatabase.child("users").child(userId).child("plantsDeleted").addListenerForSingleValueEvent(new ValueEventListener() {
@@ -1333,6 +1363,66 @@ public class DatabaseManager {
         String userId = getUserId();
         if (userId != null) {
             mDatabase.child("users").child(userId).child("plants").child(plantId).child("name").setValue(newName);
+        }
+    }
+
+    /**
+     * Show tutorial for given activity if it has never been shown before
+     * @param activity - the activity to show the tutorial
+     * @param tutorialItems - the items of the tutorial to show
+     * @param forceShow - Whether to check if tutorial was shown before or not
+     */
+    public void showTutorial(final Activity activity, final ArrayList<TutorialItem> tutorialItems, boolean forceShow) {
+        final String activityName = activity.getClass().getSimpleName();
+        if (forceShow) {
+            Intent tutorial = new Intent(activity, MaterialTutorialActivity.class);
+            tutorial.putParcelableArrayListExtra(MaterialTutorialActivity.MATERIAL_TUTORIAL_ARG_TUTORIAL_ITEMS, tutorialItems);
+            activity.startActivityForResult(tutorial, TUTORIAL_REQUEST_CODE);
+            setTutorialShown(activityName);
+        } else {
+            final String userId = getUserId();
+            if (userId != null) {
+                mDatabase.child("users").child(userId).child("tutorials").addListenerForSingleValueEvent(new ValueEventListener() {
+                    /**
+                     * Handle a change in the database contents
+                     * @param dataSnapshot - current database contents
+                     */
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        Map<String, Boolean> tutorials = new HashMap<>();
+                        // Basically, this says "For each DataSnapshot *Data* in dataSnapshot, do what's inside the method.
+                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                            String name = snapshot.getKey();
+                            boolean isTutorialShown = snapshot.getValue(Boolean.class);
+                            tutorials.put(name, isTutorialShown);
+                        }
+                        if (!tutorials.containsKey(activityName) || !tutorials.get(activityName)) {
+                            Intent tutorial = new Intent(activity, MaterialTutorialActivity.class);
+                            tutorial.putParcelableArrayListExtra(MaterialTutorialActivity.MATERIAL_TUTORIAL_ARG_TUTORIAL_ITEMS, tutorialItems);
+                            activity.startActivityForResult(tutorial, TUTORIAL_REQUEST_CODE);
+                            setTutorialShown(activityName);
+                        }
+                    }
+
+                    /**
+                     * Do nothing when the process is cancelled
+                     * @param databaseError - Ignored error
+                     */
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                    }
+                });
+            }
+        }
+    }
+
+    /**
+     * Set tutorial is shown for an activity
+     */
+    private void setTutorialShown(String activityName) {
+        final String userId = getUserId();
+        if (userId != null) {
+            mDatabase.child("users").child(userId).child("tutorials").child(activityName).setValue(true);
         }
     }
 

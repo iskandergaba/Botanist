@@ -4,6 +4,8 @@ package com.scientists.happy.botanist.ui;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -20,9 +22,12 @@ import com.vansuita.pickimage.listeners.IPickResult;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Locale;
+
+import za.co.riggaroo.materialhelptutorial.TutorialItem;
 public class AddPlantActivity extends AppCompatActivity {
     protected ImageView mPicture;
     protected TextView mPictureHint;
@@ -35,6 +40,7 @@ public class AddPlantActivity extends AppCompatActivity {
     protected Bitmap mBitmap;
     protected GregorianCalendar mBirthday;
     int mWaterHour, mWaterMin;
+
     /**
      * Launch the add plant screen
      * @param savedInstanceState - Current app state
@@ -44,6 +50,7 @@ public class AddPlantActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_plant);
         mDatabase = DatabaseManager.getInstance();
+        mDatabase.showTutorial(this, loadTutorialItems(), false);
         mPictureHint = (TextView) findViewById(R.id.picture_hint);
         mSpeciesAutoCompleteText = (AutoCompleteTextView) findViewById(R.id.species_edit_text);
         mDatabase.setSpeciesAutoComplete(this, mSpeciesAutoCompleteText);
@@ -113,10 +120,12 @@ public class AddPlantActivity extends AppCompatActivity {
         mBirthday = new GregorianCalendar();
         mWaterHour = mBirthday.get(Calendar.HOUR);
         mWaterMin = mBirthday.get(Calendar.MINUTE);
-
         overridePendingTransition(R.anim.slide_up, R.anim.hold);
     }
 
+    /**
+     * The activity was paused
+     */
     @Override
     protected void onPause() {
         super.onPause();
@@ -161,5 +170,47 @@ public class AddPlantActivity extends AppCompatActivity {
         datePickerDialog.dismissOnPause(true);
         datePickerDialog.setOnDateSetListener(listener);
         datePickerDialog.show(getFragmentManager(), "date_picker");
+    }
+
+    /**
+     * Handle options menu
+     * @param menu - options menu
+     * @return Returns success code
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_help, menu);
+        return true;
+    }
+
+    /**
+     * Handle selected option
+     * @param item - selected option
+     * @return Returns success code
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_help) {
+            mDatabase.showTutorial(this, loadTutorialItems(), true);
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * Fetch assets for the tutorial
+     * @return - Returns the list of tutorial items
+     */
+    private ArrayList<TutorialItem> loadTutorialItems() {
+        TutorialItem tutorialItem1 = new TutorialItem(getString(R.string.tutorial_title_0), getString(R.string.tutorial_contents_0),
+                R.color.colorPrimary, R.drawable.tutorial_0,  R.drawable.tutorial_0);
+        TutorialItem tutorialItem2 = new TutorialItem(getString(R.string.tutorial_title_1), getString(R.string.tutorial_contents_1),
+                R.color.colorPrimary, R.drawable.tutorial_1,  R.drawable.tutorial_1);
+        TutorialItem tutorialItem3 = new TutorialItem(getString(R.string.tutorial_title_2), getString(R.string.tutorial_contents_2),
+                R.color.colorPrimary, R.drawable.tutorial_2,  R.drawable.tutorial_2);
+        ArrayList<TutorialItem> tutorialItems = new ArrayList<>();
+        tutorialItems.add(tutorialItem1);
+        tutorialItems.add(tutorialItem2);
+        tutorialItems.add(tutorialItem3);
+        return tutorialItems;
     }
 }

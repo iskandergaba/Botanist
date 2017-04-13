@@ -68,13 +68,11 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                 }
             }
         };
-
         // Configure sign-in to request the user's ID, email address, and basic
         // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail()
                 .requestIdToken(getString(R.string.default_web_client_id)).build();
-        // Build a GoogleApiClient with access to the Google Sign-In API and the
-        // options specified by gso.
+        // Build a GoogleApiClient with access to the Google Sign-In API and the options specified by gso.
         mGoogleApiClient = new GoogleApiClient.Builder(this).enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso).build();
     }
@@ -95,7 +93,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         }
         else {
             // If the user has not previously signed in on this device or the sign-in has expired,
-            // this asynchronous branch will attempt to sign in the user silently.  Cross-device
+            // this asynchronous branch will attempt to sign in the user silently. Cross-device
             // single sign-on will occur in this branch.
             opr.setResultCallback(new ResultCallback<GoogleSignInResult>() {
                 /**
@@ -177,7 +175,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                 // If sign in fails, display a message to the user. If sign in succeeds
                 // the auth state listener will be notified and logic to handle the
                 // signed in user can be handled in the listener.
-                if (!task.isSuccessful() || user == null) {
+                if (!task.isSuccessful() || (user == null)) {
                     Log.w(TAG, "signInWithCredential", task.getException());
                     Toast.makeText(LoginActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
                     mSignInButton.setEnabled(true);

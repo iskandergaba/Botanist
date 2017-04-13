@@ -1,6 +1,9 @@
 // User object
 // @author: Iskander Gaba
 package com.scientists.happy.botanist.data;
+
+import java.util.Map;
+
 @SuppressWarnings({"WeakerAccess", "unused"})
 public class User {
     private String userName, email, userId;
@@ -8,7 +11,7 @@ public class User {
     private long botanistSince;
     private int plantsAdded, plantsDeleted, plantsNumber;
     private int waterCount, measureCount, photoCount;
-
+    private Map<String, Boolean> tutorials;
     /**
      * Required by Firebase, this useless constructor must remain
      */
@@ -116,5 +119,13 @@ public class User {
      */
     public int getPhotoCount() {
         return photoCount;
+    }
+
+    /**
+     * Fetch the number of times the user took photos of their plants
+     * @return Returns tutorials shown
+     */
+    public Map<String, Boolean> getTutorials() {
+        return tutorials;
     }
 }

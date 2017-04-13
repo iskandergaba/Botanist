@@ -45,4 +45,10 @@
         android:orderInCategory="7"
         android:title="@string/delete_dialog_title"
         app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_help"
+        android:orderInCategory="8"
+        android:title="@string/action_help"
+        app:showAsAction="never" />
 </menu>
