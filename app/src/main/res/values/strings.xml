@@ -191,6 +191,8 @@
     <string name="user_account_stats_title">User Statistics</string>
     <string name="msg_network_error">Unable to reach the server. Check your connection settings and try again</string>
     <string name="msg_unexpected_error">Unexpected error</string>
+    <string name="daily_tip_window_title">Daily Botanist Tip</string>
+    <string name="daily_tip_dismiss_button_text">Dismiss</string>
     <string name="title_current_level">Current Level</string>
     <string name="title_statistics">Statistics</string>
 </resources>

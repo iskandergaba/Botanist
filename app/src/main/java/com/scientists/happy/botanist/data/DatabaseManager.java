@@ -17,6 +17,7 @@ import android.os.AsyncTask;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -55,6 +56,7 @@ import com.scientists.happy.botanist.services.FertilizerReceiver;
 import com.scientists.happy.botanist.services.HeightMeasureReceiver;
 import com.scientists.happy.botanist.services.UpdatePhotoReceiver;
 import com.scientists.happy.botanist.services.WaterReceiver;
+import com.scientists.happy.botanist.ui.MainActivity;
 import com.scientists.happy.botanist.ui.ProfileActivity;
 import com.scientists.happy.botanist.ui.SettingsActivity;
 import com.scientists.happy.botanist.utils.GifSequenceWriter;
@@ -1533,6 +1535,116 @@ public class DatabaseManager {
         if ((mProgressDialog != null) && mProgressDialog.isShowing()) {
             mProgressDialog.dismiss();
             mProgressDialog = null;
+        }
+    }
+
+    /**
+     * Get the array index of the last daily tip the user saw, and update the cardview on the
+     * main activity if it was not today
+     * @param activity - the activity this method was called from
+     * @param dailyTips - the string Array of DailyTips to choose from
+     */
+    public void getIndexOfLastDailyTip(final Activity activity, final String[] dailyTips) {
+        final String userId = getUserId();
+        if (userId != null) {
+            mDatabase.child("users").child(userId).child("indexOfLastDailyTip").addListenerForSingleValueEvent(new ValueEventListener() {
+                /**
+                 * Handle a change in the user data
+                 * @param snapshot - the current database contents
+                 */
+                @Override
+                public void onDataChange(DataSnapshot snapshot) {
+                    MainActivity ma = (MainActivity) activity;
+                    if (snapshot.exists()) {
+                        long indexOfLastDailyTip = (long) snapshot.getValue();
+                        int dailyTipIndex = (int) (Math.random() * dailyTips.length);
+                        while (dailyTipIndex == indexOfLastDailyTip) {
+                            dailyTipIndex = (int) (Math.random() * dailyTips.length);
+                        }
+                        ma.generateDailyTipCardView(dailyTips[dailyTipIndex]);
+                        setIndexOfLastDailyTip(dailyTipIndex);
+                    } else {
+                        int dailyTipIndex = (int) (Math.random() * dailyTips.length);
+                        mDatabase.child("users").child(userId).child("indexOfLastDailyTip").setValue(dailyTipIndex);
+                        ma.generateDailyTipCardView(dailyTips[dailyTipIndex]);
+                        setIndexOfLastDailyTip(dailyTipIndex);
+                    }
+                }
+
+                /**
+                 * Do nothing when the process cancels
+                 * @param databaseError - Ignored error
+                 */
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                }
+            });
+        }
+    }
+
+    /**
+     * Update the array index of the last daily tip the user saw
+     * @param index - the array index of the daily tip the user just saw today
+     */
+    public void setIndexOfLastDailyTip(long index) {
+        String userId = getUserId();
+        if (userId != null) {
+            mDatabase.child("users").child(userId).child("indexOfLastDailyTip").setValue(index);
+        }
+    }
+
+    /**
+     * Get the date of the last daily tip the user saw, and set daily tip cardview in MainActivity
+     * to visible if it was not seen yet today
+     * @param activity - the activity this method was called from
+     */
+    public void getDateOfLastDailyTip(final Activity activity) {
+        final String userId = getUserId();
+        if (userId != null) {
+            mDatabase.child("users").child(userId).child("dateOfLastDailyTip").addListenerForSingleValueEvent(new ValueEventListener() {
+                /**
+                 * Handle a change in the user data
+                 * @param snapshot - the current database contents
+                 */
+                @Override
+                public void onDataChange(DataSnapshot snapshot) {
+                    MainActivity ma = (MainActivity) activity;
+                    if (snapshot.exists()) {
+                        Calendar today = Calendar.getInstance();
+                        today.setTimeInMillis(System.currentTimeMillis());
+                        Calendar lastTime = Calendar.getInstance();
+                        lastTime.setTimeInMillis(snapshot.getValue(Long.class));
+                        if (lastTime.get(Calendar.DAY_OF_YEAR) != today.get(Calendar.DAY_OF_YEAR)) {
+                            ma.displayDailyTipCardView(true);
+                        } else {
+                            ma.displayDailyTipCardView(false);
+                        }
+                        setDateOfLastDailyTip(today.getTimeInMillis());
+                    } else {
+                        ma.displayDailyTipCardView(true);
+                        mDatabase.child("users").child(userId).child("dateOfLastDailyTip").setValue(Calendar.getInstance().getTimeInMillis());
+                    }
+                }
+
+                /**
+                 * Do nothing when the process cancels
+                 * @param databaseError - Ignored error
+                 */
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                }
+            });
+        }
+    }
+
+    /**
+     * Update the date of the last daily tip the user saw (so user doesn't see two daily tips in one day)
+     * @param date - the date of the day the user last saw a daily tip
+     */
+    public void setDateOfLastDailyTip(long date) {
+        String userId = getUserId();
+        if (userId != null) {
+            mDatabase.child("users").child(userId).child("dateOfLastDailyTip").setValue(date);
         }
     }
 }
