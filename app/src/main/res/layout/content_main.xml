@@ -15,6 +15,52 @@
     tools:context="com.scientists.happy.botanist.ui.MainActivity"
     tools:showIn="@layout/activity_main">
 
+    <android.support.v7.widget.CardView
+        android:id="@+id/daily_tip_cardview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/activity_vertical_margin"
+        android:paddingLeft="@dimen/activity_vertical_margin"
+        android:paddingRight="@dimen/activity_vertical_margin"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="@dimen/activity_vertical_margin"
+            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/daily_tip_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/daily_tip_window_title"
+                android:textAlignment="center"
+                android:textAllCaps="false"
+                android:textStyle="bold"
+                tools:textSize="24sp" />
+
+            <TextView
+                android:id="@+id/daily_tip_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"
+                android:layout_marginLeft="@dimen/fab_margin"
+                android:layout_marginRight="@dimen/mdtp_ampm_label_size"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:text="TextView" />
+
+            <Button
+                android:id="@+id/daily_tip_dismiss_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/activity_vertical_margin"
+                android:layout_marginRight="@dimen/activity_vertical_margin"
+                android:text="@string/daily_tip_dismiss_button_text" />
+        </LinearLayout>
+    </android.support.v7.widget.CardView>
+
     <GridView
         android:id="@+id/gridview"
         android:layout_width="match_parent"

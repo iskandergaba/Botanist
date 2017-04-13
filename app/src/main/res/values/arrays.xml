@@ -14,4 +14,38 @@
         <item>3</item>
     </string-array>
 
+    <string-array name="daily_tips_values">
+        <item>Be sure the soil is well-fertilized and healthy before planting your plants.</item>
+        <item>If planting seeds, be sure not to smother the seeds by covering them with too much soil.</item>
+        <item>You can ensure young plants will grow by adding water-solubile fertilizers to your watering can  or hose sprayer.</item>
+        <item>Be sure that your plants are not competing with weeds for sunlight or other resources.</item>
+        <item>Some plants, like tomatoes, require stakes and support for their stems as they grow bigger.</item>
+        <item>Make sure to move your plants to larger containers if they grow too big.</item>
+        <item>Ensure your plant is receiving the adequate amount of light for its particular species.</item>
+        <item>Plants tend to need less water during nonactive growing seasons like winter.</item>
+        <item>Houseplants can be harmed by dry heater air in the winter. Be sure the air around your plants is humid enough so they can thrive.</item>
+        <item>Don\'t fertilize a plant that is dry. Water it first, then fertilize a few days later.</item>
+        <item>It is generally not recommended to re-pot your plants during the winter.</item>
+        <item>If growing houseplants, make sure the temperature of your home is within the acceptable range for your plants.</item>
+        <item>Alternating periods of drought and flood can really stress a plant\’s root system. Most plants like having their roots consistently moist, but not wet. Consult your plant\'s watering requirements.</item>
+        <item>When a houseplant gets attacked by an insect pest, the problem can quickly spread to other plants. Preventing insects from entering your home is key to indoor insect control.</item>
+        <item>It is also a good idea to wash the leaves of your plants several times a year. Dust and grime on houseplants doesn\'t just look bad; it is also bad for the health of the plant.</item>
+        <item>Never use a feather duster to clean plants, because dusters can easily transfer tiny insects or eggs from one plant to another.</item>
+        <item>Wash smooth-leaved houseplants with a moist, soft cloth and some insecticidal soap.</item>
+        <item>All plants need food, water and sunlight to survive, but different plants require different amounts of each. Consult individual plant requirements to determine what works best for your plant.</item>
+        <item>Good drainage is essential to healthy houseplants. Start with a good, organic potting soil (not regular soil) that has been mixed specifically for indoor gardening.</item>
+        <item>A 2–3 inch (5–7.5cm) layer of good mulch will help plants retain moisture, regulate soil temperature, and keep down weed pressure.</item>
+        <item>To remove the salt deposits that form on clay pots, combine equal parts white vinegar, rubbing alcohol and water in a spray bottle. Apply the mixture to the pot and scrub with a plastic brush. Let the pot dry before you plant anything in it.</item>
+        <item>Little clay pots make great cloches for protecting young plants from sudden, overnight frosts and freezes.</item>
+        <item>Got aphids? You can control them with a strong blast of water from the hose or with insecticidal soap.</item>
+        <item>Use leftover tea and coffee grounds to acidify the soil of acid-loving plants such as azaleas, rhododendrons, camellias, gardenias and even blueberries.</item>
+        <item>Use chamomile tea to control damping-off fungus, which often attacks young seedlings quite suddenly.</item>
+        <item>Companion planting is an excellent way to improve your garden. Some plants replenish nutrients lost by another one, and some combinations effectively keep pests away.</item>
+        <item>Compost needs time to integrate and stabilize in the soil. Apply two to three weeks prior to planting.</item>
+        <item>Like vining vegetables, but don’t have the room? Train your melons, squash, and cucumbers onto a vertical trellis or fence.</item>
+        <item>Keep dirt off lettuce and cabbage leaves when growing by spreading a 1-2 inch layer of mulch (untreated by pesticides or fertilizers) around each plant.</item>
+        <item>Insects can’t stand plants such as garlic, onions, chives and chrysanthemums. Grow these plants around the garden to help repel insects.</item>
+        <item>Healthy soil means healthy plants that are better able to resist pests and disease, reducing the need for harmful pesticides.</item>
+    </string-array>
+
 </resources>
