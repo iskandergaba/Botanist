@@ -91,7 +91,8 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
         else if (id == R.id.action_help) {
-            mDatabase.showTutorial(this, loadTutorialItems(), false);
+            mDatabase.showTutorial(this, loadTutorialItems(), true);
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }

@@ -1391,7 +1391,7 @@ public class DatabaseManager {
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         Map<String, Boolean> tutorials = new HashMap<>();
                         // Basically, this says "For each DataSnapshot *Data* in dataSnapshot, do what's inside the method.
-                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                        for (DataSnapshot snapshot: dataSnapshot.getChildren()) {
                             String name = snapshot.getKey();
                             boolean isTutorialShown = snapshot.getValue(Boolean.class);
                             tutorials.put(name, isTutorialShown);
