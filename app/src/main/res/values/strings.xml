@@ -195,5 +195,7 @@
     <string name="daily_tip_dismiss_button_text">Dismiss</string>
     <string name="title_current_level">Current Level</string>
     <string name="title_statistics">Statistics</string>
+    <string name="fertilization_shop">Fertilizers enhance the growth of plants. This goal is met in two ways, the traditional one being additives that provide nutrients. The second mode by which some fertilizers act is to enhance the effectiveness of the soil by modifying its water retention and aeration.</string>
+    <string name="accessories_shop">Who doesn\'t want a cute home for their plant babies? Find an adorable place for your plants to grow and thrive today!</string>
 </resources>
 

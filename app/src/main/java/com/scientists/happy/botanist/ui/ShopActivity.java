@@ -2,6 +2,8 @@ package com.scientists.happy.botanist.ui;
 /*
 @Wendy
 */
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -28,21 +30,36 @@ public class ShopActivity extends AppCompatActivity {
         setContentView(R.layout.activity_shop);
         mDatabase = DatabaseManager.getInstance();
         mDatabase.showTutorial(this, loadTutorialItems(), false);
-        View shopButton = findViewById(R.id.shop_button);
-        shopButton.setOnClickListener(new View.OnClickListener() {
+        View fertilizeButton = findViewById(R.id.fertilizer);
+        fertilizeButton.setOnClickListener(new View.OnClickListener() {
             /**
-             * User clicked the poop button
+             * User clicked buy now
              * @param v - current view
              */
             @Override
             public void onClick(View v) {
-                doStuff();
+                String url = "https://www.amazon.com/Best-Sellers-Patio-Lawn-Garden-Fertilizers/zgbs/lawn-garden/3752891";
+                Intent viewIntent =
+                        new Intent("android.intent.action.VIEW",
+                                Uri.parse(url));
+                startActivity(viewIntent);
             }
         });
-    }
-
-    private void doStuff() {
-        // do stuff tho
+        View accessoryButton = findViewById(R.id.accessories_button);
+        accessoryButton.setOnClickListener(new View.OnClickListener() {
+            /**
+             * User clicked buy now
+             * @param v - current view
+             */
+            @Override
+            public void onClick(View v) {
+                String url = "https://www.amazon.com/Best-Sellers-Patio-Lawn-Garden-Plant-Container-Accessories/zgbs/lawn-garden/3480695011";
+                Intent viewIntent =
+                        new Intent("android.intent.action.VIEW",
+                                Uri.parse(url));
+                startActivity(viewIntent);
+            }
+        });
     }
 
     /**
