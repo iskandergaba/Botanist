@@ -28,6 +28,7 @@ public class ShopActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_shop);
+        getActionBar().setTitle("Shop");
         mDatabase = DatabaseManager.getInstance();
         mDatabase.showTutorial(this, loadTutorialItems(), false);
         View fertilizeButton = findViewById(R.id.fertilizer);
@@ -54,6 +55,21 @@ public class ShopActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 String url = "https://www.amazon.com/Best-Sellers-Patio-Lawn-Garden-Plant-Container-Accessories/zgbs/lawn-garden/3480695011";
+                Intent viewIntent =
+                        new Intent("android.intent.action.VIEW",
+                                Uri.parse(url));
+                startActivity(viewIntent);
+            }
+        });
+        View potButton = findViewById(R.id.pot_button);
+        potButton.setOnClickListener(new View.OnClickListener() {
+            /**
+             * User clicked buy now
+             * @param v - current view
+             */
+            @Override
+            public void onClick(View v) {
+                String url = "https://www.amazon.com/Best-Sellers-Patio-Lawn-Garden-Gardening-Pots-Planters-Accessories/zgbs/lawn-garden/3480694011";
                 Intent viewIntent =
                         new Intent("android.intent.action.VIEW",
                                 Uri.parse(url));
