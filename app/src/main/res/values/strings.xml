@@ -192,7 +192,7 @@
     <string name="msg_network_error">Unable to reach the server. Check your connection settings and try again</string>
     <string name="msg_unexpected_error">Unexpected error</string>
     <string name="daily_tip_window_title">Daily Botanist Tip</string>
-    <string name="daily_tip_dismiss_button_text">Dismiss</string>
+    <string name="dismiss_button_desc">Dismiss</string>
     <string name="title_current_level">Current Level</string>
     <string name="title_statistics">Statistics</string>
     <string name="fertilization_shop">Fertilizers enhance the growth of plants. This goal is met in two ways, the traditional one being additives that provide nutrients. The second mode by which some fertilizers act is to enhance the effectiveness of the soil by modifying its water retention and aeration.</string>
