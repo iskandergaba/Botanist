@@ -9,7 +9,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.GridView;
-import android.widget.TextView;
 
 import com.scientists.happy.botanist.R;
 import com.scientists.happy.botanist.data.DatabaseManager;
@@ -28,8 +27,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mDatabase = DatabaseManager.getInstance();
-        mDatabase.showTutorial(this, loadTutorialItems(), false);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             /**
@@ -41,11 +38,24 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(MainActivity.this, AddPlantActivity.class));
             }
         });
+        View tipView = findViewById(R.id.daily_tip_cardview);
+        tipView.findViewById(R.id.daily_tip_dismiss_button).setOnClickListener(new View.OnClickListener() {
+
+            /**
+             * change visibility of CardView to gone if user clicked "Dismiss" button
+             * @param v - the view
+             */
+            @Override
+            public void onClick(View v) {
+                findViewById(R.id.daily_tip_cardview).setVisibility(View.GONE);
+            }
+        });
         GridView gridView = (GridView) findViewById(R.id.gridview);
         gridView.setEmptyView(findViewById(R.id.empty_grid_view));
+        mDatabase = DatabaseManager.getInstance();
+        mDatabase.showTutorial(this, loadTutorialItems(), false);
         mDatabase.populatePlantGrid(this, gridView);
-        mDatabase.getIndexOfLastDailyTip(this, getResources().getStringArray(R.array.daily_tips_values));
-        mDatabase.getDateOfLastDailyTip(this);
+        mDatabase.generateDailyTip(this, tipView);
     }
 
     /**
@@ -100,39 +110,6 @@ public class MainActivity extends AppCompatActivity {
         if ((requestCode == VIEW_ACCOUNT) && (resultCode == RESULT_OK)) {
             startActivity(new Intent(MainActivity.this, LoginActivity.class));
             finish();
-        }
-    }
-
-    /**
-
-     * Generate the daily tip card view
-     * @param dailyTip - the text to be displayed in the daily tip card view
-     */
-    public void generateDailyTipCardView(String dailyTip) {
-        ((TextView) findViewById(R.id.daily_tip_text)).setText(dailyTip);
-        findViewById(R.id.daily_tip_dismiss_button).setOnClickListener(new View.OnClickListener() {
-
-            /**
-             * change visibility of CardView to gone if user clicked "Dismiss" button
-             * @param v - the view
-             */
-            @Override
-            public void onClick(View v) {
-                findViewById(R.id.daily_tip_cardview).setVisibility(View.GONE);
-            }
-        });
-    }
-
-    /**
-     * Hide/show the daily tip card view depending on whether or not Firebase has that the user
-     * saw a daily tip today already
-     * @param visible - boolean corresponding to whether or not the daily tip should be visible
-     */
-    public void displayDailyTipCardView(boolean visible) {
-        if (visible) {
-            findViewById(R.id.daily_tip_cardview).setVisibility(View.VISIBLE);
-        } else {
-            findViewById(R.id.daily_tip_cardview).setVisibility(View.GONE);
         }
     }
       
