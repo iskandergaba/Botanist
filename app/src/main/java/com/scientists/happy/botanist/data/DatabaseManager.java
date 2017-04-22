@@ -17,7 +17,6 @@ import android.os.AsyncTask;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
-import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -56,7 +55,6 @@ import com.scientists.happy.botanist.services.FertilizerReceiver;
 import com.scientists.happy.botanist.services.HeightMeasureReceiver;
 import com.scientists.happy.botanist.services.UpdatePhotoReceiver;
 import com.scientists.happy.botanist.services.WaterReceiver;
-import com.scientists.happy.botanist.ui.MainActivity;
 import com.scientists.happy.botanist.ui.ProfileActivity;
 import com.scientists.happy.botanist.ui.SettingsActivity;
 import com.scientists.happy.botanist.utils.GifSequenceWriter;
@@ -1541,12 +1539,15 @@ public class DatabaseManager {
     /**
      * Get the array index of the last daily tip the user saw, and update the cardview on the
      * main activity if it was not today
-     * @param activity - the activity this method was called from
-     * @param dailyTips - the string Array of DailyTips to choose from
+     * @param context - the activity this method was called from
+     * @param tipView - the container view of the daily tip
      */
-    public void getIndexOfLastDailyTip(final Activity activity, final String[] dailyTips) {
+    public void generateDailyTip(final Context context, final View tipView) {
         final String userId = getUserId();
-        if (userId != null) {
+        final String[] dailyTips = context.getResources().getStringArray(R.array.daily_tips_values);
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        boolean displayTip = preferences.getBoolean("daily_tip", true);
+        if (displayTip && userId != null) {
             mDatabase.child("users").child(userId).child("indexOfLastDailyTip").addListenerForSingleValueEvent(new ValueEventListener() {
                 /**
                  * Handle a change in the user data
@@ -1554,29 +1555,63 @@ public class DatabaseManager {
                  */
                 @Override
                 public void onDataChange(DataSnapshot snapshot) {
-                    MainActivity ma = (MainActivity) activity;
                     if (snapshot.exists()) {
-                        long indexOfLastDailyTip = (long) snapshot.getValue();
+                        long indexOfLastDailyTip = snapshot.getValue(Long.class);
                         int dailyTipIndex = (int) (Math.random() * dailyTips.length);
                         while (dailyTipIndex == indexOfLastDailyTip) {
                             dailyTipIndex = (int) (Math.random() * dailyTips.length);
                         }
-                        ma.generateDailyTipCardView(dailyTips[dailyTipIndex]);
+                        ((TextView) tipView.findViewById(R.id.daily_tip_text)).setText(dailyTips[dailyTipIndex]);
                         setIndexOfLastDailyTip(dailyTipIndex);
                     } else {
                         int dailyTipIndex = (int) (Math.random() * dailyTips.length);
-                        mDatabase.child("users").child(userId).child("indexOfLastDailyTip").setValue(dailyTipIndex);
-                        ma.generateDailyTipCardView(dailyTips[dailyTipIndex]);
+                        ((TextView) tipView.findViewById(R.id.daily_tip_text)).setText(dailyTips[dailyTipIndex]);
                         setIndexOfLastDailyTip(dailyTipIndex);
                     }
                 }
 
                 /**
-                 * Do nothing when the process cancels
-                 * @param databaseError - Ignored error
+                 * Generate a random tip and hope it's not the same as last time if something wrong happens
+                 * @param databaseError - database encountered an error
                  */
                 @Override
                 public void onCancelled(DatabaseError databaseError) {
+                    int dailyTipIndex = (int) (Math.random() * dailyTips.length);
+                    ((TextView) tipView.findViewById(R.id.daily_tip_text)).setText(dailyTips[dailyTipIndex]);
+                    setIndexOfLastDailyTip(dailyTipIndex);
+                }
+            });
+
+            mDatabase.child("users").child(userId).child("dateOfLastDailyTip").addListenerForSingleValueEvent(new ValueEventListener() {
+                /**
+                 * Handle a change in the user data
+                 * @param snapshot - the current database contents
+                 */
+                @Override
+                public void onDataChange(DataSnapshot snapshot) {
+                    if (snapshot.exists()) {
+                        Calendar today = Calendar.getInstance();
+                        Calendar lastTime = Calendar.getInstance();
+                        lastTime.setTimeInMillis(snapshot.getValue(Long.class));
+                        if (lastTime.get(Calendar.DAY_OF_YEAR) != today.get(Calendar.DAY_OF_YEAR)) {
+                            tipView.setVisibility(View.VISIBLE);
+                            setDateOfLastDailyTip(System.currentTimeMillis());
+                        } else {
+                            tipView.setVisibility(View.GONE);
+                        }
+                    } else {
+                        tipView.setVisibility(View.VISIBLE);
+                        setDateOfLastDailyTip(System.currentTimeMillis());
+                    }
+                }
+
+                /**
+                 * Hide the tip view if cannot know whether it's been a day since the last tip or not
+                 * @param databaseError - database encountered an error
+                 */
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    tipView.setVisibility(View.GONE);
                 }
             });
         }
@@ -1586,7 +1621,7 @@ public class DatabaseManager {
      * Update the array index of the last daily tip the user saw
      * @param index - the array index of the daily tip the user just saw today
      */
-    public void setIndexOfLastDailyTip(long index) {
+    private void setIndexOfLastDailyTip(int index) {
         String userId = getUserId();
         if (userId != null) {
             mDatabase.child("users").child(userId).child("indexOfLastDailyTip").setValue(index);
@@ -1594,54 +1629,10 @@ public class DatabaseManager {
     }
 
     /**
-     * Get the date of the last daily tip the user saw, and set daily tip cardview in MainActivity
-     * to visible if it was not seen yet today
-     * @param activity - the activity this method was called from
-     */
-    public void getDateOfLastDailyTip(final Activity activity) {
-        final String userId = getUserId();
-        if (userId != null) {
-            mDatabase.child("users").child(userId).child("dateOfLastDailyTip").addListenerForSingleValueEvent(new ValueEventListener() {
-                /**
-                 * Handle a change in the user data
-                 * @param snapshot - the current database contents
-                 */
-                @Override
-                public void onDataChange(DataSnapshot snapshot) {
-                    MainActivity ma = (MainActivity) activity;
-                    if (snapshot.exists()) {
-                        Calendar today = Calendar.getInstance();
-                        today.setTimeInMillis(System.currentTimeMillis());
-                        Calendar lastTime = Calendar.getInstance();
-                        lastTime.setTimeInMillis(snapshot.getValue(Long.class));
-                        if (lastTime.get(Calendar.DAY_OF_YEAR) != today.get(Calendar.DAY_OF_YEAR)) {
-                            ma.displayDailyTipCardView(true);
-                        } else {
-                            ma.displayDailyTipCardView(false);
-                        }
-                        setDateOfLastDailyTip(today.getTimeInMillis());
-                    } else {
-                        ma.displayDailyTipCardView(true);
-                        mDatabase.child("users").child(userId).child("dateOfLastDailyTip").setValue(Calendar.getInstance().getTimeInMillis());
-                    }
-                }
-
-                /**
-                 * Do nothing when the process cancels
-                 * @param databaseError - Ignored error
-                 */
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-                }
-            });
-        }
-    }
-
-    /**
      * Update the date of the last daily tip the user saw (so user doesn't see two daily tips in one day)
      * @param date - the date of the day the user last saw a daily tip
      */
-    public void setDateOfLastDailyTip(long date) {
+    private void setDateOfLastDailyTip(long date) {
         String userId = getUserId();
         if (userId != null) {
             mDatabase.child("users").child(userId).child("dateOfLastDailyTip").setValue(date);
