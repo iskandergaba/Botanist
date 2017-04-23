@@ -1,151 +1,156 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout
+<ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_gravity="center_horizontal"
-    android:baselineAligned="false"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:orientation="vertical"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin">
+    android:layout_height="wrap_content">
 
-    <android.support.v7.widget.CardView
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/cardview_compat_inset_shadow"
-        android:layout_marginEnd="@dimen/cardview_compat_inset_shadow"
-        android:layout_marginBottom="@dimen/activity_vertical_margin"
-        android:layout_marginTop="@dimen/cardview_default_elevation">
+        android:orientation="vertical"
+        android:baselineAligned="false"
+        android:layout_gravity="center_horizontal"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:paddingBottom="@dimen/activity_vertical_margin"
-            android:paddingLeft="@dimen/activity_horizontal_margin"
-            android:paddingRight="@dimen/activity_horizontal_margin"
-            android:paddingTop="@dimen/activity_vertical_margin">
-
-            <ImageView
-                android:id="@+id/fertilizer_pic"
-                android:layout_width = "wrap_content"
-                android:layout_height= "200dp"
-                android:src="@drawable/fertilizer"/>
-
-            <TextView
-                android:id="@+id/fertilizer_description"
-                android:layout_marginTop="16dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/fertilization_shop"
-                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                android:textSize="16sp"/>
-
-            <ImageView
-                android:id="@+id/fertilizer"
-                android:layout_width="wrap_content"
-                android:layout_height="60dp"
-                android:layout_gravity="center"
-                android:clickable="true"
-                android:layout_marginTop="16dp"
-                android:foreground="?attr/selectableItemBackground"
-                android:src="@drawable/button_shop_fertilizer" />
-        </LinearLayout>
-
-    </android.support.v7.widget.CardView>
-
-    <android.support.v7.widget.CardView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/cardview_compat_inset_shadow"
-        android:layout_marginEnd="@dimen/cardview_compat_inset_shadow"
-        android:layout_marginBottom="@dimen/activity_vertical_margin"
-        android:layout_marginTop="@dimen/cardview_default_elevation">
-
-        <LinearLayout
+        <android.support.v7.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingBottom="@dimen/activity_vertical_margin"
-            android:paddingLeft="@dimen/activity_horizontal_margin"
-            android:paddingRight="@dimen/activity_horizontal_margin"
-            android:paddingTop="@dimen/activity_vertical_margin">
+            android:layout_marginStart="@dimen/cardview_compat_inset_shadow"
+            android:layout_marginEnd="@dimen/cardview_compat_inset_shadow"
+            android:layout_marginBottom="@dimen/activity_vertical_margin"
+            android:layout_marginTop="@dimen/cardview_default_elevation">
 
-            <ImageView
-                android:id="@+id/accessory_pic"
-                android:layout_width = "wrap_content"
-                android:layout_height= "200dp"
-                android:src="@drawable/accessory"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:paddingBottom="@dimen/activity_vertical_margin"
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:paddingRight="@dimen/activity_horizontal_margin"
+                android:paddingTop="@dimen/activity_vertical_margin">
 
-            <TextView
-                android:id="@+id/accessories_description"
-                android:layout_marginTop="16dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                android:text="@string/accessories_shop"
-                android:textSize="16sp"/>
+                <ImageView
+                    android:layout_width = "wrap_content"
+                    android:layout_height= "200dp"
+                    android:src="@drawable/fertilizer"/>
 
-            <ImageView
-                android:id="@+id/accessories_button"
-                android:layout_width="wrap_content"
-                android:layout_height="60dp"
-                android:layout_gravity="center"
-                android:clickable="true"
-                android:layout_marginTop="16dp"
-                android:foreground="?attr/selectableItemBackground"
-                android:src="@drawable/button_shop_accessories" />
-        </LinearLayout>
+                <TextView
+                    android:id="@+id/fertilizer_description"
+                    android:layout_marginTop="16dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/activity_vertical_margin"
+                    android:text="@string/fertilization_shop"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                    android:textSize="16sp" />
 
-    </android.support.v7.widget.CardView>
+                <ImageView
+                    android:id="@+id/shop_fertilizer_button"
+                    android:layout_width="256dp"
+                    android:layout_height="64dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/amazon_buy_now"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:clickable="true" />
 
-    <android.support.v7.widget.CardView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/cardview_compat_inset_shadow"
-        android:layout_marginEnd="@dimen/cardview_compat_inset_shadow"
-        android:layout_marginBottom="@dimen/activity_vertical_margin"
-        android:layout_marginTop="@dimen/cardview_default_elevation">
+            </LinearLayout>
 
-        <LinearLayout
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingBottom="@dimen/activity_vertical_margin"
-            android:paddingLeft="@dimen/activity_horizontal_margin"
-            android:paddingRight="@dimen/activity_horizontal_margin"
-            android:paddingTop="@dimen/activity_vertical_margin">
+            android:layout_marginStart="@dimen/cardview_compat_inset_shadow"
+            android:layout_marginEnd="@dimen/cardview_compat_inset_shadow"
+            android:layout_marginBottom="@dimen/activity_vertical_margin"
+            android:layout_marginTop="@dimen/cardview_default_elevation">
 
-            <ImageView
-                android:id="@+id/pot_pic"
-                android:layout_width = "wrap_content"
-                android:layout_height= "200dp"
-                android:layout_gravity="center"
-                android:src="@drawable/pot"/>
-
-            <TextView
-                android:id="@+id/pot_description"
-                android:layout_marginTop="16dp"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                android:text="@string/pot_shop"
-                android:textSize="16sp"/>
+                android:orientation="vertical"
+                android:paddingBottom="@dimen/activity_vertical_margin"
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:paddingRight="@dimen/activity_horizontal_margin"
+                android:paddingTop="@dimen/activity_vertical_margin">
 
-            <ImageView
-                android:id="@+id/pot_button"
-                android:layout_width="wrap_content"
-                android:layout_height="60dp"
-                android:layout_gravity="center"
-                android:clickable="true"
-                android:layout_marginTop="16dp"
-                android:foreground="?attr/selectableItemBackground"
-                android:src="@drawable/button_shop_pot" />
-        </LinearLayout>
+                <ImageView
+                    android:layout_width = "wrap_content"
+                    android:layout_height= "200dp"
+                    android:src="@drawable/accessory"/>
 
-    </android.support.v7.widget.CardView>
+                <TextView
+                    android:id="@+id/accessories_description"
+                    android:layout_marginTop="16dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                    android:text="@string/accessories_shop"
+                    android:textSize="16sp"/>
 
-</LinearLayout>
+                <ImageView
+                    android:id="@+id/shop_accessories_button"
+                    android:layout_width="256dp"
+                    android:layout_height="64dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/amazon_buy_now"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:clickable="true" />
+
+            </LinearLayout>
+
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/cardview_compat_inset_shadow"
+            android:layout_marginEnd="@dimen/cardview_compat_inset_shadow"
+            android:layout_marginBottom="@dimen/activity_vertical_margin"
+            android:layout_marginTop="@dimen/cardview_default_elevation">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingBottom="@dimen/activity_vertical_margin"
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:paddingRight="@dimen/activity_horizontal_margin"
+                android:paddingTop="@dimen/activity_vertical_margin">
+
+                <ImageView
+                    android:layout_width = "wrap_content"
+                    android:layout_height= "200dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/pots"/>
+
+                <TextView
+                    android:id="@+id/pots_description"
+                    android:layout_marginTop="16dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                    android:text="@string/pot_shop"
+                    android:textSize="16sp"/>
+
+                <ImageView
+                    android:id="@+id/shop_pot_button"
+                    android:layout_width="256dp"
+                    android:layout_height="64dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/amazon_buy_now"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:clickable="true" />
+
+            </LinearLayout>
+
+        </android.support.v7.widget.CardView>
+
+    </LinearLayout>
+
+</ScrollView>

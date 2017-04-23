@@ -28,10 +28,9 @@ public class ShopActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_shop);
-        getActionBar().setTitle("Shop");
         mDatabase = DatabaseManager.getInstance();
         mDatabase.showTutorial(this, loadTutorialItems(), false);
-        View fertilizeButton = findViewById(R.id.fertilizer);
+        View fertilizeButton = findViewById(R.id.shop_fertilizer_button);
         fertilizeButton.setOnClickListener(new View.OnClickListener() {
             /**
              * User clicked buy now
@@ -46,7 +45,7 @@ public class ShopActivity extends AppCompatActivity {
                 startActivity(viewIntent);
             }
         });
-        View accessoryButton = findViewById(R.id.accessories_button);
+        View accessoryButton = findViewById(R.id.shop_accessories_button);
         accessoryButton.setOnClickListener(new View.OnClickListener() {
             /**
              * User clicked buy now
@@ -61,7 +60,7 @@ public class ShopActivity extends AppCompatActivity {
                 startActivity(viewIntent);
             }
         });
-        View potButton = findViewById(R.id.pot_button);
+        View potButton = findViewById(R.id.shop_pot_button);
         potButton.setOnClickListener(new View.OnClickListener() {
             /**
              * User clicked buy now
