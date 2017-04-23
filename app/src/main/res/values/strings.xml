@@ -198,5 +198,7 @@
     <string name="fertilization_shop">Fertilizers enhance the growth of plants. This goal is met in two ways, the traditional one being additives that provide nutrients. The second mode by which some fertilizers act is to enhance the effectiveness of the soil by modifying its water retention and aeration.</string>
     <string name="accessories_shop">Plants need more than just food and water. Give your plants the appropriate habitat by finding the best plant accessories, so they can exceed all expectation.</string>
     <string name="pot_shop">Who doesn\'t want a cute home for their plant babies? Find an adorable place for your plants to grow and thrive today!</string>
+    <string name="toast_plant_limit_exceeded">Plants limit reached. You have to delete a plant before adding a new one</string>
+    <string name="toast_invalid_plant_input">Missing or invalid plant data. Try again</string>
 </resources>
 
