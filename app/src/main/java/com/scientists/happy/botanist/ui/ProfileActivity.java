@@ -170,23 +170,6 @@ public class ProfileActivity extends AppCompatActivity {
         });
         mDatabase.editProfile(this.findViewById(android.R.id.content), mSpecies);
         overridePendingTransition(R.anim.slide_up, R.anim.hold);
-        View buyButton = findViewById(R.id.buy);
-        buyButton.setOnClickListener(new View.OnClickListener() {
-            /**
-             * User clicked buy now
-             * @param v - current view
-             */
-            @Override
-            public void onClick(View v) {
-                String search = mSpecies.replaceAll(" ", "+").toLowerCase();
-                String url = "https://www.amazon.com/s/ref=nb_sb_noss_2?url=search-alias%3Dlawngarden&field-keywords=";
-                url += search;
-                Intent viewIntent =
-                        new Intent("android.intent.action.VIEW",
-                                Uri.parse(url));
-                startActivity(viewIntent);
-            }
-        });
     }
 
     @Override

@@ -827,7 +827,7 @@ public class DatabaseManager {
         final String userId = getUserId();
         if (userId != null) {
             DatabaseReference databaseRef = mDatabase.child("Groups").child(group);
-            return new FirebaseListAdapter<String>(activity, String.class, android.R.layout.simple_list_item_1, databaseRef) {
+            return new FirebaseListAdapter<String>(activity, String.class, R.layout.similar_plant_view, databaseRef) {
                 /**
                  * Show images in glide
                  * @param view - the current view
@@ -837,7 +837,20 @@ public class DatabaseManager {
                 @Override
                 protected void populateView(final View view, final String plant, final int position) {
                     if (!plant.equals(species)) {
-                        ((TextView) view.findViewById(android.R.id.text1)).setText(plant);
+                        ((TextView) view.findViewById(R.id.plant_species)).setText(plant);
+                        view.findViewById(R.id.amazon_button).setOnClickListener(new View.OnClickListener() {
+                            /**
+                             * User clicked buy now
+                             * @param v - current view
+                             */
+                            @Override
+                            public void onClick(View v) {
+                                String search = plant.replaceAll(" ", "+").toLowerCase();
+                                String url = "https://www.amazon.com/s/ref=nb_sb_noss_2?url=search-alias%3Dlawngarden&field-keywords=" + search;
+                                Intent viewIntent = new Intent("android.intent.action.VIEW", Uri.parse(url));
+                                activity.startActivity(viewIntent);
+                            }
+                        });
                     }
                 }
             };
