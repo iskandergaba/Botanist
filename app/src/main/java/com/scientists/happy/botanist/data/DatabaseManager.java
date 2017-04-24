@@ -953,9 +953,9 @@ public class DatabaseManager {
                     List<String> noxious = entry.getNoxious();
                     if (noxious != null) {
                         noxiousWarning.setVisibility(View.VISIBLE);
-                        TextView noxiousWarningTextView = (TextView) view.findViewById(R.id.noxious_warning_text_view);
+                        TextView noxiousWarningTextView = (TextView) view.findViewById(R.id.noxious_warning_box);
                         if (noxious.contains("Noxious")) {
-                            noxiousWarningTextView.setText(R.string.noxious_warning);
+                            noxiousWarningTextView.setText(R.string.noxious_warning_msg);
                         }
                         if (noxious.contains("Quarantine")) {
                             noxiousWarningTextView.setText(noxiousWarningTextView.getText() + " \n\n" + view.getContext().getString(R.string.quarantine_warning));

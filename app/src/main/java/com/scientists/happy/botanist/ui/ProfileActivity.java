@@ -1,6 +1,8 @@
 // Plant profile
 // @author: Antonio Muscarella and Christopher Besser
 package com.scientists.happy.botanist.ui;
+
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -11,6 +13,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.CalendarContract;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
@@ -20,6 +23,8 @@ import android.text.method.LinkMovementMethod;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.Transformation;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -60,6 +65,8 @@ public class ProfileActivity extends AppCompatActivity {
     private ImageView mPicture;
     private String changeNameText = "";
     private long mBirthday, mLastWatered, mLastFertilized;
+    private int mToxicRotationAngle, mNoxiousRotationAngle, mTipsRotationAngle;
+    private boolean mToxicExpanded, mNoxiousExpanded, mTipsExpanded;
 
     /**
      * Launch the activity
@@ -168,6 +175,49 @@ public class ProfileActivity extends AppCompatActivity {
                 buildCalendarDialog().show();
             }
         });
+
+        findViewById(R.id.care_tips_expand_collapse).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                View careTips = findViewById(R.id.care_tips_box);
+                mTipsRotationAngle = rotateImage(v, mTipsRotationAngle);
+                if (mTipsExpanded) {
+                    collapse(careTips);
+                } else {
+                    expand(careTips);
+                }
+                mTipsExpanded = !mTipsExpanded;
+            }
+        });
+
+        findViewById(R.id.toxic_warning_expand_collapse).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                View toxicWarning = findViewById(R.id.toxic_warning_box);
+                mToxicRotationAngle = rotateImage(v, mToxicRotationAngle);
+                if (mToxicExpanded) {
+                    collapse(toxicWarning);
+                } else {
+                    expand(toxicWarning);
+                }
+                mToxicExpanded = !mToxicExpanded;
+            }
+        });
+
+        findViewById(R.id.noxious_warning_expand_collapse).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                View noxiousWarning = findViewById(R.id.noxious_warning_box);
+                mNoxiousRotationAngle = rotateImage(v, mNoxiousRotationAngle);
+                if (mNoxiousExpanded) {
+                    collapse(noxiousWarning);
+                } else {
+                    expand(noxiousWarning);
+                }
+                mNoxiousExpanded = !mNoxiousExpanded;
+            }
+        });
+
         mDatabase.editProfile(this.findViewById(android.R.id.content), mSpecies);
         overridePendingTransition(R.anim.slide_up, R.anim.hold);
     }
@@ -530,6 +580,60 @@ public class ProfileActivity extends AppCompatActivity {
      */
     private double getAgeInDays(long birthday) {
         return (System.currentTimeMillis() - birthday) / 86400000.0;
+    }
+
+    public static void expand(final View v) {
+        v.measure(CoordinatorLayout.LayoutParams.MATCH_PARENT, CoordinatorLayout.LayoutParams.WRAP_CONTENT);
+        final int targetHeight = v.getMeasuredHeight();
+        Animation anim = new Animation() {
+            @Override
+            protected void applyTransformation(float interpolatedTime, Transformation t) {
+                v.getLayoutParams().height = interpolatedTime == 1
+                        ? CoordinatorLayout.LayoutParams.WRAP_CONTENT
+                        : (int)(targetHeight * interpolatedTime);
+                v.requestLayout();
+            }
+
+            @Override
+            public boolean willChangeBounds() {
+                return true;
+            }
+        };
+
+        // 3dp/ms
+        anim.setDuration(((int)(targetHeight / v.getContext().getResources().getDisplayMetrics().density)) * 3);
+        v.startAnimation(anim);
+    }
+
+    public static void collapse(final View v) {
+        final int initialHeight = v.getMeasuredHeight();
+
+        Animation a = new Animation()
+        {
+            @Override
+            protected void applyTransformation(float interpolatedTime, Transformation t) {
+                v.getLayoutParams().height = initialHeight - (int)(initialHeight * interpolatedTime);
+                v.requestLayout();
+            }
+
+            @Override
+            public boolean willChangeBounds() {
+                return true;
+            }
+        };
+
+        // 2dp/ms
+        a.setDuration(((int)(initialHeight / v.getContext().getResources().getDisplayMetrics().density)) * 2);
+        v.startAnimation(a);
+    }
+
+    private int rotateImage(View v, int rotationAngle) {
+        ObjectAnimator anim = ObjectAnimator.ofFloat(v, "rotation", rotationAngle, rotationAngle + 180);
+        anim.setDuration(500);
+        anim.start();
+        rotationAngle += 180;
+        rotationAngle %= 360;
+        return rotationAngle;
     }
 
     /**
