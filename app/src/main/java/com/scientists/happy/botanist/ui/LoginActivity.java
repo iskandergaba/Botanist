@@ -1,6 +1,7 @@
 // Log in user activity
 // @author: Iskander Gaba
 package com.scientists.happy.botanist.ui;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -9,6 +10,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
+
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -25,8 +27,8 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
-import com.scientists.happy.botanist.data.DatabaseManager;
 import com.scientists.happy.botanist.R;
+import com.scientists.happy.botanist.data.DatabaseManager;
 public class LoginActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, View.OnClickListener {
     private static final String TAG = "LoginActivity";
     private static final int RC_SIGN_IN = 9001;
@@ -225,7 +227,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
     /**
      * User clicked login
-     * @param v - current app view
+     * @param v - view clicked on
      */
     @Override
     public void onClick(View v) {

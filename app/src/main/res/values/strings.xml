@@ -12,6 +12,8 @@
 
     <string name="loading" tools:override="true">Loading…</string>
 
+    <string name="version_fmt">Version %s</string>
+
     <!-- Button labels -->
     <string name="sign_out">Sign out</string>
     <string name="disconnect">Delete Account</string>
@@ -200,5 +202,14 @@
     <string name="pot_shop">Who doesn\'t want a cute home for their plant babies? Find an adorable place for your plants to grow and thrive today!</string>
     <string name="toast_plant_limit_exceeded">Plants limit reached. You have to delete a plant before adding a new one</string>
     <string name="toast_invalid_plant_input">Missing or invalid plant data. Try again</string>
+    <string name="developers_title">Developers</string>
+    <string name="cactus_name">Antonio Muscarella</string>
+    <string name="cactus_codename">Cactus</string>
+    <string name="chia_name">Christopher Besser</string>
+    <string name="chia_codename">Chia George Washington</string>
+    <string name="flytrap_name">Iskander Gaba</string>
+    <string name="flytrap_codename">Venus Flytrap</string>
+    <string name="marimo_name">Wendy Zhang</string>
+    <string name="marimo_codename">Marimo</string>
 </resources>
 
