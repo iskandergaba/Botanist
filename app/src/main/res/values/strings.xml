@@ -12,6 +12,8 @@
 
     <string name="loading" tools:override="true">Loading…</string>
 
+    <string name="version_fmt">Version %s</string>
+
     <!-- Button labels -->
     <string name="sign_out">Sign out</string>
     <string name="disconnect">Delete Account</string>
@@ -66,11 +68,12 @@
     <string name="last_watered">Last watered (Now)</string>
     <string name="height_in_inches">Height in inches (0.0)</string>
     <string name="loading_care_tips">Loading care tips…</string>
-    <string name="toxic_warning">TOXIC WARNING: This plant or parts of it are considered toxic. Do not ingest, handle with care, and keep out of reach of pets and small children.</string>
+    <string name="toxic_warning">TOXIC WARNING</string>
+    <string name="toxic_warning_msg">This plant or parts of it are considered toxic. Do not ingest, handle with care, and keep out of reach of pets and small children.</string>
     <string name="height_fmt">Height: %.1f inches</string>
     <string name="update_height">Update Height</string>
     <string name="dialog_height_in_inches">Height in inches</string>
-    <string name="noxious_warning">NOXIOUS: This plant or parts of it are considered noxious. Be advised that it may have thorns, give off foul odors, choke or starve other plants, and may be considered a public nuisance.</string>
+    <string name="noxious_warning_msg">NOXIOUS: This plant or parts of it are considered noxious. Be advised that it may have thorns, give off foul odors, choke or starve other plants, and may be considered a public nuisance.</string>
     <string name="quarantine_warning">QUARANTINE: U.S. federal and/or state laws require this plant to be grown under quarantine. Please check your local laws to make sure you are in compliance.</string>
     <string name="regulated_warning">REGULATED: This plant is placed under restrictions in some U.S. states. Please check your local laws to be sure that you are in compliance.</string>
     <string name="banned_warning">BANNED: Possession of this plant is illegal in some U.S. states. Please check your local laws to be sure that you are in compliance.</string>
@@ -78,7 +81,7 @@
     <string name="loading_diseases">Loading diseases and pests…</string>
     <string name="user_badge_desc">User badge</string>
     <string name="fertilization_link" translatable="false"><a href='http://www.finegardening.com/fertilizing-basics'>Learn more about fertilization</a></string>
-    <string name="care_tips">Care Tips:</string>
+    <string name="care_tips">Care Tips</string>
     <string name="calendar_sync_text">Add to Calendar</string>
     <string name="calendar_dialog_text">Which reminder do you want to add to your calendar?</string>
     <string name="share">Share</string>
@@ -198,5 +201,17 @@
     <string name="fertilization_shop">Fertilizers enhance the growth of plants. This goal is met in two ways, the traditional one being additives that provide nutrients. The second mode by which some fertilizers act is to enhance the effectiveness of the soil by modifying its water retention and aeration.</string>
     <string name="accessories_shop">Plants need more than just food and water. Give your plants the appropriate habitat by finding the best plant accessories, so they can exceed all expectation.</string>
     <string name="pot_shop">Who doesn\'t want a cute home for their plant babies? Find an adorable place for your plants to grow and thrive today!</string>
+    <string name="toast_plant_limit_exceeded">Plants limit reached. You have to delete a plant before adding a new one</string>
+    <string name="toast_invalid_plant_input">Missing or invalid plant data. Try again</string>
+    <string name="developers_title">Developers</string>
+    <string name="cactus_name">Antonio Muscarella</string>
+    <string name="cactus_codename">Cactus</string>
+    <string name="chia_name">Christopher Besser</string>
+    <string name="chia_codename">Chia George Washington</string>
+    <string name="flytrap_name">Iskander Gaba</string>
+    <string name="flytrap_codename">Venus Flytrap</string>
+    <string name="marimo_name">Wendy Zhang</string>
+    <string name="marimo_codename">Marimo</string>
+    <string name="noxious_warning">NOXIOUS WARNING</string>
 </resources>
 

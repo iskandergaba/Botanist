@@ -19,6 +19,9 @@ import za.co.riggaroo.materialhelptutorial.TutorialItem;
 public class ShopActivity extends AppCompatActivity {
 
     private DatabaseManager mDatabase;
+    private static final String SHOP_FERTILIZER_URL = "https://www.amazon.com/Best-Sellers-Patio-Lawn-Garden-Fertilizers/zgbs/lawn-garden/3752891";
+    private static final String SHOP_ACCESSORIES_URL = "https://www.amazon.com/Best-Sellers-Patio-Lawn-Garden-Plant-Container-Accessories/zgbs/lawn-garden/3480695011";
+    private static final String SHOP_POT_URL = "https://www.amazon.com/Best-Sellers-Patio-Lawn-Garden-Gardening-Pots-Planters-Accessories/zgbs/lawn-garden/3480694011";
 
     /**
      * Launch the activity
@@ -38,11 +41,7 @@ public class ShopActivity extends AppCompatActivity {
              */
             @Override
             public void onClick(View v) {
-                String url = "https://www.amazon.com/Best-Sellers-Patio-Lawn-Garden-Fertilizers/zgbs/lawn-garden/3752891";
-                Intent viewIntent =
-                        new Intent("android.intent.action.VIEW",
-                                Uri.parse(url));
-                startActivity(viewIntent);
+                openWebPage(SHOP_FERTILIZER_URL);
             }
         });
         View accessoryButton = findViewById(R.id.shop_accessories_button);
@@ -53,11 +52,7 @@ public class ShopActivity extends AppCompatActivity {
              */
             @Override
             public void onClick(View v) {
-                String url = "https://www.amazon.com/Best-Sellers-Patio-Lawn-Garden-Plant-Container-Accessories/zgbs/lawn-garden/3480695011";
-                Intent viewIntent =
-                        new Intent("android.intent.action.VIEW",
-                                Uri.parse(url));
-                startActivity(viewIntent);
+                openWebPage(SHOP_ACCESSORIES_URL);
             }
         });
         View potButton = findViewById(R.id.shop_pot_button);
@@ -68,11 +63,7 @@ public class ShopActivity extends AppCompatActivity {
              */
             @Override
             public void onClick(View v) {
-                String url = "https://www.amazon.com/Best-Sellers-Patio-Lawn-Garden-Gardening-Pots-Planters-Accessories/zgbs/lawn-garden/3480694011";
-                Intent viewIntent =
-                        new Intent("android.intent.action.VIEW",
-                                Uri.parse(url));
-                startActivity(viewIntent);
+                openWebPage(SHOP_POT_URL);
             }
         });
     }
@@ -109,6 +100,11 @@ public class ShopActivity extends AppCompatActivity {
             mDatabase.showTutorial(this, loadTutorialItems(), true);
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void openWebPage(String url) {
+        Intent viewIntent = new Intent("android.intent.action.VIEW", Uri.parse(url));
+        startActivity(viewIntent);
     }
 
     /**

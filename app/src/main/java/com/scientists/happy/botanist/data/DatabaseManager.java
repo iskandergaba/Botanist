@@ -328,12 +328,19 @@ public class DatabaseManager {
      * @param height - the plant's height
      * @param bmp - the plant's picture
      */
-    public void addPlant(Context context, String name, String species, long birthday, double height, final Bitmap bmp) {
+    public boolean addPlant(Context context, String name, String species, long birthday, double height, final Bitmap bmp) {
         showProgressDialog(context, context.getString(R.string.loading));
         final Plant plant;
         // reject plant addition if species is null
-        if ((species == null) || species.equals("")) {
-            return;
+        if ((species == null) || species.equals("") || (name == null) || name.equals("")) {
+            Toast.makeText(context, R.string.toast_invalid_plant_input, Toast.LENGTH_SHORT).show();
+            hideProgressDialog();
+            return false;
+        }
+        else if (getPlantsNumber() > 999) {
+            Toast.makeText(context, R.string.toast_plant_limit_exceeded, Toast.LENGTH_SHORT).show();
+            hideProgressDialog();
+            return false;
         }
         else if (mAutocompleteCache.containsKey(species)) {
             // If the user typed a common name, fetch the scientific name
@@ -344,7 +351,8 @@ public class DatabaseManager {
             plant = new Plant(name, species, birthday, height);
         }
         else {
-            return;
+            hideProgressDialog();
+            return false;
         }
         final String plantId = plant.getId();
         final String userId = getUserId();
@@ -375,6 +383,7 @@ public class DatabaseManager {
             });
         }
         hideProgressDialog();
+        return true;
     }
 
     /**
@@ -944,9 +953,9 @@ public class DatabaseManager {
                     List<String> noxious = entry.getNoxious();
                     if (noxious != null) {
                         noxiousWarning.setVisibility(View.VISIBLE);
-                        TextView noxiousWarningTextView = (TextView) view.findViewById(R.id.noxious_warning_text_view);
+                        TextView noxiousWarningTextView = (TextView) view.findViewById(R.id.noxious_warning_box);
                         if (noxious.contains("Noxious")) {
-                            noxiousWarningTextView.setText(R.string.noxious_warning);
+                            noxiousWarningTextView.setText(R.string.noxious_warning_msg);
                         }
                         if (noxious.contains("Quarantine")) {
                             noxiousWarningTextView.setText(noxiousWarningTextView.getText() + " \n\n" + view.getContext().getString(R.string.quarantine_warning));
