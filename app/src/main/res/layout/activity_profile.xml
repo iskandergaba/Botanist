@@ -103,14 +103,15 @@
                             android:textAppearance="?android:textAppearanceLarge"
                             android:text="@string/toxic_warning"
                             android:drawableLeft="@drawable/ic_toxic"
-                            android:drawableStart="@drawable/ic_toxic"/>
+                            android:drawableStart="@drawable/ic_toxic"
+                            android:drawablePadding="4dp"/>
 
                         <ImageView
                             android:id="@+id/toxic_warning_expand_collapse"
-                            android:layout_width="32dp"
-                            android:layout_height="32dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
                             android:layout_gravity="center_vertical"
-                            android:src="@drawable/arrow_down"
+                            android:src="@drawable/ic_arrow_down"
                             android:background="?attr/selectableItemBackgroundBorderless"
                             android:clickable="true"/>
 
@@ -167,14 +168,15 @@
                             android:textAppearance="?android:textAppearanceLarge"
                             android:text="@string/noxious_warning"
                             android:drawableLeft="@drawable/ic_noxious"
-                            android:drawableStart="@drawable/ic_noxious"/>
+                            android:drawableStart="@drawable/ic_noxious"
+                            android:drawablePadding="4dp"/>
 
                         <ImageView
                             android:id="@+id/noxious_warning_expand_collapse"
-                            android:layout_width="32dp"
-                            android:layout_height="32dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
                             android:layout_gravity="center_vertical"
-                            android:src="@drawable/arrow_down"
+                            android:src="@drawable/ic_arrow_down"
                             android:background="?attr/selectableItemBackgroundBorderless"
                             android:clickable="true"/>
 
@@ -266,15 +268,16 @@
                             android:fontFamily="sans-serif-condensed"
                             android:textAppearance="?android:textAppearanceLarge"
                             android:text="@string/care_tips"
+                            android:drawablePadding="4dp"
                             android:drawableLeft="@drawable/ic_info"
                             android:drawableStart="@drawable/ic_info"/>
 
                         <ImageView
                             android:id="@+id/care_tips_expand_collapse"
-                            android:layout_width="32dp"
-                            android:layout_height="32dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
                             android:layout_gravity="center_vertical"
-                            android:src="@drawable/arrow_down"
+                            android:src="@drawable/ic_arrow_down"
                             android:background="?attr/selectableItemBackgroundBorderless"
                             android:clickable="true"/>
 
@@ -345,12 +348,13 @@
                             android:id="@+id/imageView"
                             android:layout_width="match_parent"
                             android:layout_height="64dp"
-                            android:src="@drawable/droplet" />
+                            android:src="@drawable/ic_droplet" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:gravity="center_horizontal"
+                            android:fontFamily="sans-serif-condensed"
                             android:text="@string/water_plant" />
                     </LinearLayout>
 
@@ -369,12 +373,13 @@
                         <ImageView
                             android:layout_width="match_parent"
                             android:layout_height="64dp"
-                            android:src="@drawable/poop" />
+                            android:src="@drawable/ic_poop" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:gravity="center_horizontal"
+                            android:fontFamily="sans-serif-condensed"
                             android:text="@string/fertilize_plant" />
                     </LinearLayout>
 
@@ -393,12 +398,13 @@
                         <ImageView
                             android:layout_width="match_parent"
                             android:layout_height="64dp"
-                            android:src="@drawable/ruler" />
+                            android:src="@drawable/ic_ruler" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:gravity="center_horizontal"
+                            android:fontFamily="sans-serif-condensed"
                             android:text="@string/update_height" />
                     </LinearLayout>
 
@@ -417,12 +423,13 @@
                         <ImageView
                             android:layout_width="match_parent"
                             android:layout_height="64dp"
-                            android:src="@drawable/calendar" />
+                            android:src="@drawable/ic_calendar" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:gravity="center_horizontal"
+                            android:fontFamily="sans-serif-condensed"
                             android:text="@string/calendar_sync_text" />
                     </LinearLayout>
 

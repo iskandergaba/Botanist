@@ -26,7 +26,7 @@ public class DiseaseActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_disease);
         mDatabase = DatabaseManager.getInstance();
-        mDatabase.showTutorial(this, loadTutorialItems(), true);
+        mDatabase.showTutorial(this, loadTutorialItems(), false);
         ListView list = (ListView) findViewById(R.id.diseases);
         list.setEmptyView(findViewById(R.id.empty_list_view));
         String group = (String) getIntent().getExtras().get("group");

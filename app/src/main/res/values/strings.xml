@@ -10,7 +10,7 @@
     <string name="title_activity_similar_plants">Similar Plants</string>
     <string name="title_activity_disease">Diseases and Pests</string>
 
-    <string name="loading" tools:override="true">Loading…</string>
+    <string name="loading_text">Loading…</string>
 
     <string name="version_fmt">Version %s</string>
 
