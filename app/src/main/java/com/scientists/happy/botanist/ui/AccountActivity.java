@@ -1,6 +1,7 @@
 // User's account page
 // @author: Iskander Gaba
 package com.scientists.happy.botanist.ui;
+
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -17,6 +18,7 @@ import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.github.mikephil.charting.charts.BarChart;
@@ -39,9 +41,11 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.scientists.happy.botanist.R;
 import com.scientists.happy.botanist.data.DatabaseManager;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Locale;
+
 import za.co.riggaroo.materialhelptutorial.TutorialItem;
 public class AccountActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
     private static final String TAG = "AccountActivity";
@@ -68,7 +72,7 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
         mNameTextView = (TextView) findViewById(R.id.name);
         mEmailTextView = (TextView) findViewById(R.id.email);
         mBotanistSinceTextView = (TextView) findViewById(R.id.botanist_since);
-        mPlantsNumberTextView = (TextView) findViewById(R.id.plants_number + 1);
+        mPlantsNumberTextView = (TextView) findViewById(R.id.plants_number);
         mAccountImageView = (ImageView) findViewById(R.id.account_picture);
         TextView levelTextView = (TextView) findViewById(R.id.level_text_view);
         ImageView badge = (ImageView) findViewById(R.id.user_badge);
@@ -412,7 +416,7 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
     private void showProgressDialog() {
         if (mProgressDialog == null) {
             mProgressDialog = new ProgressDialog(this);
-            mProgressDialog.setMessage(getString(R.string.loading));
+            mProgressDialog.setMessage(getString(R.string.loading_text));
             mProgressDialog.setIndeterminate(true);
             mProgressDialog.setCancelable(false);
         }
