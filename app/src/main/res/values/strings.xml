@@ -224,5 +224,11 @@
     <string name = "account_tutorial_contents_6">The Botanist badge is for master botanists.</string>
     <string name = "account_tutorial_contents_7">Press the dots in the corner to see the "Delete Account" and "Help" options.</string>
     <string name = "account_tutorial_contents_8">A window will ask to confirm that you want to delete your account.</string>
+    <string name = "statistics_tutorial_title_0">Go Back</string>
+    <string name = "statistics_tutorial_title_1">Statistics</string>
+    <string name = "statistics_tutorial_title_2">Help</string>
+    <string name = "statistics_tutorial_contents_0">Press the arrow in the top left of the screen to go back to the plant\'s profile page.</string>
+    <string name = "statistics_tutorial_contents_1">You will see a line graph of your plant\'s height over time, and a bar chart of its watering schedule.</string>
+    <string name = "statistics_tutorial_contents_2">Click the help button in the top right of the screen to see this tutorial again.</string>
 </resources>
 
