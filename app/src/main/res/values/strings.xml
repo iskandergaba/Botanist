@@ -213,5 +213,10 @@
     <string name="marimo_name">Wendy Zhang</string>
     <string name="marimo_codename">Marimo</string>
     <string name="noxious_warning">NOXIOUS WARNING</string>
+    <string name="active_growth_period">Active Growth Period</string>
+    <string name="spring">Spring</string>
+    <string name="summer">Summer</string>
+    <string name="autumn">Autumn</string>
+    <string name="winter">Winter</string>
 </resources>
 

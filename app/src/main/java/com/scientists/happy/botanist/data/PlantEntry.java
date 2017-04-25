@@ -799,7 +799,7 @@ public class PlantEntry {
      * @return Returns whether s is useful
      */
     private boolean hasMeaningfulData(String s) {
-        return !(s == null || s.equals("NA") || s.isEmpty());
+        return !(s == null || s.equals("NA") || s.trim().isEmpty());
     }
 
     /**
@@ -818,7 +818,7 @@ public class PlantEntry {
             careTips.append(inferSunRequirements());
         }
         if (hasMeaningfulData(moisture)) {
-            careTips.append("• This plant has ").append(moisture).append(" use.\n");
+            careTips.append("• This plant has ").append(moisture.toLowerCase()).append(" moisture use.\n");
         }
         if (hasMeaningfulData(minTemp)) {
             careTips.append("• This plant will not survive at temperatures below ").append(minTemp).append("°F.\n");
@@ -838,14 +838,8 @@ public class PlantEntry {
         if (hasMeaningfulData(growthHabit)) {
             careTips.append("• This plant's growth habit is ").append(growthHabit).append(".\n");
         }
-        if (hasMeaningfulData(active)) {
-            careTips.append("• This plant grows actively during ").append(active).append(".\n");
-        }
         if (hasMeaningfulData(life)) {
             careTips.append("• This plant has a ").append(life).append(" lifespan.\n");
-        }
-        if (hasMeaningfulData(afterHarvest)) {
-            careTips.append("• After harvesting, this plant grows back at a ").append(afterHarvest).append(" rate.\n");
         }
         if (hasMeaningfulData(flowerColor)) {
             careTips.append("• This plant has ").append(flowerColor).append(" flowers.\n");
@@ -862,12 +856,6 @@ public class PlantEntry {
         if (hasMeaningfulData(matureHeight)) {
             careTips.append("• This plant's mature height is ").append(matureHeight).append(" feet.\n");
         }
-        if (isToxic()) {
-            careTips.append("• This plant is considered TOXIC. Handle with care.\n");
-        }
-        if (hasMeaningfulData(anaerobic)) {
-            careTips.append("• This plant has ").append(anaerobic).append(" tolerance to low-oxygen environments.\n");
-        }
         if (hasMeaningfulData(pHRange)) {
             careTips.append("• This plant's soil pH should be ").append(pHRange).append(".\n");
         }
@@ -876,9 +864,6 @@ public class PlantEntry {
         }
         if (hasMeaningfulData(bloomPeriod)) {
             careTips.append("• This plant blooms in ").append(bloomPeriod).append(".\n");
-        }
-        if (hasMeaningfulData(availability)) {
-            careTips.append("• This plant's commercial availability is ").append(availability).append(".\n");
         }
         if (hasMeaningfulData(bloomPeriod)) {
             careTips.append("• This plant blooms in ").append(bloomPeriod).append(".\n");
@@ -925,22 +910,6 @@ public class PlantEntry {
         }
         if (hasMeaningfulData(endangered)) {
             careTips.append("• U.S. Law lists this plant as ").append(endangered).append("\n");
-        }
-        if (noxious != null && !noxious.isEmpty()) {
-            careTips.append("• By U.S. Law, this plant is listed as ");
-            for (int i = 0; i < noxious.size(); i++) {
-                if (i == noxious.size() - 1) {
-                    if (noxious.size() > 1) {
-                        careTips.append(" and ").append(noxious.get(i)).append(".\n");
-                    }
-                    else {
-                        careTips.append(noxious.get(i)).append(".\n");
-                    }
-                }
-                else {
-                    careTips.append(noxious.get(i)).append(",");
-                }
-            }
         }
         if (hasMeaningfulData(baseHeight)) {
             careTips.append("• This plant's height at base age is ").append(baseHeight).append(" feet.\n");
