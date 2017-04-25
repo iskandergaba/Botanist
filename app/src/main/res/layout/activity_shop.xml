@@ -37,7 +37,8 @@
                 <ImageView
                     android:layout_width = "wrap_content"
                     android:layout_height= "200dp"
-                    android:src="@drawable/fertilizer"/>
+                    android:src="@drawable/fertilizer"
+                    android:contentDescription="@string/fertilization_shop"/>
 
                 <TextView
                     android:id="@+id/fertilizer_description"
@@ -55,6 +56,7 @@
                     android:layout_height="64dp"
                     android:layout_gravity="center"
                     android:src="@drawable/amazon_buy_now"
+                    android:contentDescription="@string/amazon_button_desc"
                     android:foreground="?attr/selectableItemBackground"
                     android:clickable="true" />
 
@@ -82,7 +84,8 @@
                 <ImageView
                     android:layout_width = "wrap_content"
                     android:layout_height= "200dp"
-                    android:src="@drawable/accessory"/>
+                    android:src="@drawable/accessory"
+                    android:contentDescription="@string/accessories_shop"/>
 
                 <TextView
                     android:id="@+id/accessories_description"
@@ -99,6 +102,7 @@
                     android:layout_height="64dp"
                     android:layout_gravity="center"
                     android:src="@drawable/amazon_buy_now"
+                    android:contentDescription="@string/amazon_button_desc"
                     android:foreground="?attr/selectableItemBackground"
                     android:clickable="true" />
 
@@ -127,7 +131,8 @@
                     android:layout_width = "wrap_content"
                     android:layout_height= "200dp"
                     android:layout_gravity="center"
-                    android:src="@drawable/pots"/>
+                    android:src="@drawable/pots"
+                    android:contentDescription="@string/pot_shop"/>
 
                 <TextView
                     android:id="@+id/pots_description"
@@ -144,6 +149,7 @@
                     android:layout_height="64dp"
                     android:layout_gravity="center"
                     android:src="@drawable/amazon_buy_now"
+                    android:contentDescription="@string/amazon_button_desc"
                     android:foreground="?attr/selectableItemBackground"
                     android:clickable="true" />
 

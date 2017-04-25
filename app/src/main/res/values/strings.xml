@@ -213,5 +213,12 @@
     <string name="marimo_name">Wendy Zhang</string>
     <string name="marimo_codename">Marimo</string>
     <string name="noxious_warning">NOXIOUS WARNING</string>
+    <string name="welcome_to_botanist">Welcome to Botanist</string>
+    <string name="sign_in_to_get_started">Sign in to get started</string>
+    <string name="botanist_logo_desc">Botanist logo</string>
+    <string name="github_link_desc">Go to Github profile</string>
+    <string name="linkedin_link_desc">Go to Linkedin profile</string>
+    <string name="down_arrow_desc">Learn more</string>
+    <string name="amazon_button_desc">Buy from amazon</string>
 </resources>
 

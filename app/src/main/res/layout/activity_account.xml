@@ -21,7 +21,7 @@
             android:layout_height="64dp"
             android:layout_marginBottom="@dimen/activity_vertical_margin"
             android:contentDescription="@string/account_picture"
-            android:src="@drawable/logo_botanist" />
+            android:src="@drawable/ic_botanist_big" />
 
         <TextView
             android:id="@+id/name"
