@@ -111,9 +111,10 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_vertical"
+                            android:src="@drawable/ic_arrow_down"
+                            android:contentDescription="@string/toxic_warning"
                             android:background="?attr/selectableItemBackgroundBorderless"
-                            android:clickable="true"
-                            android:src="@drawable/ic_arrow_down" />
+                            android:clickable="true"/>
 
                     </LinearLayout>
 
@@ -176,9 +177,10 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_vertical"
+                            android:src="@drawable/ic_arrow_down"
+                            android:contentDescription="@string/noxious_warning"
                             android:background="?attr/selectableItemBackgroundBorderless"
-                            android:clickable="true"
-                            android:src="@drawable/ic_arrow_down" />
+                            android:clickable="true"/>
 
                     </LinearLayout>
 
@@ -279,9 +281,10 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_vertical"
+                            android:src="@drawable/ic_arrow_down"
+                            android:contentDescription="@string/down_arrow_desc"
                             android:background="?attr/selectableItemBackgroundBorderless"
-                            android:clickable="true"
-                            android:src="@drawable/ic_arrow_down" />
+                            android:clickable="true"/>
 
                     </LinearLayout>
 
@@ -511,6 +514,7 @@
                             android:id="@+id/imageView"
                             android:layout_width="match_parent"
                             android:layout_height="64dp"
+                            android:contentDescription="@string/water_plant"
                             android:src="@drawable/ic_droplet" />
 
                         <TextView
@@ -536,6 +540,7 @@
                         <ImageView
                             android:layout_width="match_parent"
                             android:layout_height="64dp"
+                            android:contentDescription="@string/fertilize_plant"
                             android:src="@drawable/ic_poop" />
 
                         <TextView
@@ -561,6 +566,7 @@
                         <ImageView
                             android:layout_width="match_parent"
                             android:layout_height="64dp"
+                            android:contentDescription="@string/update_height"
                             android:src="@drawable/ic_ruler" />
 
                         <TextView
@@ -586,6 +592,7 @@
                         <ImageView
                             android:layout_width="match_parent"
                             android:layout_height="64dp"
+                            android:contentDescription="@string/calendar_sync_text"
                             android:src="@drawable/ic_calendar" />
 
                         <TextView

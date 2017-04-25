@@ -25,6 +25,7 @@
         android:layout_width="64dp"
         android:layout_height="64dp"
         android:src="@drawable/logo_amazon"
+        android:contentDescription="@string/amazon_button_desc"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:clickable="true" />
 
