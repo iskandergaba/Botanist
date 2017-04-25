@@ -17,7 +17,6 @@ import android.os.AsyncTask;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
-import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -56,7 +55,6 @@ import com.scientists.happy.botanist.services.FertilizerReceiver;
 import com.scientists.happy.botanist.services.HeightMeasureReceiver;
 import com.scientists.happy.botanist.services.UpdatePhotoReceiver;
 import com.scientists.happy.botanist.services.WaterReceiver;
-import com.scientists.happy.botanist.ui.MainActivity;
 import com.scientists.happy.botanist.ui.ProfileActivity;
 import com.scientists.happy.botanist.ui.SettingsActivity;
 import com.scientists.happy.botanist.utils.GifSequenceWriter;
@@ -330,12 +328,19 @@ public class DatabaseManager {
      * @param height - the plant's height
      * @param bmp - the plant's picture
      */
-    public void addPlant(Context context, String name, String species, long birthday, double height, final Bitmap bmp) {
+    public boolean addPlant(Context context, String name, String species, long birthday, double height, final Bitmap bmp) {
         showProgressDialog(context, context.getString(R.string.loading));
         final Plant plant;
         // reject plant addition if species is null
-        if ((species == null) || species.equals("")) {
-            return;
+        if ((species == null) || species.equals("") || (name == null) || name.equals("")) {
+            Toast.makeText(context, R.string.toast_invalid_plant_input, Toast.LENGTH_SHORT).show();
+            hideProgressDialog();
+            return false;
+        }
+        else if (getPlantsNumber() > 999) {
+            Toast.makeText(context, R.string.toast_plant_limit_exceeded, Toast.LENGTH_SHORT).show();
+            hideProgressDialog();
+            return false;
         }
         else if (mAutocompleteCache.containsKey(species)) {
             // If the user typed a common name, fetch the scientific name
@@ -346,7 +351,8 @@ public class DatabaseManager {
             plant = new Plant(name, species, birthday, height);
         }
         else {
-            return;
+            hideProgressDialog();
+            return false;
         }
         final String plantId = plant.getId();
         final String userId = getUserId();
@@ -377,6 +383,7 @@ public class DatabaseManager {
             });
         }
         hideProgressDialog();
+        return true;
     }
 
     /**
@@ -829,7 +836,7 @@ public class DatabaseManager {
         final String userId = getUserId();
         if (userId != null) {
             DatabaseReference databaseRef = mDatabase.child("Groups").child(group);
-            return new FirebaseListAdapter<String>(activity, String.class, android.R.layout.simple_list_item_1, databaseRef) {
+            return new FirebaseListAdapter<String>(activity, String.class, R.layout.similar_plant_view, databaseRef) {
                 /**
                  * Show images in glide
                  * @param view - the current view
@@ -839,7 +846,20 @@ public class DatabaseManager {
                 @Override
                 protected void populateView(final View view, final String plant, final int position) {
                     if (!plant.equals(species)) {
-                        ((TextView) view.findViewById(android.R.id.text1)).setText(plant);
+                        ((TextView) view.findViewById(R.id.plant_species)).setText(plant);
+                        view.findViewById(R.id.amazon_button).setOnClickListener(new View.OnClickListener() {
+                            /**
+                             * User clicked buy now
+                             * @param v - current view
+                             */
+                            @Override
+                            public void onClick(View v) {
+                                String search = plant.replaceAll(" ", "+").toLowerCase();
+                                String url = "https://www.amazon.com/s/ref=nb_sb_noss_2?url=search-alias%3Dlawngarden&field-keywords=" + search;
+                                Intent viewIntent = new Intent("android.intent.action.VIEW", Uri.parse(url));
+                                activity.startActivity(viewIntent);
+                            }
+                        });
                     }
                 }
             };
@@ -933,9 +953,9 @@ public class DatabaseManager {
                     List<String> noxious = entry.getNoxious();
                     if (noxious != null) {
                         noxiousWarning.setVisibility(View.VISIBLE);
-                        TextView noxiousWarningTextView = (TextView) view.findViewById(R.id.noxious_warning_text_view);
+                        TextView noxiousWarningTextView = (TextView) view.findViewById(R.id.noxious_warning_box);
                         if (noxious.contains("Noxious")) {
-                            noxiousWarningTextView.setText(R.string.noxious_warning);
+                            noxiousWarningTextView.setText(R.string.noxious_warning_msg);
                         }
                         if (noxious.contains("Quarantine")) {
                             noxiousWarningTextView.setText(noxiousWarningTextView.getText() + " \n\n" + view.getContext().getString(R.string.quarantine_warning));
@@ -1541,12 +1561,15 @@ public class DatabaseManager {
     /**
      * Get the array index of the last daily tip the user saw, and update the cardview on the
      * main activity if it was not today
-     * @param activity - the activity this method was called from
-     * @param dailyTips - the string Array of DailyTips to choose from
+     * @param context - the activity this method was called from
+     * @param tipView - the container view of the daily tip
      */
-    public void getIndexOfLastDailyTip(final Activity activity, final String[] dailyTips) {
+    public void generateDailyTip(final Context context, final View tipView) {
         final String userId = getUserId();
-        if (userId != null) {
+        final String[] dailyTips = context.getResources().getStringArray(R.array.daily_tips_values);
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        boolean displayTip = preferences.getBoolean("daily_tip", true);
+        if (displayTip && userId != null) {
             mDatabase.child("users").child(userId).child("indexOfLastDailyTip").addListenerForSingleValueEvent(new ValueEventListener() {
                 /**
                  * Handle a change in the user data
@@ -1554,29 +1577,63 @@ public class DatabaseManager {
                  */
                 @Override
                 public void onDataChange(DataSnapshot snapshot) {
-                    MainActivity ma = (MainActivity) activity;
                     if (snapshot.exists()) {
-                        long indexOfLastDailyTip = (long) snapshot.getValue();
+                        long indexOfLastDailyTip = snapshot.getValue(Long.class);
                         int dailyTipIndex = (int) (Math.random() * dailyTips.length);
                         while (dailyTipIndex == indexOfLastDailyTip) {
                             dailyTipIndex = (int) (Math.random() * dailyTips.length);
                         }
-                        ma.generateDailyTipCardView(dailyTips[dailyTipIndex]);
+                        ((TextView) tipView.findViewById(R.id.daily_tip_text)).setText(dailyTips[dailyTipIndex]);
                         setIndexOfLastDailyTip(dailyTipIndex);
                     } else {
                         int dailyTipIndex = (int) (Math.random() * dailyTips.length);
-                        mDatabase.child("users").child(userId).child("indexOfLastDailyTip").setValue(dailyTipIndex);
-                        ma.generateDailyTipCardView(dailyTips[dailyTipIndex]);
+                        ((TextView) tipView.findViewById(R.id.daily_tip_text)).setText(dailyTips[dailyTipIndex]);
                         setIndexOfLastDailyTip(dailyTipIndex);
                     }
                 }
 
                 /**
-                 * Do nothing when the process cancels
-                 * @param databaseError - Ignored error
+                 * Generate a random tip and hope it's not the same as last time if something wrong happens
+                 * @param databaseError - database encountered an error
                  */
                 @Override
                 public void onCancelled(DatabaseError databaseError) {
+                    int dailyTipIndex = (int) (Math.random() * dailyTips.length);
+                    ((TextView) tipView.findViewById(R.id.daily_tip_text)).setText(dailyTips[dailyTipIndex]);
+                    setIndexOfLastDailyTip(dailyTipIndex);
+                }
+            });
+
+            mDatabase.child("users").child(userId).child("dateOfLastDailyTip").addListenerForSingleValueEvent(new ValueEventListener() {
+                /**
+                 * Handle a change in the user data
+                 * @param snapshot - the current database contents
+                 */
+                @Override
+                public void onDataChange(DataSnapshot snapshot) {
+                    if (snapshot.exists()) {
+                        Calendar today = Calendar.getInstance();
+                        Calendar lastTime = Calendar.getInstance();
+                        lastTime.setTimeInMillis(snapshot.getValue(Long.class));
+                        if (lastTime.get(Calendar.DAY_OF_YEAR) != today.get(Calendar.DAY_OF_YEAR)) {
+                            tipView.setVisibility(View.VISIBLE);
+                            setDateOfLastDailyTip(System.currentTimeMillis());
+                        } else {
+                            tipView.setVisibility(View.GONE);
+                        }
+                    } else {
+                        tipView.setVisibility(View.VISIBLE);
+                        setDateOfLastDailyTip(System.currentTimeMillis());
+                    }
+                }
+
+                /**
+                 * Hide the tip view if cannot know whether it's been a day since the last tip or not
+                 * @param databaseError - database encountered an error
+                 */
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    tipView.setVisibility(View.GONE);
                 }
             });
         }
@@ -1586,7 +1643,7 @@ public class DatabaseManager {
      * Update the array index of the last daily tip the user saw
      * @param index - the array index of the daily tip the user just saw today
      */
-    public void setIndexOfLastDailyTip(long index) {
+    private void setIndexOfLastDailyTip(int index) {
         String userId = getUserId();
         if (userId != null) {
             mDatabase.child("users").child(userId).child("indexOfLastDailyTip").setValue(index);
@@ -1594,54 +1651,10 @@ public class DatabaseManager {
     }
 
     /**
-     * Get the date of the last daily tip the user saw, and set daily tip cardview in MainActivity
-     * to visible if it was not seen yet today
-     * @param activity - the activity this method was called from
-     */
-    public void getDateOfLastDailyTip(final Activity activity) {
-        final String userId = getUserId();
-        if (userId != null) {
-            mDatabase.child("users").child(userId).child("dateOfLastDailyTip").addListenerForSingleValueEvent(new ValueEventListener() {
-                /**
-                 * Handle a change in the user data
-                 * @param snapshot - the current database contents
-                 */
-                @Override
-                public void onDataChange(DataSnapshot snapshot) {
-                    MainActivity ma = (MainActivity) activity;
-                    if (snapshot.exists()) {
-                        Calendar today = Calendar.getInstance();
-                        today.setTimeInMillis(System.currentTimeMillis());
-                        Calendar lastTime = Calendar.getInstance();
-                        lastTime.setTimeInMillis(snapshot.getValue(Long.class));
-                        if (lastTime.get(Calendar.DAY_OF_YEAR) != today.get(Calendar.DAY_OF_YEAR)) {
-                            ma.displayDailyTipCardView(true);
-                        } else {
-                            ma.displayDailyTipCardView(false);
-                        }
-                        setDateOfLastDailyTip(today.getTimeInMillis());
-                    } else {
-                        ma.displayDailyTipCardView(true);
-                        mDatabase.child("users").child(userId).child("dateOfLastDailyTip").setValue(Calendar.getInstance().getTimeInMillis());
-                    }
-                }
-
-                /**
-                 * Do nothing when the process cancels
-                 * @param databaseError - Ignored error
-                 */
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-                }
-            });
-        }
-    }
-
-    /**
      * Update the date of the last daily tip the user saw (so user doesn't see two daily tips in one day)
      * @param date - the date of the day the user last saw a daily tip
      */
-    public void setDateOfLastDailyTip(long date) {
+    private void setDateOfLastDailyTip(long date) {
         String userId = getUserId();
         if (userId != null) {
             mDatabase.child("users").child(userId).child("dateOfLastDailyTip").setValue(date);

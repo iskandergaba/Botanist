@@ -2,6 +2,8 @@ package com.scientists.happy.botanist.ui;
 /*
 @Wendy
 */
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -17,6 +19,9 @@ import za.co.riggaroo.materialhelptutorial.TutorialItem;
 public class ShopActivity extends AppCompatActivity {
 
     private DatabaseManager mDatabase;
+    private static final String SHOP_FERTILIZER_URL = "https://www.amazon.com/Best-Sellers-Patio-Lawn-Garden-Fertilizers/zgbs/lawn-garden/3752891";
+    private static final String SHOP_ACCESSORIES_URL = "https://www.amazon.com/Best-Sellers-Patio-Lawn-Garden-Plant-Container-Accessories/zgbs/lawn-garden/3480695011";
+    private static final String SHOP_POT_URL = "https://www.amazon.com/Best-Sellers-Patio-Lawn-Garden-Gardening-Pots-Planters-Accessories/zgbs/lawn-garden/3480694011";
 
     /**
      * Launch the activity
@@ -28,21 +33,39 @@ public class ShopActivity extends AppCompatActivity {
         setContentView(R.layout.activity_shop);
         mDatabase = DatabaseManager.getInstance();
         mDatabase.showTutorial(this, loadTutorialItems(), false);
-        View shopButton = findViewById(R.id.shop_button);
-        shopButton.setOnClickListener(new View.OnClickListener() {
+        View fertilizeButton = findViewById(R.id.shop_fertilizer_button);
+        fertilizeButton.setOnClickListener(new View.OnClickListener() {
             /**
-             * User clicked the poop button
+             * User clicked buy now
              * @param v - current view
              */
             @Override
             public void onClick(View v) {
-                doStuff();
+                openWebPage(SHOP_FERTILIZER_URL);
             }
         });
-    }
-
-    private void doStuff() {
-        // do stuff tho
+        View accessoryButton = findViewById(R.id.shop_accessories_button);
+        accessoryButton.setOnClickListener(new View.OnClickListener() {
+            /**
+             * User clicked buy now
+             * @param v - current view
+             */
+            @Override
+            public void onClick(View v) {
+                openWebPage(SHOP_ACCESSORIES_URL);
+            }
+        });
+        View potButton = findViewById(R.id.shop_pot_button);
+        potButton.setOnClickListener(new View.OnClickListener() {
+            /**
+             * User clicked buy now
+             * @param v - current view
+             */
+            @Override
+            public void onClick(View v) {
+                openWebPage(SHOP_POT_URL);
+            }
+        });
     }
 
     /**
@@ -77,6 +100,11 @@ public class ShopActivity extends AppCompatActivity {
             mDatabase.showTutorial(this, loadTutorialItems(), true);
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void openWebPage(String url) {
+        Intent viewIntent = new Intent("android.intent.action.VIEW", Uri.parse(url));
+        startActivity(viewIntent);
     }
 
     /**

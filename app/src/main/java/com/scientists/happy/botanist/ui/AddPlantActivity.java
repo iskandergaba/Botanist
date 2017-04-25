@@ -85,10 +85,12 @@ public class AddPlantActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 String height = mHeightEditText.getText().toString();
-                mDatabase.addPlant(AddPlantActivity.this, mNameEditText.getText().toString(),
+                boolean isAddSuccessful = mDatabase.addPlant(AddPlantActivity.this, mNameEditText.getText().toString(),
                         mSpeciesAutoCompleteText.getText().toString(), mBirthday.getTimeInMillis(),
                         height.equals("") ? 0 : Double.parseDouble(height), mBitmap);
-                finish();
+                if (isAddSuccessful) {
+                    finish();
+                }
             }
         });
         mPicture = (ImageView) findViewById(R.id.picture);
