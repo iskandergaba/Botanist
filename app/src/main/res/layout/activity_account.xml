@@ -29,9 +29,9 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/activity_vertical_margin"
             android:fontFamily="sans-serif-condensed"
+            android:text="@string/name_fmt"
             android:textAppearance="?android:textAppearanceMedium"
-            android:textStyle="bold"
-            android:text="@string/name_fmt" />
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/email"
@@ -39,8 +39,8 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
             android:fontFamily="sans-serif-condensed"
-            android:textAppearance="?android:textAppearanceMedium"
-            android:text="@string/email_fmt"/>
+            android:text="@string/email_fmt"
+            android:textAppearance="?android:textAppearanceMedium" />
 
         <TextView
             android:id="@+id/botanist_since"
