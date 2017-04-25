@@ -9,12 +9,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.GridView;
-
 import com.scientists.happy.botanist.R;
 import com.scientists.happy.botanist.data.DatabaseManager;
-
 import java.util.ArrayList;
-
 import za.co.riggaroo.materialhelptutorial.TutorialItem;
 public class MainActivity extends AppCompatActivity {
     private static final int VIEW_ACCOUNT = 1;
@@ -40,7 +37,6 @@ public class MainActivity extends AppCompatActivity {
         });
         View tipView = findViewById(R.id.daily_tip_cardview);
         tipView.findViewById(R.id.daily_tip_dismiss_button).setOnClickListener(new View.OnClickListener() {
-
             /**
              * change visibility of CardView to gone if user clicked "Dismiss" button
              * @param v - the view

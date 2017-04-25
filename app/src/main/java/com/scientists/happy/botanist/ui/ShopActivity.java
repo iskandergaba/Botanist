@@ -1,7 +1,6 @@
+// Shop for botanist accessories
+// @author: Wendy Zhang
 package com.scientists.happy.botanist.ui;
-/*
-@Wendy
-*/
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -9,20 +8,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-
 import com.scientists.happy.botanist.R;
 import com.scientists.happy.botanist.data.DatabaseManager;
-
 import java.util.ArrayList;
-
 import za.co.riggaroo.materialhelptutorial.TutorialItem;
 public class ShopActivity extends AppCompatActivity {
-
     private DatabaseManager mDatabase;
     private static final String SHOP_FERTILIZER_URL = "https://www.amazon.com/Best-Sellers-Patio-Lawn-Garden-Fertilizers/zgbs/lawn-garden/3752891";
     private static final String SHOP_ACCESSORIES_URL = "https://www.amazon.com/Best-Sellers-Patio-Lawn-Garden-Plant-Container-Accessories/zgbs/lawn-garden/3480695011";
     private static final String SHOP_POT_URL = "https://www.amazon.com/Best-Sellers-Patio-Lawn-Garden-Gardening-Pots-Planters-Accessories/zgbs/lawn-garden/3480694011";
-
     /**
      * Launch the activity
      * @param savedInstanceState - current app state
