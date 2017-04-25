@@ -24,8 +24,6 @@
     <string name="level_1">Little Botanist</string>
     <string name="level_2">Heisenberg</string>
     <string name="level_3">The Botanist</string>
-    <!-- Server Client ID.  This should be a valid Web OAuth 2.0 Client ID obtained
-         from https://console.developers.google.com/ -->
     <string name="server_client_id" translatable="false">993462563911-9h2lig8m0klrfst5ob8lu2lprnqgf2nf.apps.googleusercontent.com</string>
     <string name="fertilize_plant">Fertilize Plant</string>
     <string name="set_time">Set Time</string>
@@ -230,5 +228,16 @@
     <string name = "statistics_tutorial_contents_0">Press the arrow in the top left of the screen to go back to the plant\'s profile page.</string>
     <string name = "statistics_tutorial_contents_1">You will see a line graph of your plant\'s height over time, and a bar chart of its watering schedule.</string>
     <string name = "statistics_tutorial_contents_2">Click the help button in the top right of the screen to see this tutorial again.</string>
+    <string name="welcome_to_botanist">Welcome to Botanist</string>
+    <string name="sign_in_to_get_started">Sign in to get started</string>
+    <string name="botanist_logo_desc">Botanist logo</string>
+    <string name="github_link_desc">Go to Github profile</string>
+    <string name="linkedin_link_desc">Go to Linkedin profile</string>
+    <string name="down_arrow_desc">Learn more</string>
+    <string name="amazon_button_desc">Buy from amazon</string>
+    <string name="active_growth_period">Active Growth Period</string>
+    <string name="spring">Spring</string>
+    <string name="summer">Summer</string>
+    <string name="autumn">Autumn</string>
+    <string name="winter">Winter</string>
 </resources>
-
