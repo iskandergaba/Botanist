@@ -942,11 +942,11 @@ public class DatabaseManager {
                     PlantEntry entry = dataSnapshot.getValue(PlantEntry.class);
                     ((TextView) view.findViewById(R.id.group_holder)).setText(entry.getGroup());
                     ((TextView) view.findViewById(R.id.care_tips)).setText(entry.generateCareTips());
+                    generateActiveGrowth(view, entry.getActive());
                     View toxicWarning = view.findViewById(R.id.toxic_warning);
                     if (entry.isToxic()) {
                         toxicWarning.setVisibility(View.VISIBLE);
-                    }
-                    else {
+                    } else {
                         toxicWarning.setVisibility(View.GONE);
                     }
                     View noxiousWarning = view.findViewById(R.id.noxious_warning);
@@ -977,6 +977,30 @@ public class DatabaseManager {
                 public void onCancelled(DatabaseError databaseError) {
                 }
             });
+        }
+    }
+
+    /** Color the appropriate icons in the Active Growth Period box on the Care Tips in Profile
+     * @param view - the activity this is called from
+     */
+    public void generateActiveGrowth(final View view, String activeGrowthPeriod) {
+        if (activeGrowthPeriod == null || activeGrowthPeriod.trim().isEmpty() || activeGrowthPeriod.trim().equals("NA")) {
+            view.findViewById(R.id.active_growth_period_view).setVisibility(View.GONE);
+        } else {
+            view.findViewById(R.id.active_growth_period_view).setVisibility(View.VISIBLE);
+            activeGrowthPeriod = activeGrowthPeriod.trim();
+            if (!activeGrowthPeriod.equals("Year Round")) {
+                ((ImageView) view.findViewById(R.id.winter_image)).setImageResource(R.drawable.winter_grayscale);
+                if (!activeGrowthPeriod.contains("Fall")) {
+                    ((ImageView) view.findViewById(R.id.winter_image)).setImageResource(R.drawable.autumn_grayscale);
+                }
+                if (!activeGrowthPeriod.contains("Spring")) {
+                    ((ImageView) view.findViewById(R.id.winter_image)).setImageResource(R.drawable.spring_grayscale);
+                }
+                if (!activeGrowthPeriod.contains("Summmer")) {
+                    ((ImageView) view.findViewById(R.id.summer_image)).setImageResource(R.drawable.summer_grayscale);
+                }
+            }
         }
     }
 

@@ -220,5 +220,11 @@
     <string name="linkedin_link_desc">Go to Linkedin profile</string>
     <string name="down_arrow_desc">Learn more</string>
     <string name="amazon_button_desc">Buy from amazon</string>
+    <string name="active_growth_period">Active Growth Period</string>
+    <string name="spring">Spring</string>
+    <string name="summer">Summer</string>
+    <string name="autumn">Autumn</string>
+    <string name="winter">Winter</string>
+
 </resources>
 
