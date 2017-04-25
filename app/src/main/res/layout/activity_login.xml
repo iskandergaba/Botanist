@@ -20,23 +20,21 @@
 
         <ImageView
             android:id="@+id/app_logo"
-            android:layout_width="160dp"
+            android:layout_width="wrap_content"
             android:layout_height="0dp"
-            android:layout_marginTop="@dimen/activity_vertical_margin"
-            android:layout_marginBottom="@dimen/activity_vertical_margin"
-            android:src="@drawable/logo_botanist"
-            android:layout_weight="2"/>
+            android:src="@drawable/logo_botanist_big"
+            android:layout_weight="2"
+            android:contentDescription="@string/botanist_logo_desc" />
 
         <TextView
             android:id="@+id/welcome_text"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
-            android:layout_marginBottom="@dimen/activity_vertical_margin"
+            android:layout_weight="1"
             android:gravity="center"
             android:textAppearance="?android:textAppearanceLarge"
-            android:fontFamily="casual"
-            android:text="Welcome to Botanist"
-            android:layout_weight="1"/>
+            android:fontFamily="sans-serif-condensed"
+            android:text="@string/welcome_to_botanist" />
 
         <TextView
             android:id="@+id/title_text"
@@ -44,8 +42,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/activity_vertical_margin"
             android:textAppearance="?android:textAppearanceMedium"
-            android:fontFamily="casual"
-            android:text="Sign in to get started"
+            android:text="@string/sign_in_to_get_started"
             android:gravity="center" />
 
         <com.google.android.gms.common.SignInButton
