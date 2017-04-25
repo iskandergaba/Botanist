@@ -436,11 +436,11 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
         TutorialItem tutorialItem0 = new TutorialItem(getString(R.string.account_tutorial_title_0), getString(R.string.account_tutorial_contents_0),
                 R.color.colorAccent, R.drawable.account_tutorial_0,  R.drawable.account_tutorial_0);
         TutorialItem tutorialItem1 = new TutorialItem(getString(R.string.account_tutorial_title_1_0), getString(R.string.account_tutorial_contents_1_0),
-                R.color.colorAccent, R.drawable.account_tutorial_0,  R.drawable.account_tutorial_0);
-        TutorialItem tutorialItem2 = new TutorialItem(getString(R.string.account_tutorial_title_1_1), getString(R.string.account_tutorial_contents_1_1),
-                R.color.colorAccent, R.drawable.account_tutorial_0,  R.drawable.account_tutorial_0);
-        TutorialItem tutorialItem3 = new TutorialItem(getString(R.string.account_tutorial_title_2), getString(R.string.account_tutorial_contents_2),
                 R.color.colorAccent, R.drawable.account_tutorial_1,  R.drawable.account_tutorial_1);
+        TutorialItem tutorialItem2 = new TutorialItem(getString(R.string.account_tutorial_title_1_1), getString(R.string.account_tutorial_contents_1_1),
+                R.color.colorAccent, R.drawable.account_tutorial_2,  R.drawable.account_tutorial_2);
+        TutorialItem tutorialItem3 = new TutorialItem(getString(R.string.account_tutorial_title_2), getString(R.string.account_tutorial_contents_2),
+                R.color.colorAccent, R.drawable.account_tutorial_3,  R.drawable.account_tutorial_3);
         TutorialItem tutorialItem4 = new TutorialItem(getString(R.string.account_tutorial_title_3), getString(R.string.account_tutorial_contents_3),
                 R.color.colorAccent, R.drawable.badge_level_0,  R.drawable.badge_level_0);
         TutorialItem tutorialItem5 = new TutorialItem(getString(R.string.account_tutorial_title_4), getString(R.string.account_tutorial_contents_4),
@@ -450,9 +450,9 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
         TutorialItem tutorialItem7 = new TutorialItem(getString(R.string.account_tutorial_title_6), getString(R.string.account_tutorial_contents_6),
                 R.color.colorAccent, R.drawable.badge_level_3,  R.drawable.badge_level_3);
         TutorialItem tutorialItem8 = new TutorialItem(getString(R.string.account_tutorial_title_7), getString(R.string.account_tutorial_contents_7),
-                R.color.colorAccent, R.drawable.account_tutorial_2,  R.drawable.account_tutorial_2);
+                R.color.colorAccent, R.drawable.account_tutorial_4,  R.drawable.account_tutorial_4);
         TutorialItem tutorialItem9 = new TutorialItem(getString(R.string.account_tutorial_title_8), getString(R.string.account_tutorial_contents_8),
-                R.color.colorAccent, R.drawable.account_tutorial_3,  R.drawable.account_tutorial_3);
+                R.color.colorAccent, R.drawable.account_tutorial_5,  R.drawable.account_tutorial_5);
         ArrayList<TutorialItem> tutorialItems = new ArrayList<>();
         tutorialItems.add(tutorialItem0);
         tutorialItems.add(tutorialItem1);
