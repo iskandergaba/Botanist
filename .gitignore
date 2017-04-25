@@ -8,6 +8,5 @@
 /captures
 .externalNativeBuild
 parser/bin/
-parser/*.csv
 parser/*.json
 parser/*.xlsx
