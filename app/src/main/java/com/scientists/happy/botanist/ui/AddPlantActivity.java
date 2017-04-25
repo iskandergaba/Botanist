@@ -12,7 +12,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import com.scientists.happy.botanist.R;
 import com.scientists.happy.botanist.data.DatabaseManager;
 import com.vansuita.pickimage.bean.PickResult;
@@ -20,13 +19,11 @@ import com.vansuita.pickimage.bundle.PickSetup;
 import com.vansuita.pickimage.dialog.PickImageDialog;
 import com.vansuita.pickimage.listeners.IPickResult;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Locale;
-
 import za.co.riggaroo.materialhelptutorial.TutorialItem;
 public class AddPlantActivity extends AppCompatActivity {
     protected ImageView mPicture;
@@ -40,7 +37,6 @@ public class AddPlantActivity extends AppCompatActivity {
     protected Bitmap mBitmap;
     protected GregorianCalendar mBirthday;
     int mWaterHour, mWaterMin;
-
     /**
      * Launch the add plant screen
      * @param savedInstanceState - Current app state
