@@ -1,5 +1,4 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-
     <string name="app_name" tools:override="true">Botanist</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_profile">Flowey</string>
@@ -9,15 +8,10 @@
     <string name="title_activity_settings">Settings</string>
     <string name="title_activity_similar_plants">Similar Plants</string>
     <string name="title_activity_disease">Diseases and Pests</string>
-
     <string name="loading_text">Loading…</string>
-
     <string name="version_fmt">Version %s</string>
-
-    <!-- Button labels -->
     <string name="sign_out">Sign out</string>
     <string name="disconnect">Delete Account</string>
-
     <string name="gif_fmt">GIF Location: %s</string>
     <string name="name_fmt">Name: %s</string>
     <string name="email_fmt">Email: %s</string>
@@ -25,14 +19,11 @@
     <string name="plants_number_fmt">Number of plants: %d</string>
     <string name="species_fmt">Species: %s</string>
     <string name="level_fmt">Level: %s</string>
-
     <string name="gif_loading">Creating GIF…</string>
-
     <string name="level_0">Plant Murderer</string>
     <string name="level_1">Little Botanist</string>
     <string name="level_2">Heisenberg</string>
     <string name="level_3">The Botanist</string>
-
     <!-- Server Client ID.  This should be a valid Web OAuth 2.0 Client ID obtained
          from https://console.developers.google.com/ -->
     <string name="server_client_id" translatable="false">993462563911-9h2lig8m0klrfst5ob8lu2lprnqgf2nf.apps.googleusercontent.com</string>
@@ -92,12 +83,6 @@
     <string name="action_help">Help</string>
     <string name="ready">Ready to begin?</string>
     <string name="find_tutorial">Click the Help option under the main screen menu to view these instructions again.</string>
-    <string name="tutorial_title_0">Title 0</string>
-    <string name="tutorial_contents_0">Contents 0</string>
-    <string name="tutorial_title_1">Title 1</string>
-    <string name="tutorial_contents_1">Contents 1</string>
-    <string name="tutorial_title_2">Title 2</string>
-    <string name="tutorial_contents_2">Contents 2</string>
     <string name="large_text">
         "Material is the metaphor.\n\n"
 
@@ -213,6 +198,32 @@
     <string name="marimo_name">Wendy Zhang</string>
     <string name="marimo_codename">Marimo</string>
     <string name="noxious_warning">NOXIOUS WARNING</string>
+    <string name="tutorial_title_0">Title 0</string>
+    <string name="tutorial_contents_0">Contents 0</string>
+    <string name="tutorial_title_1">Title 1</string>
+    <string name="tutorial_contents_1">Contents 1</string>
+    <string name="tutorial_title_2">Title 2</string>
+    <string name="tutorial_contents_2">Contents 2</string>
+    <string name = "account_tutorial_title_0">Go Back</string>
+    <string name = "account_tutorial_title_1_0">Signing out</string>
+    <string name = "account_tutorial_title_1_1">User Statistics</string>
+    <string name = "account_tutorial_title_2">Current Badge</string>
+    <string name = "account_tutorial_title_3">Plant Murderer</string>
+    <string name = "account_tutorial_title_4">Little Botanist</string>
+    <string name = "account_tutorial_title_5">Heisenberg</string>
+    <string name = "account_tutorial_title_6">The Botanist</string>
+    <string name = "account_tutorial_title_7">More Options</string>
+    <string name = "account_tutorial_title_8">Confirm Action</string>
+    <string name = "account_tutorial_contents_0">Press the arrow in the top left of the screen to go back to the main page.</string>
+    <string name = "account_tutorial_contents_1_0">Press the "Sign Out" button at the top to sign out.</string>
+    <string name = "account_tutorial_contents_1_1">Here you can see your botanist statistics. Grow some plants and watch them change!</string>
+    <string name = "account_tutorial_contents_2">At the bottom, you can see your current badge as well as your progress towards the next badge.</string>
+    <string name = "account_tutorial_contents_3">The Plant Murderer badge goes to bad plant parents. We can do better!</string>
+    <string name = "account_tutorial_contents_4">The Little Botanist badge is for novice botanists.</string>
+    <string name = "account_tutorial_contents_5">The Heisenberg badge is for experienced botanists.</string>
+    <string name = "account_tutorial_contents_6">The Botanist badge is for master botanists.</string>
+    <string name = "account_tutorial_contents_7">Press the dots in the corner to see the "Delete Account" and "Help" options.</string>
+    <string name = "account_tutorial_contents_8">A window will ask to confirm that you want to delete your account.</string>
     <string name="welcome_to_botanist">Welcome to Botanist</string>
     <string name="sign_in_to_get_started">Sign in to get started</string>
     <string name="botanist_logo_desc">Botanist logo</string>
@@ -225,6 +236,5 @@
     <string name="summer">Summer</string>
     <string name="autumn">Autumn</string>
     <string name="winter">Winter</string>
-
 </resources>
 
