@@ -1,6 +1,7 @@
 // Asynchronous birthday receiver
 // @author: Iskander Gaba
 package com.scientists.happy.botanist.services;
+
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -10,9 +11,12 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.v4.app.NotificationCompat;
+
 import com.scientists.happy.botanist.R;
 import com.scientists.happy.botanist.ui.LoginActivity;
+
 import java.util.Calendar;
+
 import static android.content.Context.NOTIFICATION_SERVICE;
 public class BirthdayReceiver extends BroadcastReceiver {
     /**
@@ -27,7 +31,7 @@ public class BirthdayReceiver extends BroadcastReceiver {
         long birthday = intent.getExtras().getLong("birthday");
         int notificationId = intent.getExtras().getInt("id");
         int ageInYears = getAgeInYears(birthday);
-        Bitmap largeIcon = BitmapFactory.decodeResource(context.getResources(), R.drawable.logo_botanist);
+        Bitmap largeIcon = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_botanist_big);
         Intent resultIntent = new Intent(context, LoginActivity.class);
         PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         NotificationCompat.Builder mBuilder =
