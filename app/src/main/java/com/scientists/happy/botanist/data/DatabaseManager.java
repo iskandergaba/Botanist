@@ -1,6 +1,7 @@
 // Singleton Database manager for Firebase
 // @author: Christopher Besser, Antonio Muscarella, and Iskander Gaba
 package com.scientists.happy.botanist.data;
+
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -25,6 +26,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.bumptech.glide.Glide;
 import com.firebase.ui.database.FirebaseListAdapter;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
@@ -57,6 +59,7 @@ import com.scientists.happy.botanist.services.WaterReceiver;
 import com.scientists.happy.botanist.ui.ProfileActivity;
 import com.scientists.happy.botanist.ui.SettingsActivity;
 import com.scientists.happy.botanist.utils.GifSequenceWriter;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -68,8 +71,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+
 import za.co.riggaroo.materialhelptutorial.TutorialItem;
 import za.co.riggaroo.materialhelptutorial.tutorial.MaterialTutorialActivity;
+
 import static android.content.Context.ALARM_SERVICE;
 import static android.os.Environment.getExternalStoragePublicDirectory;
 public class DatabaseManager {
@@ -325,7 +330,7 @@ public class DatabaseManager {
      * @param bmp - the plant's picture
      */
     public boolean addPlant(Context context, String name, String species, long birthday, double height, final Bitmap bmp) {
-        showProgressDialog(context, context.getString(R.string.loading));
+        showProgressDialog(context, context.getString(R.string.loading_text));
         final Plant plant;
         // reject plant addition if species is null
         if ((species == null) || species.equals("") || (name == null) || name.equals("")) {
@@ -617,7 +622,7 @@ public class DatabaseManager {
      * @param heightInInches - the height of the plant
      */
     public void updatePlantHeight(final Context context, final String plantId, double heightInInches) {
-        showProgressDialog(context, context.getString(R.string.loading));
+        showProgressDialog(context, context.getString(R.string.loading_text));
         final String userId = getUserId();
         String now = Long.toString(System.currentTimeMillis());
         if (userId != null) {
@@ -662,7 +667,7 @@ public class DatabaseManager {
      * @param plantId - the id of the plant (species_name)
      */
     public void updatePlantWatering(final Context context, final String plantId) {
-        showProgressDialog(context, context.getString(R.string.loading));
+        showProgressDialog(context, context.getString(R.string.loading_text));
         final String userId = getUserId();
         String now = Long.toString(System.currentTimeMillis());
         if (userId != null) {
@@ -790,7 +795,7 @@ public class DatabaseManager {
                 public void onDataChange(DataSnapshot snapshot) {
                     boolean connected = snapshot.getValue(Boolean.class);
                     if (connected) {
-                        emptyGridView.setText(R.string.loading);
+                        emptyGridView.setText(R.string.loading_text);
                         loadingProgressBar.setVisibility(View.VISIBLE);
                     } else {
                         Toast.makeText(activity, R.string.msg_network_error, Toast.LENGTH_SHORT).show();
@@ -979,7 +984,7 @@ public class DatabaseManager {
     /** Color the appropriate icons in the Active Growth Period box on the Care Tips in Profile
      * @param view - the activity this is called from
      */
-    public void generateActiveGrowth(final View view, String activeGrowthPeriod) {
+    private void generateActiveGrowth(final View view, String activeGrowthPeriod) {
         if (activeGrowthPeriod == null || activeGrowthPeriod.trim().isEmpty() || activeGrowthPeriod.trim().equals("NA")) {
             view.findViewById(R.id.active_growth_period_view).setVisibility(View.GONE);
         } else {

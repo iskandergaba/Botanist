@@ -323,7 +323,7 @@ public class ProfileActivity extends AppCompatActivity {
             public void onClick(DialogInterface dialog, int id) {
                 mDatabase.updateNotificationTime(plantId, "lastFertilizerNotification");
                 Context context = getApplicationContext();
-                Toast.makeText(context, "Update successful", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, R.string.update_success, Toast.LENGTH_SHORT).show();
             }
         });
         builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
@@ -373,7 +373,7 @@ public class ProfileActivity extends AppCompatActivity {
      */
     private AlertDialog buildHeightInputDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setView(R.layout.height_input_dialog).setTitle("Record New Height")
+        builder.setView(R.layout.height_input_dialog).setTitle(R.string.record_new_hight)
                 .setPositiveButton(R.string.mdtp_ok, new DialogInterface.OnClickListener() {
             /**
              * User clicked submit
@@ -413,7 +413,7 @@ public class ProfileActivity extends AppCompatActivity {
      */
     private AlertDialog buildChangeNameDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setView(R.layout.name_input_dialog).setTitle("Change Plant Name");
+        builder.setView(R.layout.name_input_dialog).setTitle(R.string.update_name);
         // Set up the buttons
         builder.setPositiveButton(R.string.mdtp_ok, new DialogInterface.OnClickListener() {
             /**
@@ -502,7 +502,7 @@ public class ProfileActivity extends AppCompatActivity {
         // Chain together various setter methods to set the dialog characteristics
         builder.setMessage(R.string.calendar_dialog_text).setTitle(R.string.calendar_sync_text);
         // Add the buttons
-        builder.setPositiveButton("Watering", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(R.string.watering, new DialogInterface.OnClickListener() {
             /**
              * User clicked confirm
              * @param dialog - the warning window
@@ -512,7 +512,7 @@ public class ProfileActivity extends AppCompatActivity {
                 updateCalendar(getApplicationContext(), "Water " + mName, WATER_KEY);
             }
         });
-        builder.setNegativeButton("Fertilizing", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(R.string.fertilizing, new DialogInterface.OnClickListener() {
             /**
              * User clicked cancel
              * @param dialog - the warning window
