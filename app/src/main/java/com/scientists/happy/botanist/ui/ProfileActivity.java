@@ -373,7 +373,7 @@ public class ProfileActivity extends AppCompatActivity {
      */
     private AlertDialog buildHeightInputDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setView(R.layout.height_input_dialog).setTitle(R.string.record_new_hight)
+        builder.setView(R.layout.height_input_dialog).setTitle(R.string.record_new_height)
                 .setPositiveButton(R.string.mdtp_ok, new DialogInterface.OnClickListener() {
             /**
              * User clicked submit

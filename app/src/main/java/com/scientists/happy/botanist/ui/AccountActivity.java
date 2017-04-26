@@ -1,7 +1,6 @@
 // User's account page
 // @author: Iskander Gaba
 package com.scientists.happy.botanist.ui;
-
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -18,7 +17,6 @@ import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.github.mikephil.charting.charts.BarChart;
@@ -41,11 +39,9 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.scientists.happy.botanist.R;
 import com.scientists.happy.botanist.data.DatabaseManager;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Locale;
-
 import za.co.riggaroo.materialhelptutorial.TutorialItem;
 public class AccountActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
     private static final String TAG = "AccountActivity";
@@ -369,7 +365,6 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
              * @param id - the user id
              */
             public void onClick(DialogInterface dialog, int id) {
-                // User cancelled the dialog
             }
         });
         // Get the AlertDialog from create()
@@ -485,6 +480,12 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
         xAxis.setGranularity(1);
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         xAxis.setValueFormatter(new IAxisValueFormatter() {
+            /**
+             * Format the value
+             * @param value - value to fit to the axis
+             * @param axis - the axis to fit to
+             * @return Returns the formatted value
+             */
             @Override
             public String getFormattedValue(float value, AxisBase axis) {
                 int v = (int) value;
