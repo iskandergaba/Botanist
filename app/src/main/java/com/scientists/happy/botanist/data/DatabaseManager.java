@@ -325,7 +325,7 @@ public class DatabaseManager {
      * @param bmp - the plant's picture
      */
     public boolean addPlant(Context context, String name, String species, long birthday, double height, final Bitmap bmp) {
-        showProgressDialog(context, context.getString(R.string.loading));
+        showProgressDialog(context, context.getString(R.string.loading_text));
         final Plant plant;
         // reject plant addition if species is null
         if ((species == null) || species.equals("") || (name == null) || name.equals("")) {
@@ -617,7 +617,7 @@ public class DatabaseManager {
      * @param heightInInches - the height of the plant
      */
     public void updatePlantHeight(final Context context, final String plantId, double heightInInches) {
-        showProgressDialog(context, context.getString(R.string.loading));
+        showProgressDialog(context, context.getString(R.string.loading_text));
         final String userId = getUserId();
         String now = Long.toString(System.currentTimeMillis());
         if (userId != null) {
@@ -662,7 +662,7 @@ public class DatabaseManager {
      * @param plantId - the id of the plant (species_name)
      */
     public void updatePlantWatering(final Context context, final String plantId) {
-        showProgressDialog(context, context.getString(R.string.loading));
+        showProgressDialog(context, context.getString(R.string.loading_text));
         final String userId = getUserId();
         String now = Long.toString(System.currentTimeMillis());
         if (userId != null) {
@@ -790,7 +790,7 @@ public class DatabaseManager {
                 public void onDataChange(DataSnapshot snapshot) {
                     boolean connected = snapshot.getValue(Boolean.class);
                     if (connected) {
-                        emptyGridView.setText(R.string.loading);
+                        emptyGridView.setText(R.string.loading_text);
                         loadingProgressBar.setVisibility(View.VISIBLE);
                     } else {
                         Toast.makeText(activity, R.string.msg_network_error, Toast.LENGTH_SHORT).show();
@@ -979,7 +979,7 @@ public class DatabaseManager {
     /** Color the appropriate icons in the Active Growth Period box on the Care Tips in Profile
      * @param view - the activity this is called from
      */
-    public void generateActiveGrowth(final View view, String activeGrowthPeriod) {
+    private void generateActiveGrowth(final View view, String activeGrowthPeriod) {
         if (activeGrowthPeriod == null || activeGrowthPeriod.trim().isEmpty() || activeGrowthPeriod.trim().equals("NA")) {
             view.findViewById(R.id.active_growth_period_view).setVisibility(View.GONE);
         } else {
@@ -1419,7 +1419,8 @@ public class DatabaseManager {
             tutorial.putParcelableArrayListExtra(MaterialTutorialActivity.MATERIAL_TUTORIAL_ARG_TUTORIAL_ITEMS, tutorialItems);
             activity.startActivityForResult(tutorial, TUTORIAL_REQUEST_CODE);
             setTutorialShown(activityName);
-        } else {
+        }
+        else {
             final String userId = getUserId();
             if (userId != null) {
                 mDatabase.child("users").child(userId).child("tutorials").addListenerForSingleValueEvent(new ValueEventListener() {
@@ -1458,6 +1459,7 @@ public class DatabaseManager {
 
     /**
      * Set tutorial is shown for an activity
+     * @param activityName - name of the tutorial to update
      */
     private void setTutorialShown(String activityName) {
         final String userId = getUserId();

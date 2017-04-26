@@ -61,6 +61,7 @@
     <string name="toxic_warning_msg">This plant or parts of it are considered toxic. Do not ingest, handle with care, and keep out of reach of pets and small children.</string>
     <string name="height_fmt">Height: %.1f inches</string>
     <string name="update_height">Update Height</string>
+    <string name="update_success">Update Successful</string>
     <string name="dialog_height_in_inches">Height in inches</string>
     <string name="noxious_warning_msg">NOXIOUS: This plant or parts of it are considered noxious. Be advised that it may have thorns, give off foul odors, choke or starve other plants, and may be considered a public nuisance.</string>
     <string name="quarantine_warning">QUARANTINE: U.S. federal and/or state laws require this plant to be grown under quarantine. Please check your local laws to make sure you are in compliance.</string>
@@ -81,95 +82,6 @@
     <string name="action_help">Help</string>
     <string name="ready">Ready to begin?</string>
     <string name="find_tutorial">Click the Help option under the main screen menu to view these instructions again.</string>
-    <string name="large_text">
-        "Material is the metaphor.\n\n"
-
-        "A material metaphor is the unifying theory of a rationalized space and a system of motion."
-        "The material is grounded in tactile reality, inspired by the study of paper and ink, yet "
-        "technologically advanced and open to imagination and magic.\n"
-        "Surfaces and edges of the material provide visual cues that are grounded in reality. The "
-        "use of familiar tactile attributes helps users quickly understand affordances. Yet the "
-        "flexibility of the material creates new affordances that supercede those in the physical "
-        "world, without breaking the rules of physics.\n"
-        "The fundamentals of light, surface, and movement are key to conveying how objects move, "
-        "interact, and exist in space and in relation to each other. Realistic lighting shows "
-        "seams, divides space, and indicates moving parts.\n\n"
-
-        "Bold, graphic, intentional.\n\n"
-
-        "The foundational elements of print based design typography, grids, space, scale, color, "
-        "and use of imagery guide visual treatments. These elements do far more than please the "
-        "eye. They create hierarchy, meaning, and focus. Deliberate color choices, edge to edge "
-        "imagery, large scale typography, and intentional white space create a bold and graphic "
-        "interface that immerse the user in the experience.\n"
-        "An emphasis on user actions makes core functionality immediately apparent and provides "
-        "waypoints for the user.\n\n"
-
-        "Motion provides meaning.\n\n"
-
-        "Motion respects and reinforces the user as the prime mover. Primary user actions are "
-        "inflection points that initiate motion, transforming the whole design.\n"
-        "All action takes place in a single environment. Objects are presented to the user without "
-        "breaking the continuity of experience even as they transform and reorganize.\n"
-        "Motion is meaningful and appropriate, serving to focus attention and maintain continuity. "
-        "Feedback is subtle yet clear. Transitions are efﬁcient yet coherent.\n\n"
-
-        "3D world.\n\n"
-
-        "The material environment is a 3D space, which means all objects have x, y, and z "
-        "dimensions. The z-axis is perpendicularly aligned to the plane of the display, with the "
-        "positive z-axis extending towards the viewer. Every sheet of material occupies a single "
-        "position along the z-axis and has a standard 1dp thickness.\n"
-        "On the web, the z-axis is used for layering and not for perspective. The 3D world is "
-        "emulated by manipulating the y-axis.\n\n"
-
-        "Light and shadow.\n\n"
-
-        "Within the material environment, virtual lights illuminate the scene. Key lights create "
-        "directional shadows, while ambient light creates soft shadows from all angles.\n"
-        "Shadows in the material environment are cast by these two light sources. In Android "
-        "development, shadows occur when light sources are blocked by sheets of material at "
-        "various positions along the z-axis. On the web, shadows are depicted by manipulating the "
-        "y-axis only. The following example shows the card with a height of 6dp.\n\n"
-
-        "Resting elevation.\n\n"
-
-        "All material objects, regardless of size, have a resting elevation, or default elevation "
-        "that does not change. If an object changes elevation, it should return to its resting "
-        "elevation as soon as possible.\n\n"
-
-        "Component elevations.\n\n"
-
-        "The resting elevation for a component type is consistent across apps (e.g., FAB elevation "
-        "does not vary from 6dp in one app to 16dp in another app).\n"
-        "Components may have different resting elevations across platforms, depending on the depth "
-        "of the environment (e.g., TV has a greater depth than mobile or desktop).\n\n"
-
-        "Responsive elevation and dynamic elevation offsets.\n\n"
-
-        "Some component types have responsive elevation, meaning they change elevation in response "
-        "to user input (e.g., normal, focused, and pressed) or system events. These elevation "
-        "changes are consistently implemented using dynamic elevation offsets.\n"
-        "Dynamic elevation offsets are the goal elevation that a component moves towards, relative "
-        "to the component’s resting state. They ensure that elevation changes are consistent "
-        "across actions and component types. For example, all components that lift on press have "
-        "the same elevation change relative to their resting elevation.\n"
-        "Once the input event is completed or cancelled, the component will return to its resting "
-        "elevation.\n\n"
-
-        "Avoiding elevation interference.\n\n"
-
-        "Components with responsive elevations may encounter other components as they move between "
-        "their resting elevations and dynamic elevation offsets. Because material cannot pass "
-        "through other material, components avoid interfering with one another any number of ways, "
-        "whether on a per component basis or using the entire app layout.\n"
-        "On a component level, components can move or be removed before they cause interference. "
-        "For example, a floating action button (FAB) can disappear or move off screen before a "
-        "user picks up a card, or it can move if a snackbar appears.\n"
-        "On the layout level, design your app layout to minimize opportunities for interference. "
-        "For example, position the FAB to one side of stream of a cards so the FAB won’t interfere "
-        "when a user tries to pick up one of cards.\n\n"
-    </string>
     <string name="action_about">About</string>
     <string name="title_activity_about">About</string>
     <string name="desc_water_chart">Weekly Watering Summary</string>
@@ -196,12 +108,6 @@
     <string name="marimo_name">Wendy Zhang</string>
     <string name="marimo_codename">Marimo</string>
     <string name="noxious_warning">NOXIOUS WARNING</string>
-    <string name="tutorial_title_0">Title 0</string>
-    <string name="tutorial_contents_0">Contents 0</string>
-    <string name="tutorial_title_1">Title 1</string>
-    <string name="tutorial_contents_1">Contents 1</string>
-    <string name="tutorial_title_2">Title 2</string>
-    <string name="tutorial_contents_2">Contents 2</string>
     <string name = "account_tutorial_title_0">Go Back</string>
     <string name = "account_tutorial_title_1_0">Signing out</string>
     <string name = "account_tutorial_title_1_1">User Statistics</string>
@@ -211,17 +117,19 @@
     <string name = "account_tutorial_title_5">Heisenberg</string>
     <string name = "account_tutorial_title_6">The Botanist</string>
     <string name = "account_tutorial_title_7">More Options</string>
-    <string name = "account_tutorial_title_8">Confirm Action</string>
+    <string name = "account_tutorial_title_8">Confirm Account Deletion</string>
+    <string name = "account_tutorial_title_9">Confirm Sign Out</string>
     <string name = "account_tutorial_contents_0">Press the arrow in the top left of the screen to go back to the main page.</string>
-    <string name = "account_tutorial_contents_1_0">Press the "Sign Out" button at the top to sign out.</string>
+    <string name = "account_tutorial_contents_1_0">Press the sign out button at the top to sign out.</string>
     <string name = "account_tutorial_contents_1_1">Here you can see your botanist statistics. Grow some plants and watch them change!</string>
     <string name = "account_tutorial_contents_2">At the bottom, you can see your current badge as well as your progress towards the next badge.</string>
     <string name = "account_tutorial_contents_3">The Plant Murderer badge goes to bad plant parents. We can do better!</string>
     <string name = "account_tutorial_contents_4">The Little Botanist badge is for novice botanists.</string>
     <string name = "account_tutorial_contents_5">The Heisenberg badge is for experienced botanists.</string>
     <string name = "account_tutorial_contents_6">The Botanist badge is for master botanists.</string>
-    <string name = "account_tutorial_contents_7">Press the dots in the corner to see the "Delete Account" and "Help" options.</string>
+    <string name = "account_tutorial_contents_7">Press the dots in the corner to see the delete account and help options.</string>
     <string name = "account_tutorial_contents_8">A window will ask to confirm that you want to delete your account.</string>
+    <string name = "account_tutorial_contents_9">Hitting sign out opens a similar window.</string>
     <string name = "statistics_tutorial_title_0">Go Back</string>
     <string name = "statistics_tutorial_title_1">Statistics</string>
     <string name = "statistics_tutorial_title_2">Help</string>
@@ -240,4 +148,43 @@
     <string name="summer">Summer</string>
     <string name="autumn">Autumn</string>
     <string name="winter">Winter</string>
+    <string name = "profile_tutorial_title_0">Profile</string>
+    <string name = "profile_tutorial_title_1">Sharing</string>
+    <string name = "profile_tutorial_title_2">Options</string>
+    <string name = "profile_tutorial_title_3">Changing name</string>
+    <string name = "profile_tutorial_title_4">Deleting</string>
+    <string name = "profile_tutorial_title_5">Photographing</string>
+    <string name = "profile_tutorial_title_6">Watering</string>
+    <string name = "profile_tutorial_title_7">Fertilizing</string>
+    <string name = "profile_tutorial_title_8">Measuring</string>
+    <string name = "profile_tutorial_title_9">Adding to Calendar</string>
+    <string name = "profile_tutorial_contents_0">The profile page displays your plant\s information. Tap the care tips, toxic, or noxious banners to toggle those sections.</string>
+    <string name = "profile_tutorial_contents_1">Hitting share allows you to choose a platform to share your plant to.</string>
+    <string name = "profile_tutorial_contents_2">From the options menu, you can see additional information, change your plant\'s name, and create a gif.</string>
+    <string name = "profile_tutorial_contents_3">Tapping change name opens a window to enter the new name.</string>
+    <string name = "profile_tutorial_contents_4">Tapping delete plant asks you to confirm the action.</string>
+    <string name = "profile_tutorial_contents_5">Tap the camera icon to change the photo.</string>
+    <string name = "profile_tutorial_contents_6">Tap the water button to notify Botanist that your plant was watered.</string>
+    <string name = "profile_tutorial_contents_7">Tap the poop button to notify Botanist that your plant was fertilized.</string>
+    <string name = "profile_tutorial_contents_8">Tap the ruler button to record your plant\'s height.</string>
+    <string name = "profile_tutorial_contents_9">Tap the calendar icon to add fertilization or watering times to your calendar.</string>
+    <string name="record_new_height">Record New Height</string>
+    <string name="watering">Watering</string>
+    <string name="fertilizing">Fertilizing</string>
+    <string name = "diseases_tutorial_title_0">Diseases</string>
+    <string name = "diseases_tutorial_contents_0">Tap a disease to read about it.</string>
+    <string name = "add_tutorial_title_0">Adding a Plant</string>
+    <string name = "add_tutorial_title_1">Setting the Birthday</string>
+    <string name = "add_tutorial_title_2">Taking a Picture</string>
+    <string name = "add_tutorial_contents_0">Add a new plant by specifying at least a name and species.</string>
+    <string name = "add_tutorial_contents_1">Tapping the birthday box opens a window where you can select the plant\'s birthday.</string>
+    <string name = "add_tutorial_contents_2">Tap the photo icon to set the plant\s picture either from an existing image or from the camera.</string>
+    <string name = "main_tutorial_title_0_0">Plants</string>
+    <string name = "main_tutorial_title_0_1">Watering</string>
+    <string name = "main_tutorial_title_0_2">Adding a Plant</string>
+    <string name = "main_tutorial_title_1">Options</string>
+    <string name = "main_tutorial_contents_0_0">On this screen you can see the plants you have added. Tap a plant to see its profile.</string>
+    <string name = "main_tutorial_contents_0_1">Each item has a bar at the bottom showing how long until it needs watered. An empty bar means it should be watered immediately.</string>
+    <string name = "main_tutorial_contents_0_2">Tap the + button at the bottom right to add a new plant.</string>
+    <string name = "main_tutorial_contents_1">From options, you can access your account, settings, the shop, this tutorial, and learn about the development team.</string>
 </resources>

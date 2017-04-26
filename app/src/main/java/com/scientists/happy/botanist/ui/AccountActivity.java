@@ -1,6 +1,7 @@
 // User's account page
 // @author: Iskander Gaba
 package com.scientists.happy.botanist.ui;
+
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -17,6 +18,7 @@ import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.github.mikephil.charting.charts.BarChart;
@@ -39,9 +41,11 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.scientists.happy.botanist.R;
 import com.scientists.happy.botanist.data.DatabaseManager;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Locale;
+
 import za.co.riggaroo.materialhelptutorial.TutorialItem;
 public class AccountActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
     private static final String TAG = "AccountActivity";
@@ -412,7 +416,7 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
     private void showProgressDialog() {
         if (mProgressDialog == null) {
             mProgressDialog = new ProgressDialog(this);
-            mProgressDialog.setMessage(getString(R.string.loading));
+            mProgressDialog.setMessage(getString(R.string.loading_text));
             mProgressDialog.setIndeterminate(true);
             mProgressDialog.setCancelable(false);
         }
@@ -433,37 +437,40 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
      * @return - Returns the list of tutorial items
      */
     private ArrayList<TutorialItem> loadTutorialItems() {
-        TutorialItem tutorialItem0 = new TutorialItem(getString(R.string.account_tutorial_title_0), getString(R.string.account_tutorial_contents_0),
-                R.color.colorAccent, R.drawable.account_tutorial_0,  R.drawable.account_tutorial_0);
+//        TutorialItem tutorialItem0 = new TutorialItem(getString(R.string.account_tutorial_title_0), getString(R.string.account_tutorial_contents_0),
+//                R.color.colorAccent, R.drawable.account_tutorial_0,  R.drawable.account_tutorial_0);
         TutorialItem tutorialItem1 = new TutorialItem(getString(R.string.account_tutorial_title_1_0), getString(R.string.account_tutorial_contents_1_0),
                 R.color.colorAccent, R.drawable.account_tutorial_1,  R.drawable.account_tutorial_1);
         TutorialItem tutorialItem2 = new TutorialItem(getString(R.string.account_tutorial_title_1_1), getString(R.string.account_tutorial_contents_1_1),
                 R.color.colorAccent, R.drawable.account_tutorial_2,  R.drawable.account_tutorial_2);
         TutorialItem tutorialItem3 = new TutorialItem(getString(R.string.account_tutorial_title_2), getString(R.string.account_tutorial_contents_2),
                 R.color.colorAccent, R.drawable.account_tutorial_3,  R.drawable.account_tutorial_3);
-        TutorialItem tutorialItem4 = new TutorialItem(getString(R.string.account_tutorial_title_3), getString(R.string.account_tutorial_contents_3),
-                R.color.colorAccent, R.drawable.badge_level_0,  R.drawable.badge_level_0);
-        TutorialItem tutorialItem5 = new TutorialItem(getString(R.string.account_tutorial_title_4), getString(R.string.account_tutorial_contents_4),
-                R.color.colorAccent, R.drawable.badge_level_1,  R.drawable.badge_level_1);
-        TutorialItem tutorialItem6 = new TutorialItem(getString(R.string.account_tutorial_title_5), getString(R.string.account_tutorial_contents_5),
-                R.color.colorAccent, R.drawable.badge_level_2,  R.drawable.badge_level_2);
-        TutorialItem tutorialItem7 = new TutorialItem(getString(R.string.account_tutorial_title_6), getString(R.string.account_tutorial_contents_6),
-                R.color.colorAccent, R.drawable.badge_level_3,  R.drawable.badge_level_3);
+//        TutorialItem tutorialItem4 = new TutorialItem(getString(R.string.account_tutorial_title_3), getString(R.string.account_tutorial_contents_3),
+//                R.color.colorAccent, R.drawable.badge_level_0,  R.drawable.badge_level_0);
+//        TutorialItem tutorialItem5 = new TutorialItem(getString(R.string.account_tutorial_title_4), getString(R.string.account_tutorial_contents_4),
+//                R.color.colorAccent, R.drawable.badge_level_1,  R.drawable.badge_level_1);
+//        TutorialItem tutorialItem6 = new TutorialItem(getString(R.string.account_tutorial_title_5), getString(R.string.account_tutorial_contents_5),
+//                R.color.colorAccent, R.drawable.badge_level_2,  R.drawable.badge_level_2);
+//        TutorialItem tutorialItem7 = new TutorialItem(getString(R.string.account_tutorial_title_6), getString(R.string.account_tutorial_contents_6),
+//                R.color.colorAccent, R.drawable.badge_level_3,  R.drawable.badge_level_3);
         TutorialItem tutorialItem8 = new TutorialItem(getString(R.string.account_tutorial_title_7), getString(R.string.account_tutorial_contents_7),
                 R.color.colorAccent, R.drawable.account_tutorial_4,  R.drawable.account_tutorial_4);
         TutorialItem tutorialItem9 = new TutorialItem(getString(R.string.account_tutorial_title_8), getString(R.string.account_tutorial_contents_8),
                 R.color.colorAccent, R.drawable.account_tutorial_5,  R.drawable.account_tutorial_5);
+        TutorialItem tutorialItem10 = new TutorialItem(getString(R.string.account_tutorial_title_9), getString(R.string.account_tutorial_contents_9),
+                R.color.colorAccent, R.drawable.account_tutorial_6,  R.drawable.account_tutorial_6);
         ArrayList<TutorialItem> tutorialItems = new ArrayList<>();
-        tutorialItems.add(tutorialItem0);
+//        tutorialItems.add(tutorialItem0);
         tutorialItems.add(tutorialItem1);
         tutorialItems.add(tutorialItem2);
         tutorialItems.add(tutorialItem3);
-        tutorialItems.add(tutorialItem4);
-        tutorialItems.add(tutorialItem5);
-        tutorialItems.add(tutorialItem6);
-        tutorialItems.add(tutorialItem7);
+//        tutorialItems.add(tutorialItem4);
+//        tutorialItems.add(tutorialItem5);
+//        tutorialItems.add(tutorialItem6);
+//        tutorialItems.add(tutorialItem7);
         tutorialItems.add(tutorialItem8);
         tutorialItems.add(tutorialItem9);
+        tutorialItems.add(tutorialItem10);
         return tutorialItems;
     }
   

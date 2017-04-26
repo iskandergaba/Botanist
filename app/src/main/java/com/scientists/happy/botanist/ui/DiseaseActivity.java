@@ -7,16 +7,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListAdapter;
 import android.widget.ListView;
-
 import com.scientists.happy.botanist.R;
 import com.scientists.happy.botanist.data.DatabaseManager;
-
 import java.util.ArrayList;
-
 import za.co.riggaroo.materialhelptutorial.TutorialItem;
 public class DiseaseActivity extends AppCompatActivity {
     private DatabaseManager mDatabase;
-
     /**
      * The activity is launched
      * @param savedInstanceState - current app state
@@ -26,7 +22,7 @@ public class DiseaseActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_disease);
         mDatabase = DatabaseManager.getInstance();
-        mDatabase.showTutorial(this, loadTutorialItems(), false);
+        mDatabase.showTutorial(this, loadTutorialItem(), false);
         ListView list = (ListView) findViewById(R.id.diseases);
         list.setEmptyView(findViewById(R.id.empty_list_view));
         String group = (String) getIntent().getExtras().get("group");
@@ -63,7 +59,7 @@ public class DiseaseActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_help) {
-            mDatabase.showTutorial(this, loadTutorialItems(), true);
+            mDatabase.showTutorial(this, loadTutorialItem(), true);
         }
         return super.onOptionsItemSelected(item);
     }
@@ -72,17 +68,11 @@ public class DiseaseActivity extends AppCompatActivity {
      * Fetch assets for the tutorial
      * @return - Returns the list of tutorial items
      */
-    private ArrayList<TutorialItem> loadTutorialItems() {
-        TutorialItem tutorialItem1 = new TutorialItem(getString(R.string.tutorial_title_0), getString(R.string.tutorial_contents_0),
-                R.color.colorPrimary, R.drawable.tutorial_0,  R.drawable.tutorial_0);
-        TutorialItem tutorialItem2 = new TutorialItem(getString(R.string.tutorial_title_1), getString(R.string.tutorial_contents_1),
-                R.color.colorPrimary, R.drawable.tutorial_1,  R.drawable.tutorial_1);
-        TutorialItem tutorialItem3 = new TutorialItem(getString(R.string.tutorial_title_2), getString(R.string.tutorial_contents_2),
-                R.color.colorPrimary, R.drawable.tutorial_2,  R.drawable.tutorial_2);
+    private ArrayList<TutorialItem> loadTutorialItem() {
+        TutorialItem tutorialItem1 = new TutorialItem(getString(R.string.diseases_tutorial_title_0), getString(R.string.diseases_tutorial_contents_0),
+                R.color.colorAccent, R.drawable.diseases_tutorial_0,  R.drawable.diseases_tutorial_0);
         ArrayList<TutorialItem> tutorialItems = new ArrayList<>();
         tutorialItems.add(tutorialItem1);
-        tutorialItems.add(tutorialItem2);
-        tutorialItems.add(tutorialItem3);
         return tutorialItems;
     }
 }
