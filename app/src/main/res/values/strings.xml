@@ -108,12 +108,6 @@
     <string name="marimo_name">Wendy Zhang</string>
     <string name="marimo_codename">Marimo</string>
     <string name="noxious_warning">NOXIOUS WARNING</string>
-    <string name="tutorial_title_0">Title 0</string>
-    <string name="tutorial_contents_0">Contents 0</string>
-    <string name="tutorial_title_1">Title 1</string>
-    <string name="tutorial_contents_1">Contents 1</string>
-    <string name="tutorial_title_2">Title 2</string>
-    <string name="tutorial_contents_2">Contents 2</string>
     <string name = "account_tutorial_title_0">Go Back</string>
     <string name = "account_tutorial_title_1_0">Signing out</string>
     <string name = "account_tutorial_title_1_1">User Statistics</string>
@@ -174,7 +168,23 @@
     <string name = "profile_tutorial_contents_7">Tap the poop button to notify Botanist that your plant was fertilized.</string>
     <string name = "profile_tutorial_contents_8">Tap the ruler button to record your plant\'s height.</string>
     <string name = "profile_tutorial_contents_9">Tap the calendar icon to add fertilization or watering times to your calendar.</string>
-    <string name="record_new_hight">Record New Height</string>
+    <string name="record_new_height">Record New Height</string>
     <string name="watering">Watering</string>
     <string name="fertilizing">Fertilizing</string>
+    <string name = "diseases_tutorial_title_0">Diseases</string>
+    <string name = "diseases_tutorial_contents_0">Tap a disease to read about it.</string>
+    <string name = "add_tutorial_title_0">Adding a Plant</string>
+    <string name = "add_tutorial_title_1">Setting the Birthday</string>
+    <string name = "add_tutorial_title_2">Taking a Picture</string>
+    <string name = "add_tutorial_contents_0">Add a new plant by specifying at least a name and species.</string>
+    <string name = "add_tutorial_contents_1">Tapping the birthday box opens a window where you can select the plant\'s birthday.</string>
+    <string name = "add_tutorial_contents_2">Tap the photo icon to set the plant\s picture either from an existing image or from the camera.</string>
+    <string name = "main_tutorial_title_0_0">Plants</string>
+    <string name = "main_tutorial_title_0_1">Watering</string>
+    <string name = "main_tutorial_title_0_2">Adding a Plant</string>
+    <string name = "main_tutorial_title_1">Options</string>
+    <string name = "main_tutorial_contents_0_0">On this screen you can see the plants you have added. Tap a plant to see its profile.</string>
+    <string name = "main_tutorial_contents_0_1">Each item has a bar at the bottom showing how long until it needs watered. An empty bar means it should be watered immediately.</string>
+    <string name = "main_tutorial_contents_0_2">Tap the + button at the bottom right to add a new plant.</string>
+    <string name = "main_tutorial_contents_1">From options, you can access your account, settings, the shop, this tutorial, and learn about the development team.</string>
 </resources>
