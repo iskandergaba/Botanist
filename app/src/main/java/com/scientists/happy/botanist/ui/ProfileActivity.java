@@ -1,7 +1,6 @@
 // Plant profile
-// @author: Antonio Muscarella and Christopher Besser
+// @author: Antonio Muscarella, Christopher Besser, and Iskander Gaba
 package com.scientists.happy.botanist.ui;
-
 import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -29,7 +28,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.bumptech.glide.Glide;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
 import com.google.firebase.storage.FirebaseStorage;
@@ -40,11 +38,9 @@ import com.vansuita.pickimage.bean.PickResult;
 import com.vansuita.pickimage.bundle.PickSetup;
 import com.vansuita.pickimage.dialog.PickImageDialog;
 import com.vansuita.pickimage.listeners.IPickResult;
-
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
-
 import za.co.riggaroo.materialhelptutorial.TutorialItem;
 public class ProfileActivity extends AppCompatActivity {
     private static final String ID_KEY = "plant_id";
@@ -67,7 +63,6 @@ public class ProfileActivity extends AppCompatActivity {
     private long mBirthday, mLastWatered, mLastFertilized;
     private int mToxicRotationAngle, mNoxiousRotationAngle, mTipsRotationAngle;
     private boolean mToxicExpanded, mNoxiousExpanded, mTipsExpanded;
-
     /**
      * Launch the activity
      * @param savedInstanceState - current view state
@@ -175,43 +170,55 @@ public class ProfileActivity extends AppCompatActivity {
                 buildCalendarDialog().show();
             }
         });
-
         findViewById(R.id.care_tips_expand_collapse).setOnClickListener(new View.OnClickListener() {
+            /**
+             * User clicked care tips
+             * @param v - current view
+             */
             @Override
             public void onClick(View v) {
                 View careTips = findViewById(R.id.care_tips_box);
                 mTipsRotationAngle = rotateImage(v, mTipsRotationAngle);
                 if (mTipsExpanded) {
                     collapse(careTips);
-                } else {
+                }
+                else {
                     expand(careTips);
                 }
                 mTipsExpanded = !mTipsExpanded;
             }
         });
-
         findViewById(R.id.toxic_warning_expand_collapse).setOnClickListener(new View.OnClickListener() {
+            /**
+             * User clicked toxic warning
+             * @param v - current view
+             */
             @Override
             public void onClick(View v) {
                 View toxicWarning = findViewById(R.id.toxic_warning_box);
                 mToxicRotationAngle = rotateImage(v, mToxicRotationAngle);
                 if (mToxicExpanded) {
                     collapse(toxicWarning);
-                } else {
+                }
+                else {
                     expand(toxicWarning);
                 }
                 mToxicExpanded = !mToxicExpanded;
             }
         });
-
         findViewById(R.id.noxious_warning_expand_collapse).setOnClickListener(new View.OnClickListener() {
+            /**
+             * User clicked noxious warning
+             * @param v - current view
+             */
             @Override
             public void onClick(View v) {
                 View noxiousWarning = findViewById(R.id.noxious_warning_box);
                 mNoxiousRotationAngle = rotateImage(v, mNoxiousRotationAngle);
                 if (mNoxiousExpanded) {
                     collapse(noxiousWarning);
-                } else {
+                }
+                else {
                     expand(noxiousWarning);
                 }
                 mNoxiousExpanded = !mNoxiousExpanded;
@@ -222,6 +229,9 @@ public class ProfileActivity extends AppCompatActivity {
         overridePendingTransition(R.anim.slide_up, R.anim.hold);
     }
 
+    /**
+     * Activity paused
+     */
     @Override
     protected void onPause() {
         super.onPause();
@@ -303,7 +313,7 @@ public class ProfileActivity extends AppCompatActivity {
      */
     private AlertDialog buildFertilizedDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(R.string.confirm_message).setTitle(R.string.confirm_message);
+        builder.setMessage(R.string.confirm_message).setTitle(R.string.fertilize_plant);
         builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
             /**
              * User clicked confirm
@@ -334,7 +344,7 @@ public class ProfileActivity extends AppCompatActivity {
      */
     private AlertDialog buildWateredDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(R.string.confirm_message).setTitle(R.string.confirm_message);
+        builder.setMessage(R.string.confirm_message).setTitle(R.string.water_plant);
         builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
             /**
              * User clicked confirm
@@ -365,24 +375,24 @@ public class ProfileActivity extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setView(R.layout.height_input_dialog).setTitle("Record New Height")
                 .setPositiveButton(R.string.mdtp_ok, new DialogInterface.OnClickListener() {
-                    /**
-                     * User clicked submit
-                     * @param dialog - current dialog
-                     * @param which - selected option
-                     */
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        EditText inputEditText = (EditText) ((AlertDialog) dialog).findViewById(R.id.height_edit_text);
-                        double newHeight = Double.parseDouble(inputEditText != null ? inputEditText.getText().toString() : "-1");
-                        if (height < newHeight) {
-                            height = newHeight;
-                            mDatabase.updatePlantHeight(ProfileActivity.this, plantId, height);
-                            mHeightTextView.setText(getString(R.string.height_fmt, height));
-                        }
-                        Context context = getApplicationContext();
-                        Toast.makeText(context, "Update successful", Toast.LENGTH_SHORT).show();
-                    }
-                }).setNegativeButton(R.string.mdtp_cancel, new DialogInterface.OnClickListener() {
+            /**
+             * User clicked submit
+             * @param dialog - current dialog
+             * @param which - selected option
+             */
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                EditText inputEditText = (EditText) ((AlertDialog) dialog).findViewById(R.id.height_edit_text);
+                double newHeight = Double.parseDouble(inputEditText != null ? inputEditText.getText().toString() : "-1");
+                if (height < newHeight) {
+                    height = newHeight;
+                    mDatabase.updatePlantHeight(ProfileActivity.this, plantId, height);
+                    mHeightTextView.setText(getString(R.string.height_fmt, height));
+                }
+                Context context = getApplicationContext();
+                Toast.makeText(context, "Update successful", Toast.LENGTH_SHORT).show();
+            }
+        }).setNegativeButton(R.string.mdtp_cancel, new DialogInterface.OnClickListener() {
             /**
              * User clicked cancel
              * @param dialog - current dialog
@@ -582,10 +592,19 @@ public class ProfileActivity extends AppCompatActivity {
         return (System.currentTimeMillis() - birthday) / 86400000.0;
     }
 
+    /**
+     * Expand a hidden view
+     * @param v - current view
+     */
     public static void expand(final View v) {
         v.measure(CoordinatorLayout.LayoutParams.MATCH_PARENT, CoordinatorLayout.LayoutParams.WRAP_CONTENT);
         final int targetHeight = v.getMeasuredHeight();
         Animation anim = new Animation() {
+            /**
+             * Transform a view
+             * @param interpolatedTime - time to transition
+             * @param t - transition to apply
+             */
             @Override
             protected void applyTransformation(float interpolatedTime, Transformation t) {
                 v.getLayoutParams().height = interpolatedTime == 1
@@ -594,39 +613,58 @@ public class ProfileActivity extends AppCompatActivity {
                 v.requestLayout();
             }
 
+            /**
+             * Returns if the bounds will change
+             * @return Returns true
+             */
             @Override
             public boolean willChangeBounds() {
                 return true;
             }
         };
-
         // 3dp/ms
         anim.setDuration(((int)(targetHeight / v.getContext().getResources().getDisplayMetrics().density)) * 3);
         v.startAnimation(anim);
     }
 
+    /**
+     * Collapse a visible view
+     * @param v - current view
+     */
     public static void collapse(final View v) {
         final int initialHeight = v.getMeasuredHeight();
-
-        Animation a = new Animation()
-        {
+        Animation a = new Animation() {
+            /**
+             * Transform the view
+             * @param interpolatedTime - time to transition
+             * @param t - animation to apply
+             */
             @Override
             protected void applyTransformation(float interpolatedTime, Transformation t) {
                 v.getLayoutParams().height = initialHeight - (int)(initialHeight * interpolatedTime);
                 v.requestLayout();
             }
 
+            /**
+             * Returns whether the bounds will change
+             * @return Returns true
+             */
             @Override
             public boolean willChangeBounds() {
                 return true;
             }
         };
-
         // 2dp/ms
         a.setDuration(((int)(initialHeight / v.getContext().getResources().getDisplayMetrics().density)) * 2);
         v.startAnimation(a);
     }
 
+    /**
+     * Rotate an image
+     * @param v - current view
+     * @param rotationAngle - angle to rotate image
+     * @return Returns the rotation angle
+     */
     private int rotateImage(View v, int rotationAngle) {
         ObjectAnimator anim = ObjectAnimator.ofFloat(v, "rotation", rotationAngle, rotationAngle + 180);
         anim.setDuration(500);
@@ -641,16 +679,37 @@ public class ProfileActivity extends AppCompatActivity {
      * @return - Returns the list of tutorial items
      */
     private ArrayList<TutorialItem> loadTutorialItems() {
-        TutorialItem tutorialItem1 = new TutorialItem(getString(R.string.tutorial_title_0), getString(R.string.tutorial_contents_0),
-                R.color.colorPrimary, R.drawable.tutorial_0,  R.drawable.tutorial_0);
-        TutorialItem tutorialItem2 = new TutorialItem(getString(R.string.tutorial_title_1), getString(R.string.tutorial_contents_1),
-                R.color.colorPrimary, R.drawable.tutorial_1,  R.drawable.tutorial_1);
-        TutorialItem tutorialItem3 = new TutorialItem(getString(R.string.tutorial_title_2), getString(R.string.tutorial_contents_2),
-                R.color.colorPrimary, R.drawable.tutorial_2,  R.drawable.tutorial_2);
+        TutorialItem tutorialItem1 = new TutorialItem(getString(R.string.profile_tutorial_title_0), getString(R.string.profile_tutorial_contents_0),
+                R.color.colorAccent, R.drawable.profile_tutorial_0, R.drawable.profile_tutorial_0);
+        TutorialItem tutorialItem2 = new TutorialItem(getString(R.string.profile_tutorial_title_1), getString(R.string.profile_tutorial_contents_1),
+                R.color.colorAccent, R.drawable.profile_tutorial_1, R.drawable.profile_tutorial_1);
+        TutorialItem tutorialItem3 = new TutorialItem(getString(R.string.profile_tutorial_title_2), getString(R.string.profile_tutorial_contents_2),
+                R.color.colorAccent, R.drawable.profile_tutorial_2, R.drawable.profile_tutorial_2);
+//        TutorialItem tutorialItem4 = new TutorialItem(getString(R.string.profile_tutorial_title_3), getString(R.string.profile_tutorial_contents_3),
+//                R.color.colorAccent, R.drawable.profile_tutorial_3, R.drawable.profile_tutorial_3);
+//        TutorialItem tutorialItem5 = new TutorialItem(getString(R.string.profile_tutorial_title_4), getString(R.string.profile_tutorial_contents_4),
+//                R.color.colorAccent, R.drawable.profile_tutorial_4, R.drawable.profile_tutorial_4);
+        TutorialItem tutorialItem6 = new TutorialItem(getString(R.string.profile_tutorial_title_5), getString(R.string.profile_tutorial_contents_5),
+                R.color.colorAccent, R.drawable.profile_tutorial_5, R.drawable.profile_tutorial_5);
+//        TutorialItem tutorialItem7 = new TutorialItem(getString(R.string.profile_tutorial_title_6), getString(R.string.profile_tutorial_contents_6),
+//                R.color.colorAccent, R.drawable.profile_tutorial_6, R.drawable.profile_tutorial_6);
+//        TutorialItem tutorialItem8 = new TutorialItem(getString(R.string.profile_tutorial_title_7), getString(R.string.profile_tutorial_contents_7),
+//                R.color.colorAccent, R.drawable.profile_tutorial_7, R.drawable.profile_tutorial_7);
+//        TutorialItem tutorialItem9 = new TutorialItem(getString(R.string.profile_tutorial_title_8), getString(R.string.profile_tutorial_contents_8),
+//                R.color.colorAccent, R.drawable.profile_tutorial_8, R.drawable.profile_tutorial_8);
+//        TutorialItem tutorialItem10 = new TutorialItem(getString(R.string.profile_tutorial_title_9), getString(R.string.profile_tutorial_contents_9),
+//                R.color.colorAccent, R.drawable.profile_tutorial_9, R.drawable.profile_tutorial_9);
         ArrayList<TutorialItem> tutorialItems = new ArrayList<>();
         tutorialItems.add(tutorialItem1);
         tutorialItems.add(tutorialItem2);
         tutorialItems.add(tutorialItem3);
+//        tutorialItems.add(tutorialItem4);
+//        tutorialItems.add(tutorialItem5);
+        tutorialItems.add(tutorialItem6);
+//        tutorialItems.add(tutorialItem7);
+//        tutorialItems.add(tutorialItem8);
+//        tutorialItems.add(tutorialItem9);
+//        tutorialItems.add(tutorialItem10);
         return tutorialItems;
     }
 }
