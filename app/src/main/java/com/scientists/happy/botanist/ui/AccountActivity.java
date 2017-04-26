@@ -68,7 +68,7 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
         mNameTextView = (TextView) findViewById(R.id.name);
         mEmailTextView = (TextView) findViewById(R.id.email);
         mBotanistSinceTextView = (TextView) findViewById(R.id.botanist_since);
-        mPlantsNumberTextView = (TextView) findViewById(R.id.plants_number + 1);
+        mPlantsNumberTextView = (TextView) findViewById(R.id.plants_number);
         mAccountImageView = (ImageView) findViewById(R.id.account_picture);
         TextView levelTextView = (TextView) findViewById(R.id.level_text_view);
         ImageView badge = (ImageView) findViewById(R.id.user_badge);
