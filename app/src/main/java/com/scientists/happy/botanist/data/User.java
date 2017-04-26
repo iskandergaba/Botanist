@@ -1,9 +1,7 @@
 // User object
 // @author: Iskander Gaba
 package com.scientists.happy.botanist.data;
-
 import java.util.Map;
-
 @SuppressWarnings({"WeakerAccess", "unused"})
 public class User {
     private String userName, email, userId;
