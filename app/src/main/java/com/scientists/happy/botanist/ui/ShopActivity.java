@@ -1,5 +1,5 @@
 // Shop for botanist accessories
-// @author: Wendy Zhang
+// @author: Wendy Zhang and Iskander Gaba
 package com.scientists.happy.botanist.ui;
 import android.content.Intent;
 import android.net.Uri;

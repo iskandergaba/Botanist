@@ -199,14 +199,11 @@ public class AddPlantActivity extends AppCompatActivity {
      * @return - Returns the list of tutorial items
      */
     private ArrayList<TutorialItem> loadTutorialItems() {
-        TutorialItem tutorialItem1 = new TutorialItem(getString(R.string.add_tutorial_title_0), getString(R.string.add_tutorial_contents_0),
+        TutorialItem tutorialItem2 = new TutorialItem(getString(R.string.add_tutorial_title_0), getString(R.string.add_tutorial_contents_0),
                 R.color.colorAccent, R.drawable.add_tutorial_0,  R.drawable.add_tutorial_0);
-        TutorialItem tutorialItem2 = new TutorialItem(getString(R.string.add_tutorial_title_1), getString(R.string.add_tutorial_contents_1),
+        TutorialItem tutorialItem3 = new TutorialItem(getString(R.string.add_tutorial_title_1), getString(R.string.add_tutorial_contents_1),
                 R.color.colorAccent, R.drawable.add_tutorial_1,  R.drawable.add_tutorial_1);
-        TutorialItem tutorialItem3 = new TutorialItem(getString(R.string.add_tutorial_title_2), getString(R.string.add_tutorial_contents_2),
-                R.color.colorAccent, R.drawable.add_tutorial_2,  R.drawable.add_tutorial_2);
         ArrayList<TutorialItem> tutorialItems = new ArrayList<>();
-        tutorialItems.add(tutorialItem1);
         tutorialItems.add(tutorialItem2);
         tutorialItems.add(tutorialItem3);
         return tutorialItems;
