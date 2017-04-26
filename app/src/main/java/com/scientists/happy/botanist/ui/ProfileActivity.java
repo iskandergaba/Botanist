@@ -679,37 +679,19 @@ public class ProfileActivity extends AppCompatActivity {
      * @return - Returns the list of tutorial items
      */
     private ArrayList<TutorialItem> loadTutorialItems() {
-        TutorialItem tutorialItem1 = new TutorialItem(getString(R.string.profile_tutorial_title_0), getString(R.string.profile_tutorial_contents_0),
+        TutorialItem tutorialItem0 = new TutorialItem(getString(R.string.profile_tutorial_title_0), getString(R.string.profile_tutorial_contents_0),
                 R.color.colorAccent, R.drawable.profile_tutorial_0, R.drawable.profile_tutorial_0);
-        TutorialItem tutorialItem2 = new TutorialItem(getString(R.string.profile_tutorial_title_1), getString(R.string.profile_tutorial_contents_1),
+        TutorialItem tutorialItem1 = new TutorialItem(getString(R.string.profile_tutorial_title_1), getString(R.string.profile_tutorial_contents_1),
                 R.color.colorAccent, R.drawable.profile_tutorial_1, R.drawable.profile_tutorial_1);
-        TutorialItem tutorialItem3 = new TutorialItem(getString(R.string.profile_tutorial_title_2), getString(R.string.profile_tutorial_contents_2),
+        TutorialItem tutorialItem2 = new TutorialItem(getString(R.string.profile_tutorial_title_2), getString(R.string.profile_tutorial_contents_2),
                 R.color.colorAccent, R.drawable.profile_tutorial_2, R.drawable.profile_tutorial_2);
-//        TutorialItem tutorialItem4 = new TutorialItem(getString(R.string.profile_tutorial_title_3), getString(R.string.profile_tutorial_contents_3),
-//                R.color.colorAccent, R.drawable.profile_tutorial_3, R.drawable.profile_tutorial_3);
-//        TutorialItem tutorialItem5 = new TutorialItem(getString(R.string.profile_tutorial_title_4), getString(R.string.profile_tutorial_contents_4),
-//                R.color.colorAccent, R.drawable.profile_tutorial_4, R.drawable.profile_tutorial_4);
-        TutorialItem tutorialItem6 = new TutorialItem(getString(R.string.profile_tutorial_title_5), getString(R.string.profile_tutorial_contents_5),
-                R.color.colorAccent, R.drawable.profile_tutorial_5, R.drawable.profile_tutorial_5);
-//        TutorialItem tutorialItem7 = new TutorialItem(getString(R.string.profile_tutorial_title_6), getString(R.string.profile_tutorial_contents_6),
-//                R.color.colorAccent, R.drawable.profile_tutorial_6, R.drawable.profile_tutorial_6);
-//        TutorialItem tutorialItem8 = new TutorialItem(getString(R.string.profile_tutorial_title_7), getString(R.string.profile_tutorial_contents_7),
-//                R.color.colorAccent, R.drawable.profile_tutorial_7, R.drawable.profile_tutorial_7);
-//        TutorialItem tutorialItem9 = new TutorialItem(getString(R.string.profile_tutorial_title_8), getString(R.string.profile_tutorial_contents_8),
-//                R.color.colorAccent, R.drawable.profile_tutorial_8, R.drawable.profile_tutorial_8);
-//        TutorialItem tutorialItem10 = new TutorialItem(getString(R.string.profile_tutorial_title_9), getString(R.string.profile_tutorial_contents_9),
-//                R.color.colorAccent, R.drawable.profile_tutorial_9, R.drawable.profile_tutorial_9);
+        TutorialItem tutorialItem3 = new TutorialItem(getString(R.string.profile_tutorial_title_3), getString(R.string.profile_tutorial_contents_3),
+                R.color.colorAccent, R.drawable.profile_tutorial_3, R.drawable.profile_tutorial_3);
         ArrayList<TutorialItem> tutorialItems = new ArrayList<>();
+        tutorialItems.add(tutorialItem0);
         tutorialItems.add(tutorialItem1);
         tutorialItems.add(tutorialItem2);
         tutorialItems.add(tutorialItem3);
-//        tutorialItems.add(tutorialItem4);
-//        tutorialItems.add(tutorialItem5);
-        tutorialItems.add(tutorialItem6);
-//        tutorialItems.add(tutorialItem7);
-//        tutorialItems.add(tutorialItem8);
-//        tutorialItems.add(tutorialItem9);
-//        tutorialItems.add(tutorialItem10);
         return tutorialItems;
     }
 }
