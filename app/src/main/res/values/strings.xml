@@ -128,12 +128,12 @@
     <string name="winter">Winter</string>
     <string name = "profile_tutorial_title_0">Profile</string>
     <string name = "profile_tutorial_title_1">Sharing</string>
-    <string name = "profile_tutorial_title_2">Options</string>
-    <string name = "profile_tutorial_title_3">Photographing</string>
+    <string name = "profile_tutorial_title_2">Photographing</string>
+    <string name = "profile_tutorial_title_3">Options</string>
     <string name = "profile_tutorial_contents_0">The profile page displays your plant\'s information. Tap the care tips, toxic, or noxious banners to toggle those sections.</string>
     <string name = "profile_tutorial_contents_1">Hitting share allows you to choose a platform to share your plant to.</string>
-    <string name = "profile_tutorial_contents_2">From the options menu, you can see additional information, change your plant\'s name, and create a gif.</string>
-    <string name = "profile_tutorial_contents_3">Tap the camera icon to change the photo.</string>
+    <string name = "profile_tutorial_contents_2">Tap the camera icon to change the photo.</string>
+    <string name = "profile_tutorial_contents_3">From the options menu, you can see additional information, change your plant\'s name, and create a gif.</string>
     <string name="record_new_height">Record New Height</string>
     <string name="watering">Watering</string>
     <string name="fertilizing">Fertilizing</string>
