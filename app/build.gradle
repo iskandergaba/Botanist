@@ -41,7 +41,6 @@ dependencies {
     compile 'com.github.PhilJay:MPAndroidChart:v3.0.2'
     compile 'com.wdullaer:materialdatetimepicker:3.1.3'
     compile 'za.co.riggaroo:materialhelptutorial:1.+'
-    compile 'com.android.support.constraint:constraint-layout:1.0.2'
     testCompile 'junit:junit:4.12'
 }
 

@@ -305,7 +305,8 @@
                             android:layout_height="wrap_content"
                             android:layout_marginBottom="@dimen/activity_vertical_margin"
                             android:background="@color/cardview_light_background"
-                            android:orientation="vertical">
+                            android:orientation="vertical"
+                            android:visibility="gone">
 
                             <TextView
                                 android:id="@+id/growth_period_text_view"
