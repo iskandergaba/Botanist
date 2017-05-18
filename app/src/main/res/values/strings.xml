@@ -24,7 +24,7 @@
     <string name="level_1">Little Botanist</string>
     <string name="level_2">Heisenberg</string>
     <string name="level_3">The Botanist</string>
-    <string name="server_client_id" translatable="false">993462563911-9h2lig8m0klrfst5ob8lu2lprnqgf2nf.apps.googleusercontent.com</string>
+    <string name="server_client_id" translatable="false">240637366726-p9ggcgbq8p2d27fsr46r05gqd7ompd94.apps.googleusercontent.com</string>
     <string name="fertilize_plant">Fertilize Plant</string>
     <string name="set_time">Set Time</string>
     <string name="revoke_access_message">All your data will be permanently deleted. Are you sure you want to delete your account?</string>
