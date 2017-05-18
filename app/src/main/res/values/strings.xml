@@ -149,4 +149,5 @@
     <string name = "main_tutorial_contents_0_1">Each item has a bar at the bottom showing how long until it needs watered. An empty bar means it should be watered immediately.</string>
     <string name = "main_tutorial_contents_0_2">Tap the + button at the bottom right to add a new plant.</string>
     <string name = "main_tutorial_contents_1">From options, you can access your account, settings, the shop, this tutorial, and learn about the development team.</string>
+    <string name="github_repo"><a href="https://github.com/iskandergaba/Botanist">GitHub Repo</a></string>
 </resources>
