@@ -20,13 +20,14 @@ public class Plant {
 
     /**
      * Create a new plant
+     * @param id - the unique id of the plant
      * @param name - the name of the plant
      * @param species - the plant's species
      * @param birthday - the plant's birthday
      * @param height - the plant's height
      */
-    Plant(String name, String species, long birthday, double height) {
-        this.id = species + "_" + name;
+    Plant(String id, String name, String species, long birthday, double height) {
+        this.id = id;
         this.name = name;
         this.species = species;
         this.birthday = birthday;

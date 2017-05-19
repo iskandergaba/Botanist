@@ -324,9 +324,8 @@ public class DatabaseManager {
      * @param height - the plant's height
      * @param bmp - the plant's picture
      */
-    public boolean addPlant(Context context, String name, String species, long birthday, double height, final Bitmap bmp) {
+    public boolean addPlant(final Context context, String name, String species, long birthday, double height, final Bitmap bmp) {
         showProgressDialog(context, context.getString(R.string.loading_text));
-        final Plant plant;
         // reject plant addition if species is null
         if ((species == null) || species.equals("") || (name == null) || name.equals("")) {
             Toast.makeText(context, R.string.toast_invalid_plant_input, Toast.LENGTH_SHORT).show();
@@ -340,41 +339,30 @@ public class DatabaseManager {
         }
         else if (mAutocompleteCache.containsKey(species)) {
             // If the user typed a common name, fetch the scientific name
-            plant = new Plant(name, mAutocompleteCache.get(species), birthday, height);
+            species = mAutocompleteCache.get(species);
         }
-        else if (mAutocompleteCache.containsValue(species)) {
-            // The user must have entered the correct scientific name
-            plant = new Plant(name, species, birthday, height);
-        }
-        else {
+        else if (!mAutocompleteCache.containsValue(species)) {
+            // The user must have entered neither the scientific nor the common name
             hideProgressDialog();
             return false;
         }
-        final String plantId = plant.getId();
+
         final String userId = getUserId();
         if (userId != null) {
-            mDatabase.child("users").child(userId).child("plants").child(plantId).addListenerForSingleValueEvent(new ValueEventListener() {
-                /**
-                 * Handle a change to the data asynchronously
-                 * @param snapshot - the current database state
-                 */
+            DatabaseReference plantRef = mDatabase.child("users").child(userId).child("plants").push();
+            final String plantId = plantRef.getKey();
+            final Plant plant = new Plant(plantId, name, species, birthday, height);
+            plantRef.setValue(plant).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
-                public void onDataChange(DataSnapshot snapshot) {
-                    if (!snapshot.exists()) {
-                        mDatabase.child("users").child(userId).child("plants").child(plantId).setValue(plant);
+                public void onComplete(@NonNull Task<Void> task) {
+                    if (!task.isSuccessful()) {
+                        Toast.makeText(context, "Plant add failed, try again", Toast.LENGTH_SHORT).show();
+                    } else {
                         setPlantsNumber(++mPlantsNumber);
                         updatePlantImage(0, plantId, bmp);
                         setAddedNumber(getAddedCount() + 1);
                         updateUserRating();
                     }
-                }
-
-                /**
-                 * Do nothing when update is cancelled
-                 * @param databaseError - ignored error
-                 */
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
                 }
             });
         }
