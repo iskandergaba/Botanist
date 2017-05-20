@@ -152,4 +152,6 @@
     <string name="github_repo"><a href="https://github.com/iskandergaba/Botanist">GitHub Repo</a></string>
     <string name="license">This app is open source and licensed under the Apache License, Version 2.0</string>
     <string name="usda">Plants data were obtained from U.S. Department of Agriculture (https://www.usda.gov)</string>
+    <string name="daily_tip_settings_title">Daily Tip Settings</string>
+    <string name="notification_settings_title">Notification Settings</string>
 </resources>

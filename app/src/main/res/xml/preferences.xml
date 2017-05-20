@@ -1,51 +1,61 @@
 <PreferenceScreen
     xmlns:android="http://schemas.android.com/apk/res/android" >
 
-    <SwitchPreference
-        android:key="daily_tip"
-        android:defaultValue="true"
-        android:title="Show Daily Tip"
-        android:summary="Enable/Disable Botanist daily tip option"/>
+    <PreferenceCategory
+        android:title="@string/daily_tip_settings_title">
 
-    <Preference
-        android:key="water_time"
-        android:title="Watering Time"
-        android:summary="Set when to receive watering and plant care reminders" />
+        <SwitchPreference
+            android:key="daily_tip"
+            android:defaultValue="true"
+            android:title="Show Daily Tip"
+            android:summary="Enable/Disable Botanist daily tip option"/>
 
-    <ListPreference
-        android:key="water_reminder"
-        android:title="Watering Reminder"
-        android:entries="@array/reminder_pref_entries"
-        android:entryValues="@array/reminder_pref_values"
-        android:defaultValue="1">
+    </PreferenceCategory>
 
-    </ListPreference>
+    <PreferenceCategory
+        android:title="@string/notification_settings_title">
 
-    <ListPreference
-        android:key="height_record_reminder"
-        android:title="Height Recording Reminder"
-        android:entries="@array/reminder_pref_entries"
-        android:entryValues="@array/reminder_pref_values"
-        android:defaultValue="2">
+        <Preference
+            android:key="water_time"
+            android:title="Watering Time"
+            android:summary="Set when to receive watering and plant care reminders" />
 
-    </ListPreference>
+        <ListPreference
+            android:key="water_reminder"
+            android:title="Watering Reminder"
+            android:entries="@array/reminder_pref_entries"
+            android:entryValues="@array/reminder_pref_values"
+            android:defaultValue="1">
 
-    <ListPreference
-        android:key="photo_reminder"
-        android:title="Photo Update Reminder"
-        android:entries="@array/reminder_pref_entries"
-        android:entryValues="@array/reminder_pref_values"
-        android:defaultValue="2">
+        </ListPreference>
 
-    </ListPreference>
+        <ListPreference
+            android:key="height_record_reminder"
+            android:title="Height Recording Reminder"
+            android:entries="@array/reminder_pref_entries"
+            android:entryValues="@array/reminder_pref_values"
+            android:defaultValue="2">
 
-    <ListPreference
-        android:key="fertilize_reminder"
-        android:title="Fertilizer Reminder"
-        android:entries="@array/reminder_pref_entries"
-        android:entryValues="@array/reminder_pref_values"
-        android:defaultValue="3">
+        </ListPreference>
 
-    </ListPreference>
+        <ListPreference
+            android:key="photo_reminder"
+            android:title="Photo Update Reminder"
+            android:entries="@array/reminder_pref_entries"
+            android:entryValues="@array/reminder_pref_values"
+            android:defaultValue="2">
+
+        </ListPreference>
+
+        <ListPreference
+            android:key="fertilize_reminder"
+            android:title="Fertilizer Reminder"
+            android:entries="@array/reminder_pref_entries"
+            android:entryValues="@array/reminder_pref_values"
+            android:defaultValue="3">
+
+        </ListPreference>
+
+    </PreferenceCategory>
 
 </PreferenceScreen>
