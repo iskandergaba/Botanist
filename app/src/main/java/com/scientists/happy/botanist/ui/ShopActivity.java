@@ -7,9 +7,8 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import com.scientists.happy.botanist.R;
-import com.scientists.happy.botanist.data.DatabaseManager;
+
 public class ShopActivity extends AppCompatActivity {
-    private DatabaseManager mDatabase;
     private static final String SHOP_FERTILIZER_URL = "https://www.amazon.com/Best-Sellers-Patio-Lawn-Garden-Fertilizers/zgbs/lawn-garden/3752891";
     private static final String SHOP_ACCESSORIES_URL = "https://www.amazon.com/Best-Sellers-Patio-Lawn-Garden-Plant-Container-Accessories/zgbs/lawn-garden/3480695011";
     private static final String SHOP_POT_URL = "https://www.amazon.com/Best-Sellers-Patio-Lawn-Garden-Gardening-Pots-Planters-Accessories/zgbs/lawn-garden/3480694011";
@@ -21,7 +20,6 @@ public class ShopActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_shop);
-        mDatabase = DatabaseManager.getInstance();
         View fertilizeButton = findViewById(R.id.shop_fertilizer_button);
         fertilizeButton.setOnClickListener(new View.OnClickListener() {
             /**
@@ -68,7 +66,7 @@ public class ShopActivity extends AppCompatActivity {
     }
 
     /**
-     * Launch Google Chrome
+     * Launch Web browser
      * @param url - the url to view
      */
     private void openWebPage(String url) {
