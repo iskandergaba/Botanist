@@ -44,6 +44,16 @@ public class SettingsActivity extends AppCompatActivity {
         mPreferences = PreferenceManager.getDefaultSharedPreferences(this);
     }
 
+    /**
+     * User pressed the back button
+     * @return Returns true
+     */
+    @Override
+    public boolean onSupportNavigateUp() {
+        super.onBackPressed();
+        return true;
+    }
+
     public static class SettingsFragment extends PreferenceFragment implements OnSharedPreferenceChangeListener{
         /**
          * Run when fragment is created

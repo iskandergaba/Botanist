@@ -415,6 +415,7 @@ public class DatabaseManager {
                             mStorage.child(userId).child(plantId + "_" + i + ".jpg").delete();
                         }
                         setDeletedNumber(getDeletedCount() + 1);
+                        setPhotoCount(getPhotoCount() - (photoNum + 1));
                         updateUserRating();
                     }
                     File gif = new File(getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), plantId + ".gif");
