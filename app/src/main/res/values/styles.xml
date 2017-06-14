@@ -21,4 +21,9 @@
         <item name="colorAccent">@color/mdtp_white</item>
     </style>
 
+    <!-- Splash Screen theme. -->
+    <style name="AppTheme.SplashScreen" parent="AppTheme.NoActionBar">
+        <item name="android:windowBackground">@drawable/splash_background</item>
+    </style>
+
 </resources>
