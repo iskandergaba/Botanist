@@ -227,7 +227,6 @@ public class DatabaseManager {
     private DatabaseManager() {
         // Just in case we want to add offline caching to the app
         // FirebaseDatabase.getInstance().setPersistenceEnabled(true);
-        DatabaseReference.goOnline();
         mAutocompleteCache = new HashMap<>();
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mStorage = FirebaseStorage.getInstance().getReference();

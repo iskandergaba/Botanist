@@ -154,4 +154,9 @@
     <string name="usda">Plants data were obtained from U.S. Department of Agriculture (https://www.usda.gov)</string>
     <string name="daily_tip_settings_title">Daily Tip Settings</string>
     <string name="notification_settings_title">Notification Settings</string>
+    <string name="rate_dialog_title">Enjoying Botanist?</string>
+    <string name="rate_dialog_description">Thank you for choosing Botanist. If you enjoy using the app, please take a moment to rate it. We value your feedback and support!</string>
+    <string name="rate_button_text">Rate Botanist</string>
+    <string name="later_button_text">Remind me Later</string>
+    <string name="no_thanks_button_text">No, Thanks</string>
 </resources>
