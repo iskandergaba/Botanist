@@ -25,7 +25,7 @@ public class AboutActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_about);
-        ((TextView) findViewById(R.id.version_name)).setText(getString(R.string.version_fmt, BuildConfig.VERSION_NAME));
+        ((TextView) findViewById(R.id.version_name)).setText(BuildConfig.VERSION_NAME);
         // Set click listeners for the buttons
         findViewById(R.id.cactus_github_button).setOnClickListener(new View.OnClickListener() {
             /**
