@@ -852,15 +852,15 @@ public class DatabaseManager {
                 protected void populateView(final View view, final String plant, final int position) {
                     if (!plant.equals(species)) {
                         ((TextView) view.findViewById(R.id.plant_species)).setText(plant);
-                        view.findViewById(R.id.amazon_button).setOnClickListener(new View.OnClickListener() {
+                        view.findViewById(R.id.shop_button).setOnClickListener(new View.OnClickListener() {
                             /**
                              * User clicked buy now
                              * @param v - current view
                              */
                             @Override
                             public void onClick(View v) {
-                                String search = plant.replaceAll(" ", "+").toLowerCase();
-                                String url = "https://www.amazon.com/s/ref=nb_sb_noss_2?url=search-alias%3Dlawngarden&field-keywords=" + search;
+                                String search = plant.replaceAll(" ", "-").toLowerCase();
+                                String url = "http://www.crocus.co.uk/search/_/search." + search + "/sort.0/";
                                 Intent viewIntent = new Intent("android.intent.action.VIEW", Uri.parse(url));
                                 activity.startActivity(viewIntent);
                             }
