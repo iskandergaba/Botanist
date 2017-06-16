@@ -286,6 +286,7 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
      * Remove user's access to database on signout/timeout
      */
     private void revokeAccess() {
+        deleteUser();
         Auth.GoogleSignInApi.revokeAccess(mGoogleApiClient).setResultCallback(new ResultCallback<Status>() {
             /**
              * Revoke access result
@@ -293,13 +294,11 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
              */
             @Override
             public void onResult(@NonNull Status status) {
-                showProgressDialog();
-                deleteUser();
                 Intent resultIntent = new Intent();
                 setResult(RESULT_OK, resultIntent);
-                hideProgressDialog();
                 finish();
             }
+
         });
     }
 
@@ -310,7 +309,7 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
             String userId = user.getUid();
-            mDatabase.deleteUserRecords(userId);
+            mDatabase.deleteUserRecords(AccountActivity.this, userId);
             user.delete().addOnCompleteListener(new OnCompleteListener<Void>() {
                 /**
                  * Delete the user task completed

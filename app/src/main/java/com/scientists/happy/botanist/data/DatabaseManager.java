@@ -17,6 +17,7 @@ import android.os.AsyncTask;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -201,6 +202,8 @@ public class DatabaseManager {
             }
             catch (IOException e) {
                 return false;
+            } finally {
+                updateGallery(mContext);
             }
         }
 
@@ -227,7 +230,6 @@ public class DatabaseManager {
     private DatabaseManager() {
         // Just in case we want to add offline caching to the app
         // FirebaseDatabase.getInstance().setPersistenceEnabled(true);
-        DatabaseReference.goOnline();
         mAutocompleteCache = new HashMap<>();
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mStorage = FirebaseStorage.getInstance().getReference();
@@ -308,11 +310,36 @@ public class DatabaseManager {
      * Delete a user from the database
      * @param userId - The user id
      */
-    public void deleteUserRecords(String userId) {
+    public void deleteUserRecords(Context context, final String userId) {
+        showProgressDialog(context, context.getString(R.string.loading_text));
         if (userId != null) {
-            mStorage.child(userId).delete();
-            mDatabase.child("users").child(userId).removeValue();
+            // Remove photos uploaded by the user
+            mDatabase.child("users").child(userId).child("photos").addValueEventListener(new ValueEventListener() {
+                /**
+                 * Handle a change in the database contents
+                 * @param dataSnapshot - a snapshot of data
+                 */
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    // Deleting the user photos
+                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                        String photoFileName = snapshot.getValue(String.class);
+                        mStorage.child(userId).child(photoFileName).delete();
+                    }
+                    // then, deleting all user records
+                    mDatabase.child("users").child(userId).removeValue();
+                }
+
+                /**
+                 * Do nothing when the process is cancelled
+                 * @param databaseError - Ignored error
+                 */
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                }
+            });
         }
+        hideProgressDialog();
     }
 
     /**
@@ -385,6 +412,7 @@ public class DatabaseManager {
             StorageReference filepath = mStorage.child(userId).child(plantId + "_" + photoNum + ".jpg");
             filepath.putBytes(data);
             mDatabase.child("users").child(userId).child("plants").child(plantId).child("photoNum").setValue(photoNum);
+            mDatabase.child("users").child(userId).child("photos").push().setValue(plantId + "_" + photoNum + ".jpg");
             updateNotificationTime(plantId, "lastPhotoNotification");
             setPhotoCount(getPhotoCount() + 1);
             updateUserRating();
@@ -401,35 +429,27 @@ public class DatabaseManager {
         final String userId = getUserId();
         deleteAllReminders(context);
         if (userId != null) {
-            mDatabase.child("users").child(userId).child("plants").child(plantId).addListenerForSingleValueEvent(new ValueEventListener() {
-                /**
-                 * Handle asynchronous change to database
-                 * @param snapshot - the current database contents
-                 */
+            mDatabase.child("users").child(userId).child("plants").child(plantId).removeValue();
+            mDatabase.child("users").child(userId).child("photos").addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
-                public void onDataChange(DataSnapshot snapshot) {
-                    if (snapshot.exists()) {
-                        mDatabase.child("users").child(userId).child("plants").child(plantId).removeValue();
-                        setPlantsNumber(--mPlantsNumber);
-                        for (int i = 0; i <= photoNum; i++) {
-                            mStorage.child(userId).child(plantId + "_" + i + ".jpg").delete();
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                        String key = snapshot.getKey();
+                        String photoFileName = snapshot.getValue(String.class);
+                        if (photoFileName.contains(plantId)) {
+                            mDatabase.child("users").child(userId).child("photos").child(key).removeValue();
+                            mStorage.child(userId).child(photoFileName).delete();
                         }
-                        setDeletedNumber(getDeletedCount() + 1);
-                        setPhotoCount(getPhotoCount() - (photoNum + 1));
-                        updateUserRating();
                     }
-                    File gif = new File(getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), plantId + ".gif");
-                    if (gif.exists() && gif.delete()) {
-                        updateGallery(context);
-                    }
+                    setPlantsNumber(--mPlantsNumber);
+                    setDeletedNumber(getDeletedCount() + 1);
+                    setPhotoCount(getPhotoCount() - (photoNum + 1));
+                    updateUserRating();
                 }
 
-                /**
-                 * Do nothing when the event is cancelled.
-                 * @param databaseError - ignored error
-                 */
                 @Override
                 public void onCancelled(DatabaseError databaseError) {
+
                 }
             });
         }

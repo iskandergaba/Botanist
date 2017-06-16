@@ -12,6 +12,8 @@ import android.view.View;
 import android.widget.GridView;
 import com.scientists.happy.botanist.R;
 import com.scientists.happy.botanist.data.DatabaseManager;
+import com.scientists.happy.botanist.utils.AppRater;
+
 import java.util.ArrayList;
 import za.co.riggaroo.materialhelptutorial.TutorialItem;
 public class MainActivity extends AppCompatActivity {
@@ -59,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
         mDatabase.showTutorial(this, loadTutorialItems(), false);
         mDatabase.populatePlantGrid(this, gridView);
         mDatabase.generateDailyTip(this, tipView);
+        AppRater.INSTANCE.appLaunched(this);
     }
 
     /**
