@@ -7,10 +7,15 @@ import java.util.LinkedHashMap
 @Suppress("unused")
 class Plant {
     /**
-     * Get the number of the most recent photo
-     * @return Returns the number of the most recent photo
+     * Get the number of photos uploaded for the plant (zero-index based)
+     * @return Returns the number of the most recent photo (zero-index based)
      */
     var photoNum: Int = -1
+    /**
+     * Get the number of the most recent photo (zero-index based)
+     * @return Returns the number of the most recent photo (zero-index based)
+     */
+    var photoPointer: Int = -1
     /**
      * Get the plant's birthday
      * @return Returns the plant's birthday
@@ -42,6 +47,11 @@ class Plant {
      */
     var height: Double = 0.0
     /**
+     * Get the plant's id
+     * @return Returns the plant's id
+     */
+    var id: String? = null
+    /**
      * Get the plant's name
      * @return Returns the plant's name
      */
@@ -52,10 +62,10 @@ class Plant {
      */
     var species: String? = null
     /**
-     * Get the plant's id
-     * @return Returns the plant's id
+     * Get the plant's name
+     * @return Returns the plant's name
      */
-    var id: String? = null
+    var profilePhoto: String? = "default"
     /**
      * Get gif location
      * @return Returns the location of the plant gif
@@ -102,7 +112,6 @@ class Plant {
         this.lastWaterNotification = lastMeasureNotification
         this.lastPhotoNotification = lastMeasureNotification
         (heights as LinkedHashMap<String, Double>).put(java.lang.Long.toString(lastMeasureNotification), height)
-        photoNum = -1
         gifLocation = "No Gif made (yet!)"
     }
 
