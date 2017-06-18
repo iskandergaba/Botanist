@@ -60,10 +60,10 @@ class User {
      */
     var photoCount: Int = 0
     /**
-     * Fetch the number of times the user took photos of their plants
+     * Fetch the names of photos of all plants
      * @return Returns photos taken
      */
-    var photos: Map<String, Int>? = null
+    var photos: Map<String, String>? = null
     /**
      * Fetch the number of times the user took photos of their plants
      * @return Returns tutorials shown

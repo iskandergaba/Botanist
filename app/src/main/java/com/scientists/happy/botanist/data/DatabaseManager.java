@@ -45,6 +45,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -332,7 +333,9 @@ public class DatabaseManager {
                     // Deleting the user photos
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                         String photoFileName = snapshot.getValue(String.class);
-                        mStorage.child(userId).child(photoFileName).delete();
+                        if (photoFileName != null) {
+                            mStorage.child(userId).child(photoFileName).delete();
+                        }
                     }
                     // then, deleting all user records
                     mDatabase.child("users").child(userId).removeValue();
@@ -447,7 +450,7 @@ public class DatabaseManager {
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                         String key = snapshot.getKey();
                         String photoFileName = snapshot.getValue(String.class);
-                        if (photoFileName.contains(plantId)) {
+                        if (photoFileName != null && photoFileName.contains(plantId)) {
                             mDatabase.child("users").child(userId).child("photos").child(key).removeValue();
                             mStorage.child(userId).child(photoFileName).delete();
                         }
@@ -502,7 +505,7 @@ public class DatabaseManager {
                         List<Entry> entries = new ArrayList<>();
                         for (DataSnapshot record: snapshot.getChildren()) {
                             long time = Long.parseLong(record.getKey());
-                            float height = record.getValue(Float.class);
+                            float height = (float) record.getValue();
                             entries.add(new Entry(time, height));
                         }
                         if (!entries.isEmpty()) {
@@ -743,7 +746,7 @@ public class DatabaseManager {
         loadingProgressBar.setVisibility(View.VISIBLE);
         if (userId != null) {
             DatabaseReference databaseRef = mDatabase.child("users").child(userId).child("plants");
-            final FirebaseListAdapter<Plant> adapter = new FirebaseListAdapter<Plant>(activity, Plant.class, R.layout.grid_item_view, databaseRef) {
+            final FirebaseListAdapter<Plant> adapter = new FirebaseListAdapter<Plant>(activity, Plant.class, R.layout.plant_item_view, databaseRef) {
                 /**
                  * Populate a grid item
                  * @param view - the current view
@@ -817,7 +820,79 @@ public class DatabaseManager {
             connectedRef.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot snapshot) {
-                    boolean connected = snapshot.getValue(Boolean.class);
+                    boolean connected = (boolean) snapshot.getValue();
+                    if (connected) {
+                        emptyGridView.setText(R.string.loading_text);
+                        loadingProgressBar.setVisibility(View.VISIBLE);
+                    } else {
+                        Toast.makeText(activity, R.string.msg_network_error, Toast.LENGTH_SHORT).show();
+                        emptyGridView.setText(R.string.msg_network_error);
+                        loadingProgressBar.setVisibility(View.GONE);
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError error) {
+                }
+            });
+
+            databaseRef.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    loadingProgressBar.setVisibility(View.GONE);
+                    emptyGridView.setText(R.string.no_plants);
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    emptyGridView.setText(R.string.msg_unexpected_error);
+                    loadingProgressBar.setVisibility(View.GONE);
+                }
+            });
+            grid.setAdapter(adapter);
+        }
+    }
+
+    /**
+     * populate a grid with user plants
+     * @param activity - the current activity
+     * @param grid - the current grid
+     */
+    public void populatePhotoGrid(final Activity activity, final GridView grid, final String plantId) {
+        final String userId = getUserId();
+        final TextView emptyGridView = (TextView) activity.findViewById(R.id.empty_grid_view);
+        final ProgressBar loadingProgressBar = (ProgressBar) activity.findViewById(R.id.loading_indicator);
+        loadingProgressBar.setVisibility(View.VISIBLE);
+        if (userId != null) {
+            DatabaseReference databaseRef = mDatabase.child("users").child(userId).child("photos");
+            // An SQL-like hack to retrieve only data with values that matches the query: "plantId*"
+            // This is needed to query only images that correspond to the specific plant being edited
+            Query query = databaseRef.orderByValue().startAt(plantId).endAt(plantId + "\uf8ff");
+            databaseRef.orderByValue().endAt(plantId);
+            final FirebaseListAdapter<String> adapter = new FirebaseListAdapter<String>(activity, String.class, R.layout.photo_item_view, query) {
+                /**
+                 * Populate a grid item
+                 * @param view - the current view
+                 * @param photoName - the plant to display
+                 * @param position - the position in the menu
+                 */
+                @Override
+                protected void populateView(final View view, final String photoName, int position) {
+                    StorageReference storageReference = mStorage.child(userId).child(photoName);
+                    final ImageView picture = (ImageView) view.findViewById(R.id.photo_image_view);
+                    Glide.with(activity).using(new FirebaseImageLoader()).load(storageReference).dontAnimate()
+                            .placeholder(R.drawable.flowey).into(picture);
+                }
+
+
+            };
+
+            // After digging deep, I discovered that Firebase keeps some local information in ".info"
+            DatabaseReference connectedRef = mDatabase.child(".info/connected");
+            connectedRef.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot snapshot) {
+                    boolean connected = (boolean) snapshot.getValue();
                     if (connected) {
                         emptyGridView.setText(R.string.loading_text);
                         loadingProgressBar.setVisibility(View.VISIBLE);
@@ -965,6 +1040,7 @@ public class DatabaseManager {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     PlantEntry entry = dataSnapshot.getValue(PlantEntry.class);
+                    assert entry != null;
                     ((TextView) view.findViewById(R.id.group_holder)).setText(entry.getGroup());
                     ((TextView) view.findViewById(R.id.care_tips)).setText(entry.generateCareTips());
                     generateActiveGrowth(view, entry.getActive());
@@ -1455,7 +1531,7 @@ public class DatabaseManager {
                         // Basically, this says "For each DataSnapshot *Data* in dataSnapshot, do what's inside the method.
                         for (DataSnapshot snapshot: dataSnapshot.getChildren()) {
                             String name = snapshot.getKey();
-                            boolean isTutorialShown = snapshot.getValue(Boolean.class);
+                            boolean isTutorialShown = (boolean) snapshot.getValue();
                             tutorials.put(name, isTutorialShown);
                         }
                         if (!tutorials.containsKey(activityName) || !tutorials.get(activityName)) {
@@ -1621,7 +1697,7 @@ public class DatabaseManager {
                 @Override
                 public void onDataChange(DataSnapshot snapshot) {
                     if (snapshot.exists()) {
-                        long indexOfLastDailyTip = snapshot.getValue(Long.class);
+                        long indexOfLastDailyTip = (long) snapshot.getValue();
                         int dailyTipIndex = (int) (Math.random() * dailyTips.length);
                         while (dailyTipIndex == indexOfLastDailyTip) {
                             dailyTipIndex = (int) (Math.random() * dailyTips.length);
@@ -1657,7 +1733,7 @@ public class DatabaseManager {
                     if (snapshot.exists()) {
                         Calendar today = Calendar.getInstance();
                         Calendar lastTime = Calendar.getInstance();
-                        lastTime.setTimeInMillis(snapshot.getValue(Long.class));
+                        lastTime.setTimeInMillis((long) snapshot.getValue());
                         if (lastTime.get(Calendar.DAY_OF_YEAR) != today.get(Calendar.DAY_OF_YEAR)) {
                             tipView.setVisibility(View.VISIBLE);
                             setDateOfLastDailyTip(System.currentTimeMillis());

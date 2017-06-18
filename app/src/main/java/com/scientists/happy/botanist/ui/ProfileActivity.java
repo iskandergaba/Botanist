@@ -260,7 +260,13 @@ public class ProfileActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if (id == R.id.action_share) {
+        if (id == R.id.action_edit_profile) {
+            Intent i = new Intent(this, EditProfileActivity.class);
+            i.putExtra("plant_id", plantId);
+            startActivity(i);
+            return true;
+        }
+        else if (id == R.id.action_share) {
             sharePlant();
             return true;
         }
