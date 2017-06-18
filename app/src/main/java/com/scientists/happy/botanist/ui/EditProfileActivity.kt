@@ -19,8 +19,9 @@ class EditProfileActivity : AppCompatActivity() {
         setContentView(R.layout.activity_edit_profile)
         mDatabase = DatabaseManager.getInstance()
         val grid = findViewById(R.id.photo_grid_view) as GridView
-        grid.emptyView = findViewById(R.id.empty_list_view)
-        val plantId = intent.extras.get("plant_id") as String
+        val extras = intent.extras
+        val plantId = extras.get("plant_id") as String
+        grid.emptyView = findViewById(R.id.empty_grid_view)
         mDatabase!!.populatePhotoGrid(this, grid, plantId)
     }
 

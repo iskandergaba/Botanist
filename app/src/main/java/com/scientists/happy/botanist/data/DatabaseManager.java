@@ -864,12 +864,14 @@ public class DatabaseManager {
         final ProgressBar loadingProgressBar = (ProgressBar) activity.findViewById(R.id.loading_indicator);
         loadingProgressBar.setVisibility(View.VISIBLE);
         if (userId != null) {
-            DatabaseReference databaseRef = mDatabase.child("users").child(userId).child("photos");
+            final DatabaseReference databaseRef = mDatabase.child("users").child(userId).child("photos");
+            final DatabaseReference profilePhotoRef = mDatabase.child("users").child(userId).child("plants").child(plantId)
+                    .child("profilePhoto");
             // An SQL-like hack to retrieve only data with values that matches the query: "plantId*"
             // This is needed to query only images that correspond to the specific plant being edited
             Query query = databaseRef.orderByValue().startAt(plantId).endAt(plantId + "\uf8ff");
-            databaseRef.orderByValue().endAt(plantId);
-            final FirebaseListAdapter<String> adapter = new FirebaseListAdapter<String>(activity, String.class, R.layout.photo_item_view, query) {
+            final FirebaseListAdapter<String> adapter =
+                    new FirebaseListAdapter<String>(activity, String.class, R.layout.photo_item_view, query) {
                 /**
                  * Populate a grid item
                  * @param view - the current view
@@ -882,6 +884,33 @@ public class DatabaseManager {
                     final ImageView picture = (ImageView) view.findViewById(R.id.photo_image_view);
                     Glide.with(activity).using(new FirebaseImageLoader()).load(storageReference).dontAnimate()
                             .placeholder(R.drawable.flowey).into(picture);
+                    final View setButton = view.findViewById(R.id.set_photo_btn);
+                    setButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            profilePhotoRef.setValue(photoName);
+                            notifyDataSetChanged();
+                        }
+                    });
+                    profilePhotoRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            String profilePhoto = (String) dataSnapshot.getValue();
+                            View isSetIndicator = view.findViewById(R.id.is_set_indicator);
+                            if (profilePhoto != null && profilePhoto.equals(photoName)) {
+                                setButton.setVisibility(View.GONE);
+                                isSetIndicator.setVisibility(View.VISIBLE);
+                            } else {
+                                setButton.setVisibility(View.VISIBLE);
+                                isSetIndicator.setVisibility(View.GONE);
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
                 }
 
 
