@@ -7,6 +7,7 @@ import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -17,6 +18,7 @@ import android.os.AsyncTask;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AlertDialog;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -57,6 +59,7 @@ import com.scientists.happy.botanist.services.UpdatePhotoReceiver;
 import com.scientists.happy.botanist.services.WaterReceiver;
 import com.scientists.happy.botanist.ui.ProfileActivity;
 import com.scientists.happy.botanist.ui.SettingsActivity;
+import com.scientists.happy.botanist.utils.ExecutorValueEventListener;
 import com.scientists.happy.botanist.utils.GifSequenceWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -69,6 +72,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+
 import za.co.riggaroo.materialhelptutorial.TutorialItem;
 import za.co.riggaroo.materialhelptutorial.tutorial.MaterialTutorialActivity;
 import static android.content.Context.ALARM_SERVICE;
@@ -127,112 +132,6 @@ public class DatabaseManager {
             return null;
         }
     }
-
-    private class CreateGifTask extends AsyncTask<Void, Void, Boolean> {
-        int mPhotoNum;
-        String mPlantId;
-        String mUserId;
-        String mName;
-        String mSpecies;
-        Context mContext;
-        File mOutFile;
-        /**
-         * Prepare to launch task
-         */
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            showProgressDialog(mContext, mContext.getString(R.string.gif_loading));
-        }
-
-        /**
-         * Create the background process for loading images
-         * @param context - calling activity's context
-         * @param photoCount - number of images taken of the plant
-         * @param plantId - id of plant to make gif of
-         * @param name - name of plant to make gif of
-         * @param species - species of plant to make gif of
-         */
-        private CreateGifTask(Context context, int photoCount, String plantId, String name, String species) {
-            this.mContext = context;
-            this.mUserId = getUserId();
-            this.mPlantId = plantId;
-            this.mName = name;
-            this.mSpecies = species;
-            this.mPhotoNum = photoCount;
-        }
-
-        /**
-         * Background asynchronous update
-         * @param params - process parameters
-         * @return Returns nothing
-         */
-        @Override
-        protected Boolean doInBackground(Void... params) {
-            // Iskander updated this because the photo counting is zero-index based
-            // I changed it to zero so that if the user uploaded 2 picture only, we will still generate a GIF for them
-            if (mUserId == null || mPhotoNum > 0) {
-                Toast.makeText(mContext, "You must take at least 2 pictures to make a GIF", Toast.LENGTH_SHORT).show();
-                return false;
-            } else {
-                ByteArrayOutputStream out = new ByteArrayOutputStream();
-                GifSequenceWriter gifWriter = new GifSequenceWriter();
-                gifWriter.start(out);
-                // 500 ms frame
-                gifWriter.setDelay(500);
-                for (int i = 0; i <= mPhotoNum; i++) {
-                    StorageReference storageReference = mStorage.child(mUserId).child(mPlantId + "_" + i + ".jpg");
-                    try {
-                        Bitmap bmp = Glide.with(mContext).using(new FirebaseImageLoader()).load(storageReference).asBitmap().into(-1, -1).get();
-                        gifWriter.addFrame(bmp);
-                    }
-                    catch (InterruptedException | ExecutionException e) {
-                        return false;
-                    }
-                }
-                gifWriter.finish();
-                try {
-                    // created gif files are written to pictures public external storage
-                    File outputDir = getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES + "/Botanist");
-                    // Apparently, the external storage public directory only sometimes exists?
-                    if (!outputDir.exists()) {
-                        //noinspection ResultOfMethodCallIgnored
-                        outputDir.mkdir();
-                    }
-                    // Iskander was here, we want to save gifs with the newest plant name which the plant id might not contain
-                    mOutFile = new File(outputDir, mName + "_" + mSpecies + ".gif");
-                    FileOutputStream output = new FileOutputStream(mOutFile);
-                    output.write(out.toByteArray());
-                    output.flush();
-                    output.close();
-                    return true;
-                }
-                catch (IOException e) {
-                    return false;
-                } finally {
-                    updateGallery(mContext);
-                }
-            }
-        }
-
-        /**
-         * Determine if execution succeeded
-         * @param success - true if doInBackground succeeded.
-         */
-        @Override
-        protected void onPostExecute(Boolean success) {
-            hideProgressDialog();
-            // Pretty pessimistic approach there
-            String text = "Failed to make GIF";
-            if (success) {
-                text = mOutFile.getAbsolutePath();
-                mDatabase.child("users").child(mUserId).child("plants").child(mPlantId).child("gifLocation").setValue(text);
-                text = "Image saved in: " + text;
-            }
-            Toast.makeText(mContext, text, Toast.LENGTH_SHORT).show();
-        }
-    }
-
     /**
      * Singleton DatabaseManager constructor
      */
@@ -476,14 +375,14 @@ public class DatabaseManager {
     private void updateGallery(Context context) {
         MediaScannerConnection.scanFile(context, new String[]{Environment.getExternalStorageDirectory().toString()}, null,
                 new MediaScannerConnection.OnScanCompletedListener() {
-            /**
-             * Gallery scan completed
-             * @param path - path of the deleted image
-             * @param uri of the deleted image
-             */
-            public void onScanCompleted(String path, Uri uri) {
-            }
-        });
+                    /**
+                     * Gallery scan completed
+                     * @param path - path of the deleted image
+                     * @param uri of the deleted image
+                     */
+                    public void onScanCompleted(String path, Uri uri) {
+                    }
+                });
     }
 
     /**
@@ -865,56 +764,116 @@ public class DatabaseManager {
         loadingProgressBar.setVisibility(View.VISIBLE);
         if (userId != null) {
             final DatabaseReference databaseRef = mDatabase.child("users").child(userId).child("photos");
-            final DatabaseReference profilePhotoRef = mDatabase.child("users").child(userId).child("plants").child(plantId)
-                    .child("profilePhoto");
+            final DatabaseReference plantRef = mDatabase.child("users").child(userId).child("plants").child(plantId);
             // An SQL-like hack to retrieve only data with values that matches the query: "plantId*"
             // This is needed to query only images that correspond to the specific plant being edited
             Query query = databaseRef.orderByValue().startAt(plantId).endAt(plantId + "\uf8ff");
             final FirebaseListAdapter<String> adapter =
                     new FirebaseListAdapter<String>(activity, String.class, R.layout.photo_item_view, query) {
-                /**
-                 * Populate a grid item
-                 * @param view - the current view
-                 * @param photoName - the plant to display
-                 * @param position - the position in the menu
-                 */
-                @Override
-                protected void populateView(final View view, final String photoName, int position) {
-                    StorageReference storageReference = mStorage.child(userId).child(photoName);
-                    final ImageView picture = (ImageView) view.findViewById(R.id.photo_image_view);
-                    Glide.with(activity).using(new FirebaseImageLoader()).load(storageReference).dontAnimate()
-                            .placeholder(R.drawable.flowey).into(picture);
-                    final View setButton = view.findViewById(R.id.set_photo_btn);
-                    setButton.setOnClickListener(new View.OnClickListener() {
+                        /**
+                         * Populate a photo grid item
+                         * @param view - the current view
+                         * @param photoName - the photo to display
+                         * @param position - the position
+                         */
                         @Override
-                        public void onClick(View v) {
-                            profilePhotoRef.setValue(photoName);
-                            notifyDataSetChanged();
+                        protected void populateView(final View view, final String photoName, final int position) {
+                            final DatabaseReference profilePhotoRef = plantRef.child("profilePhoto");
+                            final StorageReference storageReference = mStorage.child(userId).child(photoName);
+                            final ImageView picture = (ImageView) view.findViewById(R.id.photo_image_view);
+                            final boolean[] isProfilePicture = new boolean[1];
+                            Glide.with(activity).using(new FirebaseImageLoader()).load(storageReference).dontAnimate()
+                                    .placeholder(R.drawable.flowey).into(picture);
+                            final View setButton = view.findViewById(R.id.set_photo_btn);
+                            setButton.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    profilePhotoRef.setValue(photoName);
+                                    notifyDataSetChanged();
+                                }
+                            });
+                            view.findViewById(R.id.delete_photo_btn).setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    buildDeletePhotoDialog(storageReference,
+                                            profilePhotoRef, position, isProfilePicture[0]).show();
+                                }
+                            });
+                            profilePhotoRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    String profilePhoto = (String) dataSnapshot.getValue();
+                                    View isSetIndicator = view.findViewById(R.id.is_set_indicator);
+                                    isProfilePicture[0] = profilePhoto != null && profilePhoto.equals(photoName);
+                                    if (isProfilePicture[0]) {
+                                        setButton.setVisibility(View.GONE);
+                                        isSetIndicator.setVisibility(View.VISIBLE);
+                                    } else {
+                                        setButton.setVisibility(View.VISIBLE);
+                                        isSetIndicator.setVisibility(View.GONE);
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+
+                                }
+                            });
                         }
-                    });
-                    profilePhotoRef.addListenerForSingleValueEvent(new ValueEventListener() {
+
                         @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            String profilePhoto = (String) dataSnapshot.getValue();
-                            View isSetIndicator = view.findViewById(R.id.is_set_indicator);
-                            if (profilePhoto != null && profilePhoto.equals(photoName)) {
-                                setButton.setVisibility(View.GONE);
-                                isSetIndicator.setVisibility(View.VISIBLE);
-                            } else {
-                                setButton.setVisibility(View.VISIBLE);
-                                isSetIndicator.setVisibility(View.GONE);
-                            }
+                        public void onDataChanged() {
+                            super.onDataChanged();
+                            final DatabaseReference photoNumRef = plantRef.child("photoNum");
+                            // Keep photoNum up to date. (photoNum is zero-based)
+                            photoNumRef.setValue(getCount() - 1);
                         }
 
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-
+                        /**
+                         * Delete Photo dialog
+                         * @return Return the dialog window warning user of photo removal
+                         */
+                        private AlertDialog buildDeletePhotoDialog(final StorageReference storageReference,
+                                                                   final DatabaseReference profilePhotoRef, final int position,
+                                                                   final boolean isProfilePicture) {
+                            //Instantiate an AlertDialog.Builder with its constructor
+                            AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
+                            //Chain together various setter methods to set the dialog characteristics
+                            builder.setTitle(R.string.dialog_delete_photo_title).setMessage(R.string.dialog_delete_photo_text);
+                            // Add the buttons
+                            builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                                /**
+                                 * User clicked confirm
+                                 * @param dialog - the revoke dialog
+                                 * @param id - the user's id
+                                 */
+                                public void onClick(DialogInterface dialog, int id) {
+                                    storageReference.delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            if (task.isSuccessful()) {
+                                                getRef(position).removeValue();
+                                                if (isProfilePicture) {
+                                                    profilePhotoRef.setValue("default");
+                                                }
+                                            }
+                                        }
+                                    });
+                                }
+                            });
+                            builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+                                /**
+                                 * User clicked cancel
+                                 * @param dialog - the dialog
+                                 * @param id - id
+                                 */
+                                public void onClick(DialogInterface dialog, int id) {
+                                }
+                            });
+                            // Get the AlertDialog from create()
+                            return builder.create();
                         }
-                    });
-                }
-
-
-            };
+                    };
 
             // After digging deep, I discovered that Firebase keeps some local information in ".info"
             DatabaseReference connectedRef = mDatabase.child(".info/connected");
@@ -941,7 +900,7 @@ public class DatabaseManager {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     loadingProgressBar.setVisibility(View.GONE);
-                    emptyGridView.setText(R.string.no_plants);
+                    emptyGridView.setText(R.string.grid_photos_empty_text);
                 }
 
                 @Override
@@ -1221,12 +1180,94 @@ public class DatabaseManager {
 
     /**
      * Create a gif of the plant
-     * @param context - calling activity
+     * @param activity - calling activity
      * @param plantId - the id of the plant to form a gif of
      * @param photoNum - the number of pictures of the plant that were taken
      */
-    public void makePlantGif(final Context context, int photoNum, String plantId, String name, String species) {
-        new CreateGifTask(context, photoNum, plantId, name, species).execute();
+    public void makePlantGif(final Activity activity, int photoNum, String plantId, String name, String species) {
+        // Iskander updated this because the photo counting is zero-index based
+        // I changed it to zero so that if the user uploaded 2 picture only, we will still generate a GIF for them
+        if (getUserId() == null || photoNum < 1) {
+            Toast.makeText(activity, "You must take at least 2 pictures to make a GIF", Toast.LENGTH_SHORT).show();
+        } else {
+            createGif(activity, plantId, name, species);
+        }
+    }
+
+    private void createGif(final Activity activity, final String plantId, final String name, final String species) {
+        showProgressDialog(activity, activity.getString(R.string.gif_loading));
+        final String userId = getUserId();
+        final ByteArrayOutputStream out = new ByteArrayOutputStream();
+        final GifSequenceWriter gifWriter = new GifSequenceWriter();
+        gifWriter.start(out);
+        // 500 ms frame
+        gifWriter.setDelay(500);
+        // An SQL-like hack to retrieve only data with values that matches the query: "plantId*"
+        // This is needed to query only images that correspond to the specific plant being edited
+        Query query = mDatabase.child("users").child(userId).child("photos")
+                .orderByValue().startAt(plantId).endAt(plantId + "\uf8ff");
+        query.addValueEventListener(new ExecutorValueEventListener(Executors.newSingleThreadExecutor()) {
+            String mResult;
+
+            @Override
+            protected void onDataChangeExecutor(DataSnapshot dataSnapshot) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    String photoName = snapshot.getValue(String.class);
+                    if (photoName != null) {
+                        StorageReference storageReference = mStorage.child(userId).child(photoName);
+                        try {
+                            Bitmap bmp = Glide.with(activity).using(new FirebaseImageLoader()).load(storageReference)
+                                    .asBitmap().skipMemoryCache(true).into(-1, -1).get();
+                            gifWriter.addFrame(bmp);
+                        } catch (InterruptedException | ExecutionException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+                gifWriter.finish();
+                try {
+                    // created gif files are written to pictures public external storage
+                    File outputDir = getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES + "/Botanist");
+                    // Apparently, the external storage public directory only sometimes exists?
+                    if (!outputDir.exists()) {
+                        //noinspection ResultOfMethodCallIgnored
+                        outputDir.mkdir();
+                    }
+                    // Iskander was here, we want to save gifs with the newest plant name which the plant id might not contain
+                    File outFile = new File(outputDir, name + "_" + species + ".gif");
+                    FileOutputStream output = new FileOutputStream(outFile);
+                    output.write(out.toByteArray());
+                    output.flush();
+                    output.close();
+                    String path = outFile.getAbsolutePath();
+                    mDatabase.child("users").child(userId).child("plants").child(plantId).child("gifLocation").setValue(path);
+                    mResult = "GIF saved in: " + path;
+                }
+                catch (IOException e) {
+                    mResult = "Failed to make GIF";
+                } finally {
+                    updateGallery(activity);
+                    hideProgressDialog();
+                    makeToastResult(activity);
+                }
+            }
+
+            @Override
+            protected void onCancelledExecutor(DatabaseError databaseError) {
+                mResult = "Failed to make GIF";
+                hideProgressDialog();
+                makeToastResult(activity);
+            }
+
+            private void makeToastResult(final Context context) {
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(context, mResult, Toast.LENGTH_LONG).show();
+                    }
+                });
+            }
+        });
     }
 
     /**

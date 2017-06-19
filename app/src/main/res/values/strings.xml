@@ -166,4 +166,7 @@
     <string name="gifts_and_home">Gifts and Home</string>
     <string name="shop_gifts_btn_text">Shop Gifts</string>
     <string name="shop_now">Shop Now</string>
+    <string name="dialog_delete_photo_title">Delete photo</string>
+    <string name="dialog_delete_photo_text">Are you sure you want to delete this photo? This action cannot be undone</string>
+    <string name="grid_photos_empty_text">No photos found</string>
 </resources>

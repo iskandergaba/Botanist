@@ -281,7 +281,7 @@ public class ProfileActivity extends AppCompatActivity {
             return true;
         }
         else if (id == R.id.action_export_gif) {
-            mDatabase.makePlantGif(this, mPhotoNum, plantId, mName, mSpecies);
+            mDatabase.makePlantGif(ProfileActivity.this, mPhotoNum, plantId, mName, mSpecies);
             return true;
         }
         else if (id == R.id.action_similar_plants) {
