@@ -5,6 +5,12 @@
     tools:context="com.scientists.happy.botanist.ui.ProfileActivity">
 
     <item
+        android:id="@+id/action_edit_profile"
+        android:orderInCategory="0"
+        android:title="Edit"
+        app:showAsAction="ifRoom" />
+
+    <item
         android:id="@+id/action_share"
         android:orderInCategory="1"
         android:title="@string/share"

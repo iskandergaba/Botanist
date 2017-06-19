@@ -27,131 +27,189 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:paddingBottom="@dimen/activity_vertical_margin"
-                android:paddingLeft="@dimen/activity_horizontal_margin"
-                android:paddingRight="@dimen/activity_horizontal_margin"
-                android:paddingTop="@dimen/activity_vertical_margin">
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
-                <ImageView
-                    android:layout_width = "wrap_content"
-                    android:layout_height= "200dp"
-                    android:src="@drawable/fertilizer"
-                    android:contentDescription="@string/fertilization_shop"/>
-
-                <TextView
-                    android:id="@+id/fertilizer_description"
-                    android:layout_marginTop="16dp"
-                    android:layout_width="wrap_content"
+                <FrameLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:orientation="vertical"
                     android:layout_marginBottom="@dimen/activity_vertical_margin"
-                    android:text="@string/fertilization_shop"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                    android:textSize="16sp" />
+                    android:clickable="true">
 
-                <ImageView
-                    android:id="@+id/shop_fertilizer_button"
-                    android:layout_width="256dp"
-                    android:layout_height="64dp"
-                    android:layout_gravity="center"
-                    android:src="@drawable/amazon_buy_now"
-                    android:contentDescription="@string/amazon_button_desc"
-                    android:foreground="?attr/selectableItemBackground"
-                    android:clickable="true" />
+                    <ImageView
+                        android:id="@+id/pots_image_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="250dp"
+                        android:src="@drawable/plant_pots"
+                        android:contentDescription="@string/plant_picture_desc"
+                        android:scaleType="centerCrop"/>
 
-            </LinearLayout>
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom"
+                        android:paddingBottom="@dimen/activity_vertical_margin"
+                        android:paddingLeft="@dimen/activity_horizontal_margin"
+                        android:paddingRight="@dimen/activity_horizontal_margin"
+                        android:paddingTop="@dimen/activity_vertical_margin"
+                        android:background="@color/mdtp_transparent_black"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                        android:textColor="@android:color/white"
+                        android:fontFamily="sans-serif-condensed"
+                        android:text="@string/pots" />
 
-        </android.support.v7.widget.CardView>
-
-        <android.support.v7.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/cardview_compat_inset_shadow"
-            android:layout_marginEnd="@dimen/cardview_compat_inset_shadow"
-            android:layout_marginBottom="@dimen/activity_vertical_margin"
-            android:layout_marginTop="@dimen/cardview_default_elevation">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingBottom="@dimen/activity_vertical_margin"
-                android:paddingLeft="@dimen/activity_horizontal_margin"
-                android:paddingRight="@dimen/activity_horizontal_margin"
-                android:paddingTop="@dimen/activity_vertical_margin">
-
-                <ImageView
-                    android:layout_width = "wrap_content"
-                    android:layout_height= "200dp"
-                    android:src="@drawable/accessory"
-                    android:contentDescription="@string/accessories_shop"/>
+                </FrameLayout>
 
                 <TextView
-                    android:id="@+id/accessories_description"
-                    android:layout_marginTop="16dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                    android:text="@string/accessories_shop"
-                    android:textSize="16sp"/>
-
-                <ImageView
-                    android:id="@+id/shop_accessories_button"
-                    android:layout_width="256dp"
-                    android:layout_height="64dp"
-                    android:layout_gravity="center"
-                    android:src="@drawable/amazon_buy_now"
-                    android:contentDescription="@string/amazon_button_desc"
-                    android:foreground="?attr/selectableItemBackground"
-                    android:clickable="true" />
-
-            </LinearLayout>
-
-        </android.support.v7.widget.CardView>
-
-        <android.support.v7.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/cardview_compat_inset_shadow"
-            android:layout_marginEnd="@dimen/cardview_compat_inset_shadow"
-            android:layout_marginBottom="@dimen/activity_vertical_margin"
-            android:layout_marginTop="@dimen/cardview_default_elevation">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingBottom="@dimen/activity_vertical_margin"
-                android:paddingLeft="@dimen/activity_horizontal_margin"
-                android:paddingRight="@dimen/activity_horizontal_margin"
-                android:paddingTop="@dimen/activity_vertical_margin">
-
-                <ImageView
-                    android:layout_width = "wrap_content"
-                    android:layout_height= "200dp"
-                    android:layout_gravity="center"
-                    android:src="@drawable/pots"
-                    android:contentDescription="@string/pot_shop"/>
-
-                <TextView
-                    android:id="@+id/pots_description"
-                    android:layout_marginTop="16dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                     android:text="@string/pot_shop"
-                    android:textSize="16sp"/>
+                    android:textAppearance="@style/Theme.AppCompat.Light.Dialog"
+                    android:textSize="16sp"
+                    android:paddingLeft="@dimen/activity_horizontal_margin"
+                    android:paddingRight="@dimen/activity_horizontal_margin" />
 
-                <ImageView
-                    android:id="@+id/shop_pot_button"
-                    android:layout_width="256dp"
-                    android:layout_height="64dp"
-                    android:layout_gravity="center"
-                    android:src="@drawable/amazon_buy_now"
-                    android:contentDescription="@string/amazon_button_desc"
-                    android:foreground="?attr/selectableItemBackground"
-                    android:clickable="true" />
+                <Button
+                    android:id="@+id/shop_pots_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:clickable="true"
+                    android:text="@string/shop_pots_btn_text"
+                    style="@style/Widget.AppCompat.Button.Borderless.Colored" />
+
+            </LinearLayout>
+
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/cardview_compat_inset_shadow"
+            android:layout_marginEnd="@dimen/cardview_compat_inset_shadow"
+            android:layout_marginBottom="@dimen/activity_vertical_margin"
+            android:layout_marginTop="@dimen/cardview_default_elevation">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginBottom="@dimen/activity_vertical_margin"
+                    android:clickable="true">
+
+                    <ImageView
+                        android:id="@+id/plant_tools_image_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="250dp"
+                        android:src="@drawable/plant_tools"
+                        android:contentDescription="@string/plant_picture_desc"
+                        android:scaleType="centerCrop"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom"
+                        android:paddingBottom="@dimen/activity_vertical_margin"
+                        android:paddingLeft="@dimen/activity_horizontal_margin"
+                        android:paddingRight="@dimen/activity_horizontal_margin"
+                        android:paddingTop="@dimen/activity_vertical_margin"
+                        android:background="@color/mdtp_transparent_black"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                        android:textColor="@android:color/white"
+                        android:fontFamily="sans-serif-condensed"
+                        android:text="@string/tools_and_accessories" />
+
+                </FrameLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/tools_shop"
+                    android:textAppearance="@style/Theme.AppCompat.Light.Dialog"
+                    android:textSize="16sp"
+                    android:paddingLeft="@dimen/activity_horizontal_margin"
+                    android:paddingRight="@dimen/activity_horizontal_margin" />
+
+                <Button
+                    android:id="@+id/shop_tools_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:clickable="true"
+                    android:text="@string/shop_tools_btn_text"
+                    style="@style/Widget.AppCompat.Button.Borderless.Colored" />
+
+            </LinearLayout>
+
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/cardview_compat_inset_shadow"
+            android:layout_marginEnd="@dimen/cardview_compat_inset_shadow"
+            android:layout_marginBottom="@dimen/activity_vertical_margin"
+            android:layout_marginTop="@dimen/cardview_default_elevation">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginBottom="@dimen/activity_vertical_margin"
+                    android:clickable="true">
+
+                    <ImageView
+                        android:id="@+id/plant_gift_image_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="250dp"
+                        android:src="@drawable/plant_gift"
+                        android:contentDescription="@string/plant_picture_desc"
+                        android:scaleType="centerCrop"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom"
+                        android:paddingBottom="@dimen/activity_vertical_margin"
+                        android:paddingLeft="@dimen/activity_horizontal_margin"
+                        android:paddingRight="@dimen/activity_horizontal_margin"
+                        android:paddingTop="@dimen/activity_vertical_margin"
+                        android:background="@color/mdtp_transparent_black"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                        android:textColor="@android:color/white"
+                        android:fontFamily="sans-serif-condensed"
+                        android:text="@string/gifts_and_home" />
+
+                </FrameLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/gifts_shop"
+                    android:textAppearance="@style/Theme.AppCompat.Light.Dialog"
+                    android:textSize="16sp"
+                    android:paddingLeft="@dimen/activity_horizontal_margin"
+                    android:paddingRight="@dimen/activity_horizontal_margin" />
+
+                <Button
+                    android:id="@+id/shop_gifts_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:clickable="true"
+                    android:text="@string/shop_gifts_btn_text"
+                    style="@style/Widget.AppCompat.Button.Borderless.Colored" />
 
             </LinearLayout>
 

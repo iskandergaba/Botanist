@@ -47,14 +47,16 @@ public class ProfileActivity extends AppCompatActivity {
     private static final String NAME_KEY = "name";
     private static final String SPECIES_KEY = "species";
     private static final String HEIGHT_KEY = "height";
-    private static final String PHOTO_KEY = "photo_num";
+    private static final String PHOTO_KEY = "profile_photo";
+    private static final String PHOTO_NUM_KEY = "photo_num";
+    private static final String PHOTO_POINTER_KEY = "photo_pointer";
     private static final String GIF_LOCATION_KEY = "gif_location";
     private static final String BIRTHDAY_KEY = "birthday";
     private static final String WATER_KEY = "last_watered";
     private static final String FERTILIZER_KEY = "last_fertilized";
-    private String mName, mSpecies, plantId, mGifLocation;
+    private String mName, mSpecies, plantId, mProfilePhoto, mGifLocation;
     private double height;
-    private int photoNum;
+    private int mPhotoNum, mPhotoPointer;
     private Bitmap mBitmap;
     private DatabaseManager mDatabase;
     private TextView mHeightTextView, mGroup;
@@ -84,7 +86,9 @@ public class ProfileActivity extends AppCompatActivity {
         mName = i.getExtras().getString(NAME_KEY);
         mSpecies = i.getExtras().getString(SPECIES_KEY);
         height = i.getExtras().getDouble(HEIGHT_KEY);
-        photoNum = i.getExtras().getInt(PHOTO_KEY);
+        mProfilePhoto = i.getExtras().getString(PHOTO_KEY);
+        mPhotoNum = i.getExtras().getInt(PHOTO_NUM_KEY);
+        mPhotoPointer = i.getExtras().getInt(PHOTO_POINTER_KEY);
         mBirthday = i.getExtras().getLong(BIRTHDAY_KEY);
         mLastWatered = i.getExtras().getLong(WATER_KEY);
         mLastFertilized = i.getExtras().getLong(FERTILIZER_KEY);
@@ -109,7 +113,7 @@ public class ProfileActivity extends AppCompatActivity {
                     public void onPickResult(PickResult r) {
                         mBitmap = r.getBitmap();
                         mPicture.setImageBitmap(mBitmap);
-                        mDatabase.updatePlantImage(++photoNum, plantId, mBitmap);
+                        mDatabase.updatePlantImage(++mPhotoPointer, ++mPhotoNum, plantId, mBitmap);
                     }
                 }).show(getSupportFragmentManager());
             }
@@ -118,7 +122,7 @@ public class ProfileActivity extends AppCompatActivity {
         fertilizationLink.setMovementMethod(LinkMovementMethod.getInstance());
         ActivityCompat.postponeEnterTransition(this);
         StorageReference storageReference = FirebaseStorage.getInstance().getReference()
-                .child(mDatabase.getUserId()).child(plantId + "_" + photoNum + ".jpg");
+                .child(mDatabase.getUserId()).child(mProfilePhoto);
         Glide.with(this).using(new FirebaseImageLoader()).load(storageReference).dontAnimate().placeholder(R.drawable.flowey)
                 .into(mPicture);
         TextView speciesTextView = (TextView) findViewById(R.id.plant_species);
@@ -256,7 +260,13 @@ public class ProfileActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if (id == R.id.action_share) {
+        if (id == R.id.action_edit_profile) {
+            Intent i = new Intent(this, EditProfileActivity.class);
+            i.putExtra("plant_id", plantId);
+            startActivity(i);
+            return true;
+        }
+        else if (id == R.id.action_share) {
             sharePlant();
             return true;
         }
@@ -271,7 +281,7 @@ public class ProfileActivity extends AppCompatActivity {
             return true;
         }
         else if (id == R.id.action_export_gif) {
-            mDatabase.makePlantGif(this, photoNum, plantId, mName, mSpecies);
+            mDatabase.makePlantGif(ProfileActivity.this, mPhotoNum, plantId, mName, mSpecies);
             return true;
         }
         else if (id == R.id.action_similar_plants) {
@@ -472,7 +482,7 @@ public class ProfileActivity extends AppCompatActivity {
              * @param id - the user id
              */
             public void onClick(DialogInterface dialog, int id) {
-                mDatabase.deletePlant(ProfileActivity.this, plantId, photoNum);
+                mDatabase.deletePlant(ProfileActivity.this, plantId, mPhotoNum);
                 Intent resultIntent = new Intent();
                 setResult(RESULT_OK, resultIntent);
                 finish();

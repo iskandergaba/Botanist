@@ -93,9 +93,9 @@
     <string name="dismiss_button_desc">Dismiss</string>
     <string name="title_current_level">Current Level</string>
     <string name="title_statistics">Statistics</string>
-    <string name="fertilization_shop">Fertilizers enhance the growth of plants. This goal is met in two ways, the traditional one being additives that provide nutrients. The second mode by which some fertilizers act is to enhance the effectiveness of the soil by modifying its water retention and aeration.</string>
-    <string name="accessories_shop">Plants need more than just food and water. Give your plants the appropriate habitat by finding the best plant accessories, so they can exceed all expectation.</string>
-    <string name="pot_shop">Who doesn\'t want a cute home for their plant babies? Find an adorable place for your plants to grow and thrive today!</string>
+    <string name="gifts_shop">You Can\'t decide about your gift to your botanist friend in their upcoming birthday? buy them a cute plant. They\'re not into botany? Then it is the perfect opportunity to introduce them to this world!</string>
+    <string name="tools_shop">Plants need more than just food and water. Give your plants the appropriate habitat by finding the best plant accessories and using the right set of gardening tools.</string>
+    <string name="pot_shop">Who doesn\'t want a cute home for their plant babies?</string>
     <string name="toast_plant_limit_exceeded">Plants limit reached. You have to delete a plant before adding a new one</string>
     <string name="toast_invalid_plant_input">Missing or invalid plant data. Try again</string>
     <string name="developers_title">Developers</string>
@@ -159,4 +159,14 @@
     <string name="rate_button_text">Rate Botanist</string>
     <string name="later_button_text">Remind me Later</string>
     <string name="no_thanks_button_text">No, Thanks</string>
+    <string name="pots">Pots</string>
+    <string name="shop_tools_btn_text">Shop Tools</string>
+    <string name="shop_pots_btn_text">Shop Pots</string>
+    <string name="tools_and_accessories">Tools and Accessories</string>
+    <string name="gifts_and_home">Gifts and Home</string>
+    <string name="shop_gifts_btn_text">Shop Gifts</string>
+    <string name="shop_now">Shop Now</string>
+    <string name="dialog_delete_photo_title">Delete photo</string>
+    <string name="dialog_delete_photo_text">Are you sure you want to delete this photo? This action cannot be undone</string>
+    <string name="grid_photos_empty_text">No photos found</string>
 </resources>

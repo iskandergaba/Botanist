@@ -112,6 +112,14 @@
                 android:value="com.scientists.happy.botanist.ui.ProfileActivity" />
         </activity>
         <activity
+            android:name=".ui.EditProfileActivity"
+            android:label="Edit Profile"
+            android:parentActivityName=".ui.ProfileActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.scientists.happy.botanist.ui.ProfileActivity" />
+        </activity>
+        <activity
             android:name=".ui.SimilarPlantsActivity"
             android:label="@string/title_activity_similar_plants"
             android:parentActivityName=".ui.ProfileActivity">

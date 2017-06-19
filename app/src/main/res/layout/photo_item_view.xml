@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:clickable="true">
+
+    <ImageView
+        android:id="@+id/photo_image_view"
+        android:layout_width="match_parent"
+        android:layout_height="220dp"
+        android:src="@drawable/flowey"
+        android:contentDescription="@string/plant_picture_desc"
+        android:scaleType="centerCrop"/>
+
+    <ImageView
+        android:id="@+id/is_set_indicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_check_mark"
+        android:layout_gravity="end"
+        android:visibility="gone"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="2"
+        android:layout_gravity="bottom"
+        android:gravity="center"
+        android:background="@color/mdtp_transparent_black">
+
+        <ImageView
+            android:id="@+id/delete_photo_btn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:src="@drawable/ic_delete"
+            style="?android:attr/buttonStyleSmall"
+            android:background="@color/transparent"
+            android:foreground="?attr/selectableItemBackground"/>
+
+        <ImageView
+            android:id="@+id/set_photo_btn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:src="@drawable/ic_check_mark"
+            android:tint="@android:color/white"
+            style="?android:attr/buttonStyleSmall"
+            android:background="@color/transparent"
+            android:foreground="?attr/selectableItemBackground"/>
+
+    </LinearLayout>
+
+</FrameLayout>

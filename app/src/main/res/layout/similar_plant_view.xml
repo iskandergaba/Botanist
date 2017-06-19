@@ -20,13 +20,13 @@
         android:textAppearance="?android:textAppearanceMedium"
         android:fontFamily="sans-serif-condensed"/>
 
-    <ImageView
-        android:id="@+id/amazon_button"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
-        android:src="@drawable/logo_amazon"
-        android:contentDescription="@string/amazon_button_desc"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:clickable="true" />
+    <Button
+        android:id="@+id/shop_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:clickable="true"
+        android:text="@string/shop_now"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored" />
 
 </LinearLayout>
