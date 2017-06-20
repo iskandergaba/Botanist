@@ -61,6 +61,9 @@ import com.scientists.happy.botanist.ui.ProfileActivity;
 import com.scientists.happy.botanist.ui.SettingsActivity;
 import com.scientists.happy.botanist.utils.ExecutorValueEventListener;
 import com.scientists.happy.botanist.utils.GifSequenceWriter;
+
+import org.jetbrains.annotations.NotNull;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -856,6 +859,8 @@ public class DatabaseManager {
                                                 if (isProfilePicture) {
                                                     profilePhotoRef.setValue("default");
                                                 }
+                                                // Keep photoCount up-to-date
+                                                setPhotoCount(getPhotoCount() - 1);
                                             }
                                         }
                                     });
@@ -1141,7 +1146,7 @@ public class DatabaseManager {
      * Get the user's id number
      * @return Returns the user's id number
      */
-    public String getUserId() {
+    private String getUserId() {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         return (user != null) ? user.getUid() : null;
     }
@@ -1181,6 +1186,39 @@ public class DatabaseManager {
     /**
      * Create a gif of the plant
      * @param activity - calling activity
+     * @param plantId - the id of the plant
+     * @param view - profile photo ImageView
+     */
+    public void loadProfilePhoto(final Activity activity, final String plantId, final ImageView view) {
+        final String userId = getUserId();
+        if (userId != null) {
+            DatabaseReference databaseReference = mDatabase.child("users").child(userId).child("plants").child(plantId)
+                    .child("profilePhoto");
+            databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NotNull DataSnapshot dataSnapshot) {
+                    String fileName = dataSnapshot.getValue(String.class);
+                    int placeHolderResId = R.drawable.flowey;
+                    if (fileName != null && !fileName.equals("default")) {
+                        StorageReference profilePhotoReference = mStorage.child(userId).child(fileName);
+                        Glide.with(activity).using(new FirebaseImageLoader()).
+                                load(profilePhotoReference).dontAnimate().placeholder(placeHolderResId).into(view);
+                    } else {
+                        Glide.with(activity).load(placeHolderResId).dontAnimate().placeholder(placeHolderResId).into(view);
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NotNull DatabaseError databaseError) {
+
+                }
+            });
+        }
+    }
+
+    /**
+     * Create a gif of the plant
+     * @param activity - calling activity
      * @param plantId - the id of the plant to form a gif of
      * @param photoNum - the number of pictures of the plant that were taken
      */
@@ -1197,77 +1235,78 @@ public class DatabaseManager {
     private void createGif(final Activity activity, final String plantId, final String name, final String species) {
         showProgressDialog(activity, activity.getString(R.string.gif_loading));
         final String userId = getUserId();
-        final ByteArrayOutputStream out = new ByteArrayOutputStream();
-        final GifSequenceWriter gifWriter = new GifSequenceWriter();
-        gifWriter.start(out);
-        // 500 ms frame
-        gifWriter.setDelay(500);
-        // An SQL-like hack to retrieve only data with values that matches the query: "plantId*"
-        // This is needed to query only images that correspond to the specific plant being edited
-        Query query = mDatabase.child("users").child(userId).child("photos")
-                .orderByValue().startAt(plantId).endAt(plantId + "\uf8ff");
-        query.addValueEventListener(new ExecutorValueEventListener(Executors.newSingleThreadExecutor()) {
-            String mResult;
+        if (userId != null) {
+            final ByteArrayOutputStream out = new ByteArrayOutputStream();
+            final GifSequenceWriter gifWriter = new GifSequenceWriter();
+            gifWriter.start(out);
+            // 500 ms frame
+            gifWriter.setDelay(500);
+            // An SQL-like hack to retrieve only data with values that matches the query: "plantId*"
+            // This is needed to query only images that correspond to the specific plant being edited
+            Query query = mDatabase.child("users").child(userId).child("photos")
+                    .orderByValue().startAt(plantId).endAt(plantId + "\uf8ff");
+            query.addValueEventListener(new ExecutorValueEventListener(Executors.newSingleThreadExecutor()) {
+                String mResult;
 
-            @Override
-            protected void onDataChangeExecutor(DataSnapshot dataSnapshot) {
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    String photoName = snapshot.getValue(String.class);
-                    if (photoName != null) {
-                        StorageReference storageReference = mStorage.child(userId).child(photoName);
-                        try {
-                            Bitmap bmp = Glide.with(activity).using(new FirebaseImageLoader()).load(storageReference)
-                                    .asBitmap().skipMemoryCache(true).into(-1, -1).get();
-                            gifWriter.addFrame(bmp);
-                        } catch (InterruptedException | ExecutionException e) {
-                            e.printStackTrace();
+                @Override
+                protected void onDataChangeExecutor(@NonNull DataSnapshot dataSnapshot) {
+                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                        String photoName = snapshot.getValue(String.class);
+                        if (photoName != null) {
+                            StorageReference storageReference = mStorage.child(userId).child(photoName);
+                            try {
+                                Bitmap bmp = Glide.with(activity).using(new FirebaseImageLoader()).load(storageReference)
+                                        .asBitmap().skipMemoryCache(true).into(-1, -1).get();
+                                gifWriter.addFrame(bmp);
+                            } catch (InterruptedException | ExecutionException e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
-                }
-                gifWriter.finish();
-                try {
-                    // created gif files are written to pictures public external storage
-                    File outputDir = getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES + "/Botanist");
-                    // Apparently, the external storage public directory only sometimes exists?
-                    if (!outputDir.exists()) {
-                        //noinspection ResultOfMethodCallIgnored
-                        outputDir.mkdir();
+                    gifWriter.finish();
+                    try {
+                        // created gif files are written to pictures public external storage
+                        File outputDir = getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES + "/Botanist");
+                        // Apparently, the external storage public directory only sometimes exists?
+                        if (!outputDir.exists()) {
+                            //noinspection ResultOfMethodCallIgnored
+                            outputDir.mkdir();
+                        }
+                        // Iskander was here, we want to save gifs with the newest plant name which the plant id might not contain
+                        File outFile = new File(outputDir, name + "_" + species + ".gif");
+                        FileOutputStream output = new FileOutputStream(outFile);
+                        output.write(out.toByteArray());
+                        output.flush();
+                        output.close();
+                        String path = outFile.getAbsolutePath();
+                        mDatabase.child("users").child(userId).child("plants").child(plantId).child("gifLocation").setValue(path);
+                        mResult = "GIF saved in: " + path;
+                    } catch (IOException e) {
+                        mResult = "Failed to make GIF";
+                    } finally {
+                        updateGallery(activity);
+                        hideProgressDialog();
+                        makeToastResult(activity);
                     }
-                    // Iskander was here, we want to save gifs with the newest plant name which the plant id might not contain
-                    File outFile = new File(outputDir, name + "_" + species + ".gif");
-                    FileOutputStream output = new FileOutputStream(outFile);
-                    output.write(out.toByteArray());
-                    output.flush();
-                    output.close();
-                    String path = outFile.getAbsolutePath();
-                    mDatabase.child("users").child(userId).child("plants").child(plantId).child("gifLocation").setValue(path);
-                    mResult = "GIF saved in: " + path;
                 }
-                catch (IOException e) {
+
+                @Override
+                protected void onCancelledExecutor(@NonNull DatabaseError databaseError) {
                     mResult = "Failed to make GIF";
-                } finally {
-                    updateGallery(activity);
                     hideProgressDialog();
                     makeToastResult(activity);
                 }
-            }
 
-            @Override
-            protected void onCancelledExecutor(DatabaseError databaseError) {
-                mResult = "Failed to make GIF";
-                hideProgressDialog();
-                makeToastResult(activity);
-            }
-
-            private void makeToastResult(final Context context) {
-                activity.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(context, mResult, Toast.LENGTH_LONG).show();
-                    }
-                });
-            }
-        });
+                private void makeToastResult(final Context context) {
+                    activity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(context, mResult, Toast.LENGTH_LONG).show();
+                        }
+                    });
+                }
+            });
+        }
     }
 
     /**

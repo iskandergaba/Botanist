@@ -28,10 +28,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.bumptech.glide.Glide;
-import com.firebase.ui.storage.images.FirebaseImageLoader;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 import com.scientists.happy.botanist.R;
 import com.scientists.happy.botanist.data.DatabaseManager;
 import com.vansuita.pickimage.bean.PickResult;
@@ -47,17 +43,15 @@ public class ProfileActivity extends AppCompatActivity {
     private static final String NAME_KEY = "name";
     private static final String SPECIES_KEY = "species";
     private static final String HEIGHT_KEY = "height";
-    private static final String PHOTO_KEY = "profile_photo";
     private static final String PHOTO_NUM_KEY = "photo_num";
     private static final String PHOTO_POINTER_KEY = "photo_pointer";
     private static final String GIF_LOCATION_KEY = "gif_location";
     private static final String BIRTHDAY_KEY = "birthday";
     private static final String WATER_KEY = "last_watered";
     private static final String FERTILIZER_KEY = "last_fertilized";
-    private String mName, mSpecies, plantId, mProfilePhoto, mGifLocation;
+    private String mName, mSpecies, plantId, mGifLocation;
     private double height;
     private int mPhotoNum, mPhotoPointer;
-    private Bitmap mBitmap;
     private DatabaseManager mDatabase;
     private TextView mHeightTextView, mGroup;
     private ImageView mPicture;
@@ -86,7 +80,6 @@ public class ProfileActivity extends AppCompatActivity {
         mName = i.getExtras().getString(NAME_KEY);
         mSpecies = i.getExtras().getString(SPECIES_KEY);
         height = i.getExtras().getDouble(HEIGHT_KEY);
-        mProfilePhoto = i.getExtras().getString(PHOTO_KEY);
         mPhotoNum = i.getExtras().getInt(PHOTO_NUM_KEY);
         mPhotoPointer = i.getExtras().getInt(PHOTO_POINTER_KEY);
         mBirthday = i.getExtras().getLong(BIRTHDAY_KEY);
@@ -111,9 +104,9 @@ public class ProfileActivity extends AppCompatActivity {
                      */
                     @Override
                     public void onPickResult(PickResult r) {
-                        mBitmap = r.getBitmap();
-                        mPicture.setImageBitmap(mBitmap);
-                        mDatabase.updatePlantImage(++mPhotoPointer, ++mPhotoNum, plantId, mBitmap);
+                        Bitmap bitmap = r.getBitmap();
+                        mPicture.setImageBitmap(bitmap);
+                        mDatabase.updatePlantImage(++mPhotoPointer, ++mPhotoNum, plantId, bitmap);
                     }
                 }).show(getSupportFragmentManager());
             }
@@ -121,10 +114,6 @@ public class ProfileActivity extends AppCompatActivity {
         TextView fertilizationLink = (TextView)findViewById(R.id.fertilization_link);
         fertilizationLink.setMovementMethod(LinkMovementMethod.getInstance());
         ActivityCompat.postponeEnterTransition(this);
-        StorageReference storageReference = FirebaseStorage.getInstance().getReference()
-                .child(mDatabase.getUserId()).child(mProfilePhoto);
-        Glide.with(this).using(new FirebaseImageLoader()).load(storageReference).dontAnimate().placeholder(R.drawable.flowey)
-                .into(mPicture);
         TextView speciesTextView = (TextView) findViewById(R.id.plant_species);
         speciesTextView.setText(getString(R.string.species_fmt, mSpecies));
         mHeightTextView = (TextView) findViewById(R.id.plant_height);
@@ -185,8 +174,7 @@ public class ProfileActivity extends AppCompatActivity {
                 mTipsRotationAngle = rotateImage(v, mTipsRotationAngle);
                 if (mTipsExpanded) {
                     collapse(careTips);
-                }
-                else {
+                } else {
                     expand(careTips);
                 }
                 mTipsExpanded = !mTipsExpanded;
@@ -203,8 +191,7 @@ public class ProfileActivity extends AppCompatActivity {
                 mToxicRotationAngle = rotateImage(v, mToxicRotationAngle);
                 if (mToxicExpanded) {
                     collapse(toxicWarning);
-                }
-                else {
+                } else {
                     expand(toxicWarning);
                 }
                 mToxicExpanded = !mToxicExpanded;
@@ -221,8 +208,7 @@ public class ProfileActivity extends AppCompatActivity {
                 mNoxiousRotationAngle = rotateImage(v, mNoxiousRotationAngle);
                 if (mNoxiousExpanded) {
                     collapse(noxiousWarning);
-                }
-                else {
+                } else {
                     expand(noxiousWarning);
                 }
                 mNoxiousExpanded = !mNoxiousExpanded;
@@ -231,6 +217,12 @@ public class ProfileActivity extends AppCompatActivity {
 
         mDatabase.editProfile(this.findViewById(android.R.id.content), mSpecies);
         overridePendingTransition(R.anim.slide_up, R.anim.hold);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mDatabase.loadProfilePhoto(this, plantId, mPicture);
     }
 
     /**
