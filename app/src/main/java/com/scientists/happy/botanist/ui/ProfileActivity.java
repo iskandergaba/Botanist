@@ -11,14 +11,12 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.CalendarContract;
-import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.method.LinkMovementMethod;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -29,6 +27,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.scientists.happy.botanist.R;
+import com.scientists.happy.botanist.controller.ProfileController;
 import com.scientists.happy.botanist.data.DatabaseManager;
 import com.vansuita.pickimage.bean.PickResult;
 import com.vansuita.pickimage.bundle.PickSetup;
@@ -53,12 +52,14 @@ public class ProfileActivity extends AppCompatActivity {
     private double height;
     private int mPhotoNum, mPhotoPointer;
     private DatabaseManager mDatabase;
-    private TextView mHeightTextView, mGroup;
+    private TextView mGroup;
     private ImageView mPicture;
     private String changeNameText = "";
     private long mBirthday, mLastWatered, mLastFertilized;
     private int mToxicRotationAngle, mNoxiousRotationAngle, mTipsRotationAngle;
     private boolean mToxicExpanded, mNoxiousExpanded, mTipsExpanded;
+
+    private ProfileController mController;
     /**
      * Launch the activity
      * @param savedInstanceState - current view state
@@ -86,38 +87,9 @@ public class ProfileActivity extends AppCompatActivity {
         mLastWatered = i.getExtras().getLong(WATER_KEY);
         mLastFertilized = i.getExtras().getLong(FERTILIZER_KEY);
         mGifLocation = i.getExtras().getString(GIF_LOCATION_KEY);
-        setTitle(mName);
         mPicture = (ImageView) findViewById(R.id.plant_picture);
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.camera_fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            /**
-             * Handle click event in the picture
-             * @param v - the current view
-             */
-            @Override
-            public void onClick(View v) {
-                final PickSetup setup = new PickSetup().setSystemDialog(true);
-                PickImageDialog.build(setup).setOnPickResult(new IPickResult() {
-                    /**
-                     * Handle the selected result
-                     * @param r - the selected result
-                     */
-                    @Override
-                    public void onPickResult(PickResult r) {
-                        Bitmap bitmap = r.getBitmap();
-                        mPicture.setImageBitmap(bitmap);
-                        mDatabase.updatePlantImage(++mPhotoPointer, ++mPhotoNum, plantId, bitmap);
-                    }
-                }).show(getSupportFragmentManager());
-            }
-        });
-        TextView fertilizationLink = (TextView)findViewById(R.id.fertilization_link);
-        fertilizationLink.setMovementMethod(LinkMovementMethod.getInstance());
+        mController = new ProfileController(this, plantId);
         ActivityCompat.postponeEnterTransition(this);
-        TextView speciesTextView = (TextView) findViewById(R.id.plant_species);
-        speciesTextView.setText(getString(R.string.species_fmt, mSpecies));
-        mHeightTextView = (TextView) findViewById(R.id.plant_height);
-        mHeightTextView.setText(getString(R.string.height_fmt, height));
         mGroup = (TextView) findViewById(R.id.group_holder);
         View heightButton = findViewById(R.id.height_button);
         heightButton.setOnClickListener(new View.OnClickListener() {
@@ -214,15 +186,13 @@ public class ProfileActivity extends AppCompatActivity {
                 mNoxiousExpanded = !mNoxiousExpanded;
             }
         });
-
-        mDatabase.editProfile(this.findViewById(android.R.id.content), mSpecies);
         overridePendingTransition(R.anim.slide_up, R.anim.hold);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        mDatabase.loadProfilePhoto(this, plantId, mPicture);
+        mController.load();
     }
 
     /**
@@ -255,6 +225,8 @@ public class ProfileActivity extends AppCompatActivity {
         if (id == R.id.action_edit_profile) {
             Intent i = new Intent(this, EditProfileActivity.class);
             i.putExtra("plant_id", plantId);
+            i.putExtra("photo_num", mPhotoNum);
+            i.putExtra("photo_pointer", mPhotoPointer);
             startActivity(i);
             return true;
         }
@@ -389,7 +361,6 @@ public class ProfileActivity extends AppCompatActivity {
                 if (height < newHeight) {
                     height = newHeight;
                     mDatabase.updatePlantHeight(ProfileActivity.this, plantId, height);
-                    mHeightTextView.setText(getString(R.string.height_fmt, height));
                 }
                 Context context = getApplicationContext();
                 Toast.makeText(context, "Update successful", Toast.LENGTH_SHORT).show();
@@ -430,7 +401,6 @@ public class ProfileActivity extends AppCompatActivity {
                     changeNameText = inputEditText.getText().toString();
                     mDatabase.setPlantName(plantId, changeNameText);
                     mName = changeNameText;
-                    setTitle(mName);
                 }
             }
         });
@@ -446,15 +416,6 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
         return builder.create();
-    }
-
-    /**
-     * Set the page title
-     * @param title - te new title
-     */
-    private void setTitle(String title) {
-        CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.toolbar_layout);
-        collapsingToolbarLayout.setTitle(title);
     }
 
     /**
