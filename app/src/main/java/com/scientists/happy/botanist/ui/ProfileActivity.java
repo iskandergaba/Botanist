@@ -6,13 +6,11 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.CalendarContract;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -23,16 +21,12 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.scientists.happy.botanist.R;
 import com.scientists.happy.botanist.controller.ProfileController;
 import com.scientists.happy.botanist.data.DatabaseManager;
-import com.vansuita.pickimage.bean.PickResult;
-import com.vansuita.pickimage.bundle.PickSetup;
-import com.vansuita.pickimage.dialog.PickImageDialog;
-import com.vansuita.pickimage.listeners.IPickResult;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
@@ -53,8 +47,6 @@ public class ProfileActivity extends AppCompatActivity {
     private int mPhotoNum, mPhotoPointer;
     private DatabaseManager mDatabase;
     private TextView mGroup;
-    private ImageView mPicture;
-    private String changeNameText = "";
     private long mBirthday, mLastWatered, mLastFertilized;
     private int mToxicRotationAngle, mNoxiousRotationAngle, mTipsRotationAngle;
     private boolean mToxicExpanded, mNoxiousExpanded, mTipsExpanded;
@@ -87,7 +79,6 @@ public class ProfileActivity extends AppCompatActivity {
         mLastWatered = i.getExtras().getLong(WATER_KEY);
         mLastFertilized = i.getExtras().getLong(FERTILIZER_KEY);
         mGifLocation = i.getExtras().getString(GIF_LOCATION_KEY);
-        mPicture = (ImageView) findViewById(R.id.plant_picture);
         mController = new ProfileController(this, plantId);
         ActivityCompat.postponeEnterTransition(this);
         mGroup = (TextView) findViewById(R.id.group_holder);
@@ -234,10 +225,6 @@ public class ProfileActivity extends AppCompatActivity {
             sharePlant();
             return true;
         }
-        else if (id == R.id.action_change_name) {
-            buildChangeNameDialog().show();
-            return true;
-        }
         else if (id == R.id.action_stats) {
             Intent i = new Intent(this, StatsActivity.class);
             i.putExtra("plant_id", plantId);
@@ -374,44 +361,6 @@ public class ProfileActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 // Cancel
-                dialog.cancel();
-            }
-        });
-        return builder.create();
-    }
-
-    /**
-     * Allow the user to change the name of the plant
-     * @return - returns the alert window
-     */
-    private AlertDialog buildChangeNameDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setView(R.layout.name_input_dialog).setTitle(R.string.update_name);
-        // Set up the buttons
-        builder.setPositiveButton(R.string.mdtp_ok, new DialogInterface.OnClickListener() {
-            /**
-             * User clicked submit
-             * @param dialog - warning dialog
-             * @param which - user selected option
-             */
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                EditText inputEditText = (EditText) ((AlertDialog) dialog).findViewById(R.id.name_edit_text);
-                if (inputEditText != null) {
-                    changeNameText = inputEditText.getText().toString();
-                    mDatabase.setPlantName(plantId, changeNameText);
-                    mName = changeNameText;
-                }
-            }
-        });
-        builder.setNegativeButton(R.string.mdtp_cancel, new DialogInterface.OnClickListener() {
-            /**
-             * User cancelled name update
-             * @param dialog - warning dialog
-             * @param which - user selected option
-             */
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
                 dialog.cancel();
             }
         });

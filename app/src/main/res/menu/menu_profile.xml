@@ -6,21 +6,15 @@
 
     <item
         android:id="@+id/action_edit_profile"
-        android:orderInCategory="0"
+        android:orderInCategory="1"
         android:title="Edit"
         app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/action_share"
-        android:orderInCategory="1"
+        android:orderInCategory="2"
         android:title="@string/share"
         app:showAsAction="ifRoom" />
-
-    <item
-        android:id="@+id/action_change_name"
-        android:orderInCategory="2"
-        android:title="@string/update_name"
-        app:showAsAction="never" />
 
     <item
         android:id="@+id/action_stats"

@@ -67,7 +67,7 @@
     <string name="quarantine_warning">QUARANTINE: U.S. federal and/or state laws require this plant to be grown under quarantine. Please check your local laws to make sure you are in compliance.</string>
     <string name="regulated_warning">REGULATED: This plant is placed under restrictions in some U.S. states. Please check your local laws to be sure that you are in compliance.</string>
     <string name="banned_warning">BANNED: Possession of this plant is illegal in some U.S. states. Please check your local laws to be sure that you are in compliance.</string>
-    <string name="update_name">Change Name</string>
+    <string name="rename">Rename</string>
     <string name="loading_diseases">Loading diseases and pests…</string>
     <string name="user_badge_desc">User badge</string>
     <string name="fertilization_link" translatable="false"><a href='http://www.finegardening.com/fertilizing-basics'>Learn more about fertilization</a></string>
@@ -169,4 +169,5 @@
     <string name="dialog_delete_photo_title">Delete photo</string>
     <string name="dialog_delete_photo_text">Are you sure you want to delete this photo? This action cannot be undone</string>
     <string name="grid_photos_empty_text">No photos found</string>
+    <string name="photos">Photos</string>
 </resources>

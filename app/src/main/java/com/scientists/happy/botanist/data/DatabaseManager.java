@@ -7,7 +7,6 @@ import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -18,7 +17,6 @@ import android.os.AsyncTask;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
-import android.support.v7.app.AlertDialog;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -405,7 +403,7 @@ public class DatabaseManager {
                         List<Entry> entries = new ArrayList<>();
                         for (DataSnapshot record: snapshot.getChildren()) {
                             long time = Long.parseLong(record.getKey());
-                            float height = record.getValue(Float.class);
+                            float height = (float) record.getValue();
                             entries.add(new Entry(time, height));
                         }
                         if (!entries.isEmpty()) {
