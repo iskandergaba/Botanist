@@ -17,8 +17,6 @@ import com.google.firebase.storage.StorageReference
 import com.scientists.happy.botanist.R
 import com.scientists.happy.botanist.data.DatabaseManager
 import com.scientists.happy.botanist.data.Plant
-import com.vansuita.pickimage.bundle.PickSetup
-import com.vansuita.pickimage.dialog.PickImageDialog
 
 class EditProfileController(private val mActivity: AppCompatActivity, private val mPlantId: String) {
     private var mProgressDialog: ProgressDialog? = null
@@ -27,8 +25,9 @@ class EditProfileController(private val mActivity: AppCompatActivity, private va
     private var mPhotoPointer = -1
 
     private val mDatabase = DatabaseManager.getInstance()
-    private val mUserStorage = mDatabase.userStorage
+    private val mPlantReference = mDatabase.getPlantReference(mPlantId)
     private val mUserPhotosReference = mDatabase.userPhotosReference
+    private val mUserStorage = mDatabase.userStorage
 
     init {
         mDatabase.getPlantReference(mPlantId).addValueEventListener(object : ValueEventListener {
@@ -56,14 +55,6 @@ class EditProfileController(private val mActivity: AppCompatActivity, private va
         loadNameSection()
         populatePhotoGrid(mActivity)
         hideProgressDialog()
-    }
-
-    fun uploadPhoto() {
-        val setup = PickSetup().setSystemDialog(true)
-        PickImageDialog.build(setup).setOnPickResult { r ->
-            val bitmap = r.bitmap
-            mDatabase.updatePlantImage(++mPhotoPointer, ++mPhotoNum, mPlantId, bitmap)
-        }.show(mActivity.supportFragmentManager)
     }
 
     /**
@@ -204,7 +195,7 @@ class EditProfileController(private val mActivity: AppCompatActivity, private va
             builder.setView(dialogView).setTitle(R.string.rename)
             // Set up the buttons
             builder.setPositiveButton(R.string.mdtp_ok) { _, _ ->
-                mDatabase.setPlantName(mPlantId, inputEditText.text.toString())
+                mPlantReference.child("name").setValue(inputEditText.text.toString())
             }
             builder.setNegativeButton(R.string.mdtp_cancel) { dialog, _ ->
                 dialog.cancel()

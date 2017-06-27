@@ -16,7 +16,7 @@ class SimilarPlantsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_similar_plants)
-        val list = findViewById(R.id.similar_plants) as ListView
+        val list:ListView = findViewById(R.id.similar_plants) as ListView
         list.emptyView = findViewById(R.id.empty_list_view)
         val group = intent.extras.get("group") as String
         val species = intent.extras.get("species") as String

@@ -2,17 +2,9 @@
 // @author: Antonio Muscarella, Christopher Besser, and Iskander Gaba
 package com.scientists.happy.botanist.ui;
 import android.animation.ObjectAnimator;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.provider.CalendarContract;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -20,42 +12,18 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
-import android.widget.EditText;
-import android.widget.TextView;
-import android.widget.Toast;
+
 import com.scientists.happy.botanist.R;
 import com.scientists.happy.botanist.controller.ProfileController;
 import com.scientists.happy.botanist.data.DatabaseManager;
-
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Locale;
-import za.co.riggaroo.materialhelptutorial.TutorialItem;
-public class ProfileActivity extends AppCompatActivity {
+public class ProfileActivity extends AppCompatActivity implements View.OnClickListener {
     private static final String ID_KEY = "plant_id";
-    private static final String NAME_KEY = "name";
-    private static final String SPECIES_KEY = "species";
-    private static final String HEIGHT_KEY = "height";
-    private static final String PHOTO_NUM_KEY = "photo_num";
-    private static final String PHOTO_POINTER_KEY = "photo_pointer";
-    private static final String GIF_LOCATION_KEY = "gif_location";
-    private static final String BIRTHDAY_KEY = "birthday";
-    private static final String WATER_KEY = "last_watered";
-    private static final String FERTILIZER_KEY = "last_fertilized";
-    private String mName, mSpecies, plantId, mGifLocation;
-    private double height;
-    private int mPhotoNum, mPhotoPointer;
     private DatabaseManager mDatabase;
-    private TextView mGroup;
-    private long mBirthday, mLastWatered, mLastFertilized;
     private int mToxicRotationAngle, mNoxiousRotationAngle, mTipsRotationAngle;
     private boolean mToxicExpanded, mNoxiousExpanded, mTipsExpanded;
 
     private ProfileController mController;
-    /**
-     * Launch the activity
-     * @param savedInstanceState - current view state
-     */
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,117 +34,19 @@ public class ProfileActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
         mDatabase = DatabaseManager.getInstance();
-        mDatabase.showTutorial(this, loadTutorialItems(), false);
-        // store individual plant information from the extras passed through the intent
-        Intent i = getIntent();
-        plantId = i.getExtras().getString(ID_KEY);
-        mName = i.getExtras().getString(NAME_KEY);
-        mSpecies = i.getExtras().getString(SPECIES_KEY);
-        height = i.getExtras().getDouble(HEIGHT_KEY);
-        mPhotoNum = i.getExtras().getInt(PHOTO_NUM_KEY);
-        mPhotoPointer = i.getExtras().getInt(PHOTO_POINTER_KEY);
-        mBirthday = i.getExtras().getLong(BIRTHDAY_KEY);
-        mLastWatered = i.getExtras().getLong(WATER_KEY);
-        mLastFertilized = i.getExtras().getLong(FERTILIZER_KEY);
-        mGifLocation = i.getExtras().getString(GIF_LOCATION_KEY);
+        Bundle extras = getIntent().getExtras();
+        String plantId = extras.getString(ID_KEY);
         mController = new ProfileController(this, plantId);
         ActivityCompat.postponeEnterTransition(this);
-        mGroup = (TextView) findViewById(R.id.group_holder);
-        View heightButton = findViewById(R.id.height_button);
-        heightButton.setOnClickListener(new View.OnClickListener() {
-            /**
-             * User clicked update height
-             * @param v - current view
-             */
-            @Override
-            public void onClick(View v) {
-                buildHeightInputDialog().show();
-            }
-        });
-        View poopButton = findViewById(R.id.poop_button);
-        poopButton.setOnClickListener(new View.OnClickListener() {
-            /**
-             * User clicked update height
-             * @param v - current view
-             */
-            @Override
-            public void onClick(View v) {
-                buildFertilizedDialog().show();
-            }
-        });
-        View waterButton = findViewById(R.id.water_button);
-        waterButton.setOnClickListener(new View.OnClickListener() {
-            /**
-             * User clicked update height
-             * @param v - current view
-             */
-            @Override
-            public void onClick(View v) {
-                buildWateredDialog().show();
-            }
-        });
-        View calendarButton = findViewById(R.id.calendar_button);
-        calendarButton.setOnClickListener(new View.OnClickListener() {
-            /**
-             * Delete plant from PlantArray when delete button is pressed
-             * @param v - the button view
-             */
-            @Override
-            public void onClick(View v) {
-                buildCalendarDialog().show();
-            }
-        });
-        findViewById(R.id.care_tips_expand_collapse).setOnClickListener(new View.OnClickListener() {
-            /**
-             * User clicked care tips
-             * @param v - current view
-             */
-            @Override
-            public void onClick(View v) {
-                View careTips = findViewById(R.id.care_tips_box);
-                mTipsRotationAngle = rotateImage(v, mTipsRotationAngle);
-                if (mTipsExpanded) {
-                    collapse(careTips);
-                } else {
-                    expand(careTips);
-                }
-                mTipsExpanded = !mTipsExpanded;
-            }
-        });
-        findViewById(R.id.toxic_warning_expand_collapse).setOnClickListener(new View.OnClickListener() {
-            /**
-             * User clicked toxic warning
-             * @param v - current view
-             */
-            @Override
-            public void onClick(View v) {
-                View toxicWarning = findViewById(R.id.toxic_warning_box);
-                mToxicRotationAngle = rotateImage(v, mToxicRotationAngle);
-                if (mToxicExpanded) {
-                    collapse(toxicWarning);
-                } else {
-                    expand(toxicWarning);
-                }
-                mToxicExpanded = !mToxicExpanded;
-            }
-        });
-        findViewById(R.id.noxious_warning_expand_collapse).setOnClickListener(new View.OnClickListener() {
-            /**
-             * User clicked noxious warning
-             * @param v - current view
-             */
-            @Override
-            public void onClick(View v) {
-                View noxiousWarning = findViewById(R.id.noxious_warning_box);
-                mNoxiousRotationAngle = rotateImage(v, mNoxiousRotationAngle);
-                if (mNoxiousExpanded) {
-                    collapse(noxiousWarning);
-                } else {
-                    expand(noxiousWarning);
-                }
-                mNoxiousExpanded = !mNoxiousExpanded;
-            }
-        });
+        // Setting OnClickListeners
+        findViewById(R.id.camera_fab).setOnClickListener(this);
+        findViewById(R.id.height_button).setOnClickListener(this);
+        findViewById(R.id.poop_button).setOnClickListener(this);
+        findViewById(R.id.water_button).setOnClickListener(this);
+        findViewById(R.id.calendar_button).setOnClickListener(this);
+        findViewById(R.id.care_tips_expand_collapse).setOnClickListener(this);
+        findViewById(R.id.toxic_warning_expand_collapse).setOnClickListener(this);
+        findViewById(R.id.noxious_warning_expand_collapse).setOnClickListener(this);
         overridePendingTransition(R.anim.slide_up, R.anim.hold);
     }
 
@@ -184,331 +54,90 @@ public class ProfileActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         mController.load();
+        mDatabase.showTutorial(this, mController.loadTutorialItems(), false);
     }
 
-    /**
-     * Activity paused
-     */
     @Override
     protected void onPause() {
         super.onPause();
         overridePendingTransition(R.anim.hold, R.anim.slide_down);
     }
 
-    /**
-     * Create Action Overflow menu
-     * @param menu - actions
-     * @return Returns success code
-     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_profile, menu);
         return true;
     }
 
-    /**
-     * Action overflow menu
-     * @param item - selected item
-     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.action_edit_profile) {
-            Intent i = new Intent(this, EditProfileActivity.class);
-            i.putExtra("plant_id", plantId);
-            i.putExtra("photo_num", mPhotoNum);
-            i.putExtra("photo_pointer", mPhotoPointer);
-            startActivity(i);
-            return true;
-        }
-        else if (id == R.id.action_share) {
-            sharePlant();
-            return true;
-        }
-        else if (id == R.id.action_stats) {
-            Intent i = new Intent(this, StatsActivity.class);
-            i.putExtra("plant_id", plantId);
-            startActivity(i);
-            return true;
-        }
-        else if (id == R.id.action_export_gif) {
-            mDatabase.makePlantGif(ProfileActivity.this, mPhotoNum, plantId, mName, mSpecies);
-            return true;
-        }
-        else if (id == R.id.action_similar_plants) {
-            Intent i = new Intent(this, SimilarPlantsActivity.class);
-            i.putExtra("species", mSpecies);
-            i.putExtra("group", mGroup.getText().toString());
-            startActivity(i);
-            return true;
-        }
-        else if (id == R.id.action_diseases) {
-            Intent i = new Intent(this, DiseaseActivity.class);
-            i.putExtra("group", mGroup.getText().toString());
-            startActivity(i);
-            return true;
-        }
-        else if (id == R.id.action_delete) {
-            buildDeleteDialog().show();
-            return true;
-        }
-        else if (id == R.id.action_help) {
-            mDatabase.showTutorial(this, loadTutorialItems(), true);
-        }
-        return super.onOptionsItemSelected(item);
+        return mController.handleOptionsItemSelected(item.getItemId());
     }
 
-    /**
-     * User navigated up from the activity
-     * @return returns true
-     */
     @Override
     public boolean onSupportNavigateUp() {
         super.onBackPressed();
         return true;
     }
 
-    /**
-     * User fertilized plant
-     * @return Returns alert window
-     */
-    private AlertDialog buildFertilizedDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(R.string.confirm_message).setTitle(R.string.fertilize_plant);
-        builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-            /**
-             * User clicked confirm
-             * @param dialog - the warning window
-             * @param id - the user id
-             */
-            public void onClick(DialogInterface dialog, int id) {
-                mDatabase.updateNotificationTime(plantId, "lastFertilizerNotification");
-                Context context = getApplicationContext();
-                Toast.makeText(context, R.string.update_success, Toast.LENGTH_SHORT).show();
-            }
-        });
-        builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
-            /**
-             * User clicked cancel
-             * @param dialog - the warning window
-             * @param id - the user id
-             */
-            public void onClick(DialogInterface dialog, int id) {
-            }
-        });
-        return builder.create();
-    }
-
-    /**
-     * User watered plant
-     * @return Returns warning screen
-     */
-    private AlertDialog buildWateredDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(R.string.confirm_message).setTitle(R.string.water_plant);
-        builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-            /**
-             * User clicked confirm
-             * @param dialog - the warning window
-             * @param id - the user id
-             */
-            public void onClick(DialogInterface dialog, int id) {
-                mDatabase.updatePlantWatering(ProfileActivity.this, plantId);
-            }
-        });
-        builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
-            /**
-             * User clicked cancel
-             * @param dialog - the warning window
-             * @param id - the user id
-             */
-            public void onClick(DialogInterface dialog, int id) {
-            }
-        });
-        return builder.create();
-    }
-
-    /**
-     * Input height window
-     * @return Returns warning screen
-     */
-    private AlertDialog buildHeightInputDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setView(R.layout.height_input_dialog).setTitle(R.string.record_new_height)
-                .setPositiveButton(R.string.mdtp_ok, new DialogInterface.OnClickListener() {
-            /**
-             * User clicked submit
-             * @param dialog - current dialog
-             * @param which - selected option
-             */
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                EditText inputEditText = (EditText) ((AlertDialog) dialog).findViewById(R.id.height_edit_text);
-                double newHeight = Double.parseDouble(inputEditText != null ? inputEditText.getText().toString() : "-1");
-                if (height < newHeight) {
-                    height = newHeight;
-                    mDatabase.updatePlantHeight(ProfileActivity.this, plantId, height);
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.camera_fab:
+                mController.uploadPhoto();
+                break;
+            case R.id.height_button:
+                mController.buildHeightInputDialog().show();
+                break;
+            case R.id.water_button:
+                mController.buildWateredDialog().show();
+                break;
+            case R.id.poop_button:
+                mController.buildFertilizedDialog().show();
+                break;
+            case R.id.calendar_button:
+                mController.buildCalendarDialog().show();
+                break;
+            case R.id.care_tips_expand_collapse:
+                View careTips = findViewById(R.id.care_tips_box);
+                mTipsRotationAngle = rotateImage(view, mTipsRotationAngle);
+                if (mTipsExpanded) {
+                    collapse(careTips);
+                } else {
+                    expand(careTips);
                 }
-                Context context = getApplicationContext();
-                Toast.makeText(context, "Update successful", Toast.LENGTH_SHORT).show();
-            }
-        }).setNegativeButton(R.string.mdtp_cancel, new DialogInterface.OnClickListener() {
-            /**
-             * User clicked cancel
-             * @param dialog - current dialog
-             * @param which - selected option
-             */
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                // Cancel
-                dialog.cancel();
-            }
-        });
-        return builder.create();
-    }
-
-    /**
-     * Warn the user that the plant will be deleted
-     * @return - returns the alert window
-     */
-    private AlertDialog buildDeleteDialog() {
-        // Instantiate an AlertDialog.Builder with its constructor
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        // Chain together various setter methods to set the dialog characteristics
-        builder.setMessage(R.string.delete_message).setTitle(R.string.delete_dialog_title);
-        // Add the buttons
-        builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-            /**
-             * User clicked confirm
-             * @param dialog - the warning window
-             * @param id - the user id
-             */
-            public void onClick(DialogInterface dialog, int id) {
-                mDatabase.deletePlant(ProfileActivity.this, plantId, mPhotoNum);
-                Intent resultIntent = new Intent();
-                setResult(RESULT_OK, resultIntent);
-                finish();
-            }
-        });
-        builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
-            /**
-             * User clicked cancel
-             * @param dialog - the warning window
-             * @param id - the user id
-             */
-            public void onClick(DialogInterface dialog, int id) {
-                // User cancelled the dialog
-            }
-        });
-        // Get the AlertDialog from create()
-        return builder.create();
-    }
-
-    /**
-     * Ask the user which reminder they want to add to their calendar
-     * @return - returns the alert window
-     */
-    private AlertDialog buildCalendarDialog() {
-        // Instantiate an AlertDialog.Builder with its constructor
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        // Chain together various setter methods to set the dialog characteristics
-        builder.setMessage(R.string.calendar_dialog_text).setTitle(R.string.calendar_sync_text);
-        // Add the buttons
-        builder.setPositiveButton(R.string.watering, new DialogInterface.OnClickListener() {
-            /**
-             * User clicked confirm
-             * @param dialog - the warning window
-             * @param id - the user id
-             */
-            public void onClick(DialogInterface dialog, int id) {
-                updateCalendar(getApplicationContext(), "Water " + mName, WATER_KEY);
-            }
-        });
-        builder.setNegativeButton(R.string.fertilizing, new DialogInterface.OnClickListener() {
-            /**
-             * User clicked cancel
-             * @param dialog - the warning window
-             * @param id - the user id
-             */
-            public void onClick(DialogInterface dialog, int id) {
-                updateCalendar(getApplicationContext(), "Fertilize " + mName, FERTILIZER_KEY);
-            }
-        });
-        // Get the AlertDialog from create()
-        return builder.create();
-    }
-
-    /**
-     * write to phone's calendar
-     * @param context - the context from which this is called
-     * @param title - the title of the event to add
-     */
-    private void updateCalendar(Context context, String title, String type) {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        int hour = preferences.getInt("water_hour", 9);
-        int minute = preferences.getInt("water_minute", 0);
-        int reminderSetting;
-        Calendar cal = Calendar.getInstance();
-        if (type.equals(WATER_KEY)) {
-            reminderSetting = Integer.parseInt(preferences.getString(SettingsActivity.WATER_REMINDER_KEY, "1"));
-            long interval = mDatabase.getReminderIntervalInMillis(reminderSetting);
-            cal.setTimeInMillis(mLastWatered + interval);
+                mTipsExpanded = !mTipsExpanded;
+                break;
+            case R.id.toxic_warning_expand_collapse:
+                View toxicWarning = findViewById(R.id.toxic_warning_box);
+                mToxicRotationAngle = rotateImage(view, mToxicRotationAngle);
+                if (mToxicExpanded) {
+                    collapse(toxicWarning);
+                } else {
+                    expand(toxicWarning);
+                }
+                mToxicExpanded = !mToxicExpanded;
+                break;
+            case R.id.noxious_warning_expand_collapse:
+                View noxiousWarning = findViewById(R.id.noxious_warning_box);
+                mNoxiousRotationAngle = rotateImage(view, mNoxiousRotationAngle);
+                if (mNoxiousExpanded) {
+                    collapse(noxiousWarning);
+                } else {
+                    expand(noxiousWarning);
+                }
+                mNoxiousExpanded = !mNoxiousExpanded;
+                break;
+            default:
+                break;
         }
-        else if (type.equals(FERTILIZER_KEY)) {
-            reminderSetting = Integer.parseInt(preferences.getString(SettingsActivity.FERTILIZER_REMINDER_KEY, "2"));
-            long interval = mDatabase.getReminderIntervalInMillis(reminderSetting);
-            cal.setTimeInMillis(mLastFertilized + interval);
-        }
-        cal.set(Calendar.HOUR, hour);
-        cal.set(Calendar.MINUTE, minute);
-        Intent calendarIntent = new Intent(Intent.ACTION_EDIT);
-        calendarIntent.setType("vnd.android.cursor.item/event");
-        calendarIntent.putExtra(CalendarContract.Events.TITLE, title);
-        calendarIntent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, cal.getTimeInMillis() );
-        calendarIntent.putExtra(CalendarContract.EXTRA_EVENT_END_TIME, cal.getTimeInMillis() + 36000);
-        calendarIntent.putExtra(CalendarContract.Events.ALL_DAY, false);
-        calendarIntent.putExtra(CalendarContract.Events.DESCRIPTION, title);
-        context.startActivity(calendarIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
-    }
-
-    /**
-     * Trigger the share intent
-     */
-    private void sharePlant() {
-        String title = "Meet my plant: " + mName + "!";
-        String text = "Name: " + mName + "\nSpecies: " + mSpecies + "\nFamily: " + mGroup.getText().toString()
-                + "\nAge: " + String.format(Locale.US, "%.2f", getAgeInDays(mBirthday)) + " days"
-                + "\nHeight: " + height + " inches\nShared via: Botanist";
-        Intent shareIntent = new Intent();
-        shareIntent.setAction(Intent.ACTION_SEND);
-        shareIntent.putExtra(Intent.EXTRA_TITLE, title);
-        shareIntent.putExtra(Intent.EXTRA_TEXT, text);
-        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        if (mGifLocation.equals("No Gif made (yet!)")) {
-            shareIntent.setType("plain/text");
-        }
-        else {
-            Uri gifUri = Uri.parse("file://" + mGifLocation);
-            shareIntent.putExtra(Intent.EXTRA_STREAM, gifUri);
-            shareIntent.setType("image/*");
-        }
-        startActivity(Intent.createChooser(shareIntent, getString(R.string.share_dialog_title)));
-    }
-
-    /**
-     * Returns the plant's age in years
-     * @param birthday - the plant's birthday
-     * @return Returns age in days
-     */
-    private double getAgeInDays(long birthday) {
-        return (System.currentTimeMillis() - birthday) / 86400000.0;
     }
 
     /**
      * Expand a hidden view
      * @param v - current view
      */
-    public static void expand(final View v) {
+    private static void expand(final View v) {
         v.measure(CoordinatorLayout.LayoutParams.MATCH_PARENT, CoordinatorLayout.LayoutParams.WRAP_CONTENT);
         final int targetHeight = v.getMeasuredHeight();
         Animation anim = new Animation() {
@@ -543,7 +172,7 @@ public class ProfileActivity extends AppCompatActivity {
      * Collapse a visible view
      * @param v - current view
      */
-    public static void collapse(final View v) {
+    private static void collapse(final View v) {
         final int initialHeight = v.getMeasuredHeight();
         Animation a = new Animation() {
             /**
@@ -584,26 +213,5 @@ public class ProfileActivity extends AppCompatActivity {
         rotationAngle += 180;
         rotationAngle %= 360;
         return rotationAngle;
-    }
-
-    /**
-     * Fetch assets for the tutorial
-     * @return - Returns the list of tutorial items
-     */
-    private ArrayList<TutorialItem> loadTutorialItems() {
-        TutorialItem tutorialItem0 = new TutorialItem(getString(R.string.profile_tutorial_title_0), getString(R.string.profile_tutorial_contents_0),
-                R.color.colorAccent, R.drawable.profile_tutorial_0, R.drawable.profile_tutorial_0);
-        TutorialItem tutorialItem1 = new TutorialItem(getString(R.string.profile_tutorial_title_1), getString(R.string.profile_tutorial_contents_1),
-                R.color.colorAccent, R.drawable.profile_tutorial_1, R.drawable.profile_tutorial_1);
-        TutorialItem tutorialItem2 = new TutorialItem(getString(R.string.profile_tutorial_title_2), getString(R.string.profile_tutorial_contents_2),
-                R.color.colorAccent, R.drawable.profile_tutorial_2, R.drawable.profile_tutorial_2);
-        TutorialItem tutorialItem3 = new TutorialItem(getString(R.string.profile_tutorial_title_3), getString(R.string.profile_tutorial_contents_3),
-                R.color.colorAccent, R.drawable.profile_tutorial_3, R.drawable.profile_tutorial_3);
-        ArrayList<TutorialItem> tutorialItems = new ArrayList<>();
-        tutorialItems.add(tutorialItem0);
-        tutorialItems.add(tutorialItem1);
-        tutorialItems.add(tutorialItem2);
-        tutorialItems.add(tutorialItem3);
-        return tutorialItems;
     }
 }

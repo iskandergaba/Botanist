@@ -25,6 +25,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.bumptech.glide.Glide;
 import com.firebase.ui.database.FirebaseListAdapter;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
@@ -45,7 +46,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -57,26 +57,19 @@ import com.scientists.happy.botanist.services.UpdatePhotoReceiver;
 import com.scientists.happy.botanist.services.WaterReceiver;
 import com.scientists.happy.botanist.ui.ProfileActivity;
 import com.scientists.happy.botanist.ui.SettingsActivity;
-import com.scientists.happy.botanist.utils.ExecutorValueEventListener;
-import com.scientists.happy.botanist.utils.GifSequenceWriter;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executors;
 
 import za.co.riggaroo.materialhelptutorial.TutorialItem;
 import za.co.riggaroo.materialhelptutorial.tutorial.MaterialTutorialActivity;
+
 import static android.content.Context.ALARM_SERVICE;
-import static android.os.Environment.getExternalStoragePublicDirectory;
 
 public class DatabaseManager {
     private static final int HEIGHT_MEASURE_RECEIVER_ID_OFFSET = 1000;
@@ -321,10 +314,11 @@ public class DatabaseManager {
             String profilePhoto = plantId + "_" + photoPointer + ".jpg";
             StorageReference filepath = mStorage.child(userId).child(profilePhoto);
             filepath.putBytes(data);
+            DatabaseReference plantRef = mDatabase.child("users").child(userId).child("plants").child(plantId);
             mDatabase.child("users").child(userId).child("photos").push().setValue(profilePhoto);
-            mDatabase.child("users").child(userId).child("plants").child(plantId).child("profilePhoto").setValue(profilePhoto);
-            mDatabase.child("users").child(userId).child("plants").child(plantId).child("photoNum").setValue(photoNum);
-            mDatabase.child("users").child(userId).child("plants").child(plantId).child("photoPointer").setValue(photoPointer);
+            plantRef.child("profilePhoto").setValue(profilePhoto);
+            plantRef.child("photoPointer").setValue(photoPointer);
+            plantRef.child("photoNum").setValue(photoNum);
             updateNotificationTime(plantId, "lastPhotoNotification");
             setPhotoCount(getPhotoCount() + 1);
             updateUserRating();
@@ -332,46 +326,10 @@ public class DatabaseManager {
     }
 
     /**
-     * Remove plant from the database
-     * @param context - the current app context
-     * @param plantId - the id of the plant
-     * @param photoNum - the number of pictures that plant has
-     */
-    public void deletePlant(final Context context, final String plantId, final int photoNum) {
-        final String userId = getUserId();
-        deleteAllReminders(context);
-        if (userId != null) {
-            mDatabase.child("users").child(userId).child("plants").child(plantId).removeValue();
-            mDatabase.child("users").child(userId).child("photos").addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                        String key = snapshot.getKey();
-                        String photoFileName = snapshot.getValue(String.class);
-                        if (photoFileName != null && photoFileName.contains(plantId)) {
-                            mDatabase.child("users").child(userId).child("photos").child(key).removeValue();
-                            mStorage.child(userId).child(photoFileName).delete();
-                        }
-                    }
-                    setPlantsNumber(--mPlantsNumber);
-                    setDeletedNumber(getDeletedCount() + 1);
-                    setPhotoCount(getPhotoCount() - (photoNum + 1));
-                    updateUserRating();
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-
-                }
-            });
-        }
-    }
-
-    /**
      * Delete gif reference from the Android Gallery
      * @param context - app context
      */
-    private void updateGallery(Context context) {
+    public void updateGallery(Context context) {
         MediaScannerConnection.scanFile(context, new String[]{Environment.getExternalStorageDirectory().toString()}, null,
                 new MediaScannerConnection.OnScanCompletedListener() {
                     /**
@@ -403,7 +361,7 @@ public class DatabaseManager {
                         List<Entry> entries = new ArrayList<>();
                         for (DataSnapshot record: snapshot.getChildren()) {
                             long time = Long.parseLong(record.getKey());
-                            float height = (float) record.getValue();
+                            float height = record.getValue(Float.class);
                             entries.add(new Entry(time, height));
                         }
                         if (!entries.isEmpty()) {
@@ -692,16 +650,7 @@ public class DatabaseManager {
                         public void onClick(View v) {
                             Intent i = new Intent(activity.getApplicationContext(), ProfileActivity.class);
                             i.putExtra("plant_id", plant.getId());
-                            i.putExtra("name", plant.getName());
-                            i.putExtra("species", plant.getSpecies());
                             i.putExtra("height", plant.getHeight());
-                            i.putExtra("photo_num", plant.getPhotoNum());
-                            i.putExtra("photo_pointer", plant.getPhotoPointer());
-                            i.putExtra("profile_photo", plant.getProfilePhoto());
-                            i.putExtra("gif_location", plant.getGifLocation());
-                            i.putExtra("birthday", plant.getBirthday());
-                            i.putExtra("last_watered", plant.getLastWaterNotification());
-                            i.putExtra("last_fertilized", plant.getLastFertilizerNotification());
                             activity.startActivity(i);
                         }
                     });
@@ -936,98 +885,6 @@ public class DatabaseManager {
         }
         return -1;
     }
-    /**
-     * Create a gif of the plant
-     * @param activity - calling activity
-     * @param plantId - the id of the plant to form a gif of
-     * @param photoNum - the number of pictures of the plant that were taken
-     */
-    public void makePlantGif(final Activity activity, int photoNum, String plantId, String name, String species) {
-        // Iskander updated this because the photo counting is zero-index based
-        // I changed it to zero so that if the user uploaded 2 picture only, we will still generate a GIF for them
-        if (getUserId() == null || photoNum < 1) {
-            Toast.makeText(activity, "You must take at least 2 pictures to make a GIF", Toast.LENGTH_SHORT).show();
-        } else {
-            createGif(activity, plantId, name, species);
-        }
-    }
-
-    private void createGif(final Activity activity, final String plantId, final String name, final String species) {
-        showProgressDialog(activity, activity.getString(R.string.gif_loading));
-        final String userId = getUserId();
-        if (userId != null) {
-            final ByteArrayOutputStream out = new ByteArrayOutputStream();
-            final GifSequenceWriter gifWriter = new GifSequenceWriter();
-            gifWriter.start(out);
-            // 500 ms frame
-            gifWriter.setDelay(500);
-            // An SQL-like hack to retrieve only data with values that matches the query: "plantId*"
-            // This is needed to query only images that correspond to the specific plant being edited
-            Query query = mDatabase.child("users").child(userId).child("photos")
-                    .orderByValue().startAt(plantId).endAt(plantId + "\uf8ff");
-            query.addValueEventListener(new ExecutorValueEventListener(Executors.newSingleThreadExecutor()) {
-                String mResult;
-
-                @Override
-                protected void onDataChangeExecutor(@NonNull DataSnapshot dataSnapshot) {
-                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                        String photoName = snapshot.getValue(String.class);
-                        if (photoName != null) {
-                            StorageReference storageReference = mStorage.child(userId).child(photoName);
-                            try {
-                                Bitmap bmp = Glide.with(activity).using(new FirebaseImageLoader()).load(storageReference)
-                                        .asBitmap().skipMemoryCache(true).into(-1, -1).get();
-                                gifWriter.addFrame(bmp);
-                            } catch (InterruptedException | ExecutionException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }
-                    gifWriter.finish();
-                    try {
-                        // created gif files are written to pictures public external storage
-                        File outputDir = getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES + "/Botanist");
-                        // Apparently, the external storage public directory only sometimes exists?
-                        if (!outputDir.exists()) {
-                            //noinspection ResultOfMethodCallIgnored
-                            outputDir.mkdir();
-                        }
-                        // Iskander was here, we want to save gifs with the newest plant name which the plant id might not contain
-                        File outFile = new File(outputDir, name + "_" + species + ".gif");
-                        FileOutputStream output = new FileOutputStream(outFile);
-                        output.write(out.toByteArray());
-                        output.flush();
-                        output.close();
-                        String path = outFile.getAbsolutePath();
-                        mDatabase.child("users").child(userId).child("plants").child(plantId).child("gifLocation").setValue(path);
-                        mResult = "GIF saved in: " + path;
-                    } catch (IOException e) {
-                        mResult = "Failed to make GIF";
-                    } finally {
-                        updateGallery(activity);
-                        hideProgressDialog();
-                        makeToastResult(activity);
-                    }
-                }
-
-                @Override
-                protected void onCancelledExecutor(@NonNull DatabaseError databaseError) {
-                    mResult = "Failed to make GIF";
-                    hideProgressDialog();
-                    makeToastResult(activity);
-                }
-
-                private void makeToastResult(final Context context) {
-                    activity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(context, mResult, Toast.LENGTH_LONG).show();
-                        }
-                    });
-                }
-            });
-        }
-    }
 
     /**
      * Delete the birthday reminders
@@ -1083,7 +940,7 @@ public class DatabaseManager {
     /**
      * Update the user's rating
      */
-    private void updateUserRating() {
+    public void updateUserRating() {
         String userId = getUserId();
         long added = getAddedCount();
         long deleted = getDeletedCount();
@@ -1269,7 +1126,7 @@ public class DatabaseManager {
      * Get how long the user has been a botanist
      * @return Returns the total number of deleted plants
      */
-    private long getDeletedCount() {
+    public long getDeletedCount() {
         final String userId = getUserId();
         if (userId != null) {
             mDatabase.child("users").child(userId).child("plantsDeleted").addListenerForSingleValueEvent(new ValueEventListener() {
@@ -1300,7 +1157,7 @@ public class DatabaseManager {
      * Update the number of plants
      * @param count - the new number of deleted plants
      */
-    private void setDeletedNumber(long count) {
+    public void setDeletedNumber(long count) {
         String userId = getUserId();
         mPlantsDeleted = count;
         if (userId != null) {
@@ -1312,23 +1169,11 @@ public class DatabaseManager {
      * Update the number of plants
      * @param count - the new number of plants
      */
-    private void setPlantsNumber(long count) {
+    public void setPlantsNumber(long count) {
         String userId = getUserId();
         mPlantsNumber = count;
         if (userId != null) {
             mDatabase.child("users").child(userId).child("plantsNumber").setValue(count);
-        }
-    }
-
-    /**
-     * Update the name of a plant
-     * @param plantId - the ID of the plant
-     * @param newName - the new name for the plant
-     */
-    public void setPlantName(String plantId, String newName) {
-        String userId = getUserId();
-        if (userId != null) {
-            mDatabase.child("users").child(userId).child("plants").child(plantId).child("name").setValue(newName);
         }
     }
 

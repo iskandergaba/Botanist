@@ -3,7 +3,6 @@
 package com.scientists.happy.botanist.ui
 
 import android.os.Bundle
-import android.support.design.widget.FloatingActionButton
 import android.support.v7.app.AppCompatActivity
 import android.widget.GridView
 import com.scientists.happy.botanist.R
@@ -25,10 +24,6 @@ class EditProfileActivity : AppCompatActivity() {
         mController = EditProfileController(this, plantId)
         val grid = findViewById(R.id.photo_grid_view) as GridView
         grid.emptyView = findViewById(R.id.empty_grid_view)
-        val fab = findViewById(R.id.camera_fab) as FloatingActionButton
-        fab.setOnClickListener {
-            mController?.uploadPhoto()
-        }
     }
 
     override fun onResume() {
