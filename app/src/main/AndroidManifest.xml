@@ -112,7 +112,7 @@
                 android:value="com.scientists.happy.botanist.ui.ProfileActivity" />
         </activity>
         <activity
-            android:name=".ui.EditProfileActivity"
+            android:name=".ui.EditActivity"
             android:label="Edit Profile"
             android:parentActivityName=".ui.ProfileActivity">
             <meta-data

@@ -10,19 +10,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.GridView;
+
 import com.scientists.happy.botanist.R;
+import com.scientists.happy.botanist.controller.MainController;
 import com.scientists.happy.botanist.data.DatabaseManager;
 import com.scientists.happy.botanist.utils.AppRater;
-
-import java.util.ArrayList;
-import za.co.riggaroo.materialhelptutorial.TutorialItem;
 public class MainActivity extends AppCompatActivity {
     private static final int VIEW_ACCOUNT = 1;
-    private DatabaseManager mDatabase;
-    /**
-     * Launch app
-     * @param savedInstanceState - app state
-     */
+    private MainController mController;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,62 +51,18 @@ public class MainActivity extends AppCompatActivity {
                 findViewById(R.id.daily_tip_cardview).setVisibility(View.GONE);
             }
         });
-        GridView gridView = (GridView) findViewById(R.id.gridview);
+        GridView gridView = (GridView) findViewById(R.id.plants_grid);
         gridView.setEmptyView(findViewById(R.id.empty_grid_view));
-        mDatabase = DatabaseManager.getInstance();
-        mDatabase.showTutorial(this, loadTutorialItems(), false);
-        mDatabase.populatePlantGrid(this, gridView);
-        mDatabase.generateDailyTip(this, tipView);
+        mController = new MainController(this);
         AppRater.INSTANCE.appLaunched(this);
     }
 
-    /**
-     * Handle options menu
-     * @param menu - options menu
-     * @return Returns success code
-     */
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
+    protected void onStart() {
+        mController.load();
+        super.onStart();
     }
 
-    /**
-     * Handle selected option
-     * @param item - selected option
-     * @return Returns success code
-     */
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            startActivity(new Intent(this, SettingsActivity.class));
-            return true;
-        }
-        else if (id == R.id.action_account) {
-            startActivityForResult(new Intent(MainActivity.this, AccountActivity.class), VIEW_ACCOUNT);
-            return true;
-        }
-        else if (id == R.id.action_shop) {
-            startActivity(new Intent(MainActivity.this, ShopActivity.class));
-            return true;
-        }
-        else if (id == R.id.action_about) {
-            startActivity(new Intent(MainActivity.this, AboutActivity.class));
-            return true;
-        }
-        else if (id == R.id.action_help) {
-            mDatabase.showTutorial(this, loadTutorialItems(), true);
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    /**
-     * Launched activity ended
-     * @param requestCode - activity launch request code
-     * @param resultCode - activity launch result
-     * @param data - activity result data
-     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if ((requestCode == VIEW_ACCOUNT) && (resultCode == RESULT_OK)) {
@@ -118,25 +70,33 @@ public class MainActivity extends AppCompatActivity {
             finish();
         }
     }
-      
-     /*
-     * Fetch assets for the tutorial
-     * @return - Returns the list of tutorial items
-     */
-    private ArrayList<TutorialItem> loadTutorialItems() {
-        TutorialItem tutorialItem0 = new TutorialItem(getString(R.string.main_tutorial_title_0_0), getString(R.string.main_tutorial_contents_0_0),
-                R.color.colorAccent, R.drawable.main_tutorial_0_0,  R.drawable.main_tutorial_0_0);
-        TutorialItem tutorialItem1 = new TutorialItem(getString(R.string.main_tutorial_title_0_1), getString(R.string.main_tutorial_contents_0_1),
-                R.color.colorAccent, R.drawable.main_tutorial_0_1,  R.drawable.main_tutorial_0_1);
-        TutorialItem tutorialItem2 = new TutorialItem(getString(R.string.main_tutorial_title_0_2), getString(R.string.main_tutorial_contents_0_2),
-                R.color.colorAccent, R.drawable.main_tutorial_0_2,  R.drawable.main_tutorial_0_2);
-        TutorialItem tutorialItem3 = new TutorialItem(getString(R.string.main_tutorial_title_1), getString(R.string.main_tutorial_contents_1),
-                R.color.colorAccent, R.drawable.main_tutorial_1,  R.drawable.main_tutorial_1);
-        ArrayList<TutorialItem> tutorialItems = new ArrayList<>();
-        tutorialItems.add(tutorialItem0);
-        tutorialItems.add(tutorialItem1);
-        tutorialItems.add(tutorialItem2);
-        tutorialItems.add(tutorialItem3);
-        return tutorialItems;
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.action_settings:
+                startActivity(new Intent(this, SettingsActivity.class));
+                return true;
+            case R.id.action_account:
+                startActivityForResult(new Intent(MainActivity.this, AccountActivity.class), VIEW_ACCOUNT);
+                return true;
+            case R.id.action_shop:
+                startActivity(new Intent(MainActivity.this, ShopActivity.class));
+                return true;
+            case R.id.action_about:
+                startActivity(new Intent(MainActivity.this, AboutActivity.class));
+                return true;
+            case R.id.action_help:
+                DatabaseManager.getInstance().showTutorial(this, mController.loadTutorialItems(), true);
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

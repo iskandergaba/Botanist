@@ -20,15 +20,10 @@ import android.support.annotation.NonNull;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.GridView;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
 import com.firebase.ui.database.FirebaseListAdapter;
-import com.firebase.ui.storage.images.FirebaseImageLoader;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.data.BarData;
@@ -49,13 +44,14 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.StorageTask;
+import com.google.firebase.storage.UploadTask;
 import com.scientists.happy.botanist.R;
 import com.scientists.happy.botanist.services.BirthdayReceiver;
 import com.scientists.happy.botanist.services.FertilizerReceiver;
 import com.scientists.happy.botanist.services.HeightMeasureReceiver;
 import com.scientists.happy.botanist.services.UpdatePhotoReceiver;
 import com.scientists.happy.botanist.services.WaterReceiver;
-import com.scientists.happy.botanist.ui.ProfileActivity;
 import com.scientists.happy.botanist.ui.SettingsActivity;
 
 import java.io.ByteArrayOutputStream;
@@ -72,10 +68,10 @@ import za.co.riggaroo.materialhelptutorial.tutorial.MaterialTutorialActivity;
 import static android.content.Context.ALARM_SERVICE;
 
 public class DatabaseManager {
-    private static final int HEIGHT_MEASURE_RECEIVER_ID_OFFSET = 1000;
-    private static final int FERTILIZER_RECEIVER_ID_OFFSET = 2000;
-    private static final int UPDATE_PHOTO_RECEIVER_ID_OFFSET = 3000;
-    private static final int BIRTHDAY_RECEIVER_ID_OFFSET = 4000;
+    public static final int HEIGHT_MEASURE_RECEIVER_ID_OFFSET = 1000;
+    public static final int FERTILIZER_RECEIVER_ID_OFFSET = 2000;
+    public static final int UPDATE_PHOTO_RECEIVER_ID_OFFSET = 3000;
+    public static final int BIRTHDAY_RECEIVER_ID_OFFSET = 4000;
     private static final int TUTORIAL_REQUEST_CODE = 1234;
     private long mPlantsAdded, mPlantsDeleted, mPlantsNumber;
     private long mWaterCount, mMeasureCount, mPhotoCount;
@@ -305,24 +301,31 @@ public class DatabaseManager {
      * @param plantId - id of the plant whose image needs to update
      * @param bmp - new image
      */
-    public void updatePlantImage(int photoPointer, int photoNum, final String plantId, Bitmap bmp) {
+    public StorageTask<UploadTask.TaskSnapshot> updatePlantImage(final int photoPointer, final int photoNum, final String plantId, Bitmap bmp) {
         final String userId = getUserId();
         if ((userId != null) && (bmp != null)) {
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             bmp.compress(Bitmap.CompressFormat.JPEG, 100, stream);
             byte[] data = stream.toByteArray();
-            String profilePhoto = plantId + "_" + photoPointer + ".jpg";
+            final String profilePhoto = plantId + "_" + photoPointer + ".jpg";
             StorageReference filepath = mStorage.child(userId).child(profilePhoto);
-            filepath.putBytes(data);
-            DatabaseReference plantRef = mDatabase.child("users").child(userId).child("plants").child(plantId);
-            mDatabase.child("users").child(userId).child("photos").push().setValue(profilePhoto);
-            plantRef.child("profilePhoto").setValue(profilePhoto);
-            plantRef.child("photoPointer").setValue(photoPointer);
-            plantRef.child("photoNum").setValue(photoNum);
-            updateNotificationTime(plantId, "lastPhotoNotification");
-            setPhotoCount(getPhotoCount() + 1);
-            updateUserRating();
+            return filepath.putBytes(data).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                    if(task.isSuccessful()) {
+                        DatabaseReference plantRef = mDatabase.child("users").child(userId).child("plants").child(plantId);
+                        mDatabase.child("users").child(userId).child("photos").push().setValue(profilePhoto);
+                        plantRef.child("profilePhoto").setValue(profilePhoto);
+                        plantRef.child("photoPointer").setValue(photoPointer);
+                        plantRef.child("photoNum").setValue(photoNum);
+                        updateNotificationTime(plantId, "lastPhotoNotification");
+                        setPhotoCount(getPhotoCount() + 1);
+                        updateUserRating();
+                    }
+                }
+            });
         }
+        return null;
     }
 
     /**
@@ -589,117 +592,6 @@ public class DatabaseManager {
             });
         }
     }
-
-    /**
-     * populate a grid with user plants
-     * @param activity - the current activity
-     * @param grid - the current grid
-     */
-    public void populatePlantGrid(final Activity activity, final GridView grid) {
-        final String userId = getUserId();
-        final TextView emptyGridView = (TextView) activity.findViewById(R.id.empty_grid_view);
-        final ProgressBar loadingProgressBar = (ProgressBar) activity.findViewById(R.id.loading_indicator);
-        loadingProgressBar.setVisibility(View.VISIBLE);
-        if (userId != null) {
-            DatabaseReference databaseRef = mDatabase.child("users").child(userId).child("plants");
-            final FirebaseListAdapter<Plant> adapter = new FirebaseListAdapter<Plant>(activity, Plant.class, R.layout.plant_item_view, databaseRef) {
-                /**
-                 * Populate a grid item
-                 * @param view - the current view
-                 * @param plant - the plant to display
-                 * @param position - the position in the menu
-                 */
-                @Override
-                protected void populateView(final View view, final Plant plant, final int position) {
-                    String profilePhoto = plant.getProfilePhoto();
-                    if (profilePhoto == null) {
-                        // For earlier versions before profilePhoto property was added
-                        long photoNum = plant.getPhotoNum();
-                        profilePhoto = photoNum < 0 ? "default" : plant.getId() + "_" + photoNum + ".jpg";
-                        plant.setProfilePhoto(profilePhoto);
-                    }
-                    StorageReference storageReference = mStorage.child(userId).child(profilePhoto);
-                    ((TextView) view.findViewById(R.id.grid_item_nickname)).setText(plant.getName());
-                    ((TextView) view.findViewById(R.id.grid_item_species)).setText(plant.getSpecies());
-                    final ImageView picture = (ImageView) view.findViewById(R.id.grid_item_image_view);
-                    Glide.with(activity).using(new FirebaseImageLoader()).load(storageReference).dontAnimate()
-                            .placeholder(R.drawable.flowey).into(picture);
-                    // One day, before the progress bar becomes empty
-                    long interval = getReminderIntervalInMillis(1);
-                    long diff = System.currentTimeMillis() - plant.getLastWatered();
-                    float progress = 100 - (float) (100.0 * diff / interval);
-                    // The minimum value is one, just to make sure it's visible to the user
-                    if (progress < 1) {
-                        progress = 1;
-                    }
-                    ((ProgressBar) view.findViewById(R.id.progress)).setProgress(Math.round(progress));
-                    Calendar now = Calendar.getInstance();
-                    Calendar birthday = Calendar.getInstance();
-                    birthday.setTimeInMillis(plant.getBirthday());
-                    if (now.get(Calendar.MONTH) == birthday.get(Calendar.MONTH)
-                            && now.get(Calendar.DAY_OF_MONTH) == birthday.get(Calendar.DAY_OF_MONTH)
-                            && now.get(Calendar.YEAR) != birthday.get(Calendar.YEAR)) {
-                        view.findViewById(R.id.birthday_image_view).setVisibility(View.VISIBLE);
-                    }
-                    view.setOnClickListener(new View.OnClickListener() {
-                        /**
-                         * User clicked a plant
-                         * @param v - the current view
-                         */
-                        @Override
-                        public void onClick(View v) {
-                            Intent i = new Intent(activity.getApplicationContext(), ProfileActivity.class);
-                            i.putExtra("plant_id", plant.getId());
-                            i.putExtra("height", plant.getHeight());
-                            activity.startActivity(i);
-                        }
-                    });
-                    setReminders(activity, plant, position, new WaterReceiver());
-                    setReminders(activity, plant, position + HEIGHT_MEASURE_RECEIVER_ID_OFFSET, new HeightMeasureReceiver());
-                    setReminders(activity, plant, position + FERTILIZER_RECEIVER_ID_OFFSET, new FertilizerReceiver());
-                    setReminders(activity, plant, position + UPDATE_PHOTO_RECEIVER_ID_OFFSET, new UpdatePhotoReceiver());
-                    setBirthdayReminder(activity, plant, position + BIRTHDAY_RECEIVER_ID_OFFSET);
-                }
-            };
-
-            // After digging deep, I discovered that Firebase keeps some local information in ".info"
-            DatabaseReference connectedRef = mDatabase.child(".info/connected");
-            connectedRef.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot snapshot) {
-                    boolean connected = (boolean) snapshot.getValue();
-                    if (connected) {
-                        emptyGridView.setText(R.string.loading_text);
-                        loadingProgressBar.setVisibility(View.VISIBLE);
-                    } else {
-                        Toast.makeText(activity, R.string.msg_network_error, Toast.LENGTH_SHORT).show();
-                        emptyGridView.setText(R.string.msg_network_error);
-                        loadingProgressBar.setVisibility(View.GONE);
-                    }
-                }
-
-                @Override
-                public void onCancelled(DatabaseError error) {
-                }
-            });
-
-            databaseRef.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    loadingProgressBar.setVisibility(View.GONE);
-                    emptyGridView.setText(R.string.no_plants);
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-                    emptyGridView.setText(R.string.msg_unexpected_error);
-                    loadingProgressBar.setVisibility(View.GONE);
-                }
-            });
-            grid.setAdapter(adapter);
-        }
-    }
-
 
 
     /**
@@ -1245,7 +1137,7 @@ public class DatabaseManager {
      * @param plant - the plant whose birthday is reminded of
      * @param id - the id of the plant
      */
-    private void setBirthdayReminder(Context context, Plant plant, int id) {
+    public void setBirthdayReminder(Context context, Plant plant, int id) {
         Intent intent = new Intent(context, BirthdayReceiver.class);
         intent.putExtra("name", plant.getName());
         intent.putExtra("species", plant.getSpecies());
@@ -1271,7 +1163,7 @@ public class DatabaseManager {
      * @param id - notification id
      * @param receiver - the type of reminder to set
      */
-    private void setReminders(Context context, Plant plant, int id, BroadcastReceiver receiver) {
+    public void setReminders(Context context, Plant plant, int id, BroadcastReceiver receiver) {
         Intent intent = new Intent(context, receiver.getClass());
         intent.putExtra("name", plant.getName());
         intent.putExtra("plant_id", plant.getId());
@@ -1352,91 +1244,10 @@ public class DatabaseManager {
     }
 
     /**
-     * Get the array index of the last daily tip the user saw, and update the cardview on the
-     * main activity if it was not today
-     * @param context - the activity this method was called from
-     * @param tipView - the container view of the daily tip
-     */
-    public void generateDailyTip(final Context context, final View tipView) {
-        final String userId = getUserId();
-        final String[] dailyTips = context.getResources().getStringArray(R.array.daily_tips_values);
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        boolean displayTip = preferences.getBoolean("daily_tip", true);
-        if (displayTip && userId != null) {
-            mDatabase.child("users").child(userId).child("indexOfLastDailyTip").addListenerForSingleValueEvent(new ValueEventListener() {
-                /**
-                 * Handle a change in the user data
-                 * @param snapshot - the current database contents
-                 */
-                @Override
-                public void onDataChange(DataSnapshot snapshot) {
-                    if (snapshot.exists()) {
-                        long indexOfLastDailyTip = (long) snapshot.getValue();
-                        int dailyTipIndex = (int) (Math.random() * dailyTips.length);
-                        while (dailyTipIndex == indexOfLastDailyTip) {
-                            dailyTipIndex = (int) (Math.random() * dailyTips.length);
-                        }
-                        ((TextView) tipView.findViewById(R.id.daily_tip_text)).setText(dailyTips[dailyTipIndex]);
-                        setIndexOfLastDailyTip(dailyTipIndex);
-                    } else {
-                        int dailyTipIndex = (int) (Math.random() * dailyTips.length);
-                        ((TextView) tipView.findViewById(R.id.daily_tip_text)).setText(dailyTips[dailyTipIndex]);
-                        setIndexOfLastDailyTip(dailyTipIndex);
-                    }
-                }
-
-                /**
-                 * Generate a random tip and hope it's not the same as last time if something wrong happens
-                 * @param databaseError - database encountered an error
-                 */
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-                    int dailyTipIndex = (int) (Math.random() * dailyTips.length);
-                    ((TextView) tipView.findViewById(R.id.daily_tip_text)).setText(dailyTips[dailyTipIndex]);
-                    setIndexOfLastDailyTip(dailyTipIndex);
-                }
-            });
-
-            mDatabase.child("users").child(userId).child("dateOfLastDailyTip").addListenerForSingleValueEvent(new ValueEventListener() {
-                /**
-                 * Handle a change in the user data
-                 * @param snapshot - the current database contents
-                 */
-                @Override
-                public void onDataChange(DataSnapshot snapshot) {
-                    if (snapshot.exists()) {
-                        Calendar today = Calendar.getInstance();
-                        Calendar lastTime = Calendar.getInstance();
-                        lastTime.setTimeInMillis((long) snapshot.getValue());
-                        if (lastTime.get(Calendar.DAY_OF_YEAR) != today.get(Calendar.DAY_OF_YEAR)) {
-                            tipView.setVisibility(View.VISIBLE);
-                            setDateOfLastDailyTip(System.currentTimeMillis());
-                        } else {
-                            tipView.setVisibility(View.GONE);
-                        }
-                    } else {
-                        tipView.setVisibility(View.VISIBLE);
-                        setDateOfLastDailyTip(System.currentTimeMillis());
-                    }
-                }
-
-                /**
-                 * Hide the tip view if cannot know whether it's been a day since the last tip or not
-                 * @param databaseError - database encountered an error
-                 */
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-                    tipView.setVisibility(View.GONE);
-                }
-            });
-        }
-    }
-
-    /**
      * Update the array index of the last daily tip the user saw
      * @param index - the array index of the daily tip the user just saw today
      */
-    private void setIndexOfLastDailyTip(int index) {
+    public void setIndexOfLastDailyTip(int index) {
         String userId = getUserId();
         if (userId != null) {
             mDatabase.child("users").child(userId).child("indexOfLastDailyTip").setValue(index);
@@ -1447,16 +1258,26 @@ public class DatabaseManager {
      * Update the date of the last daily tip the user saw (so user doesn't see two daily tips in one day)
      * @param date - the date of the day the user last saw a daily tip
      */
-    private void setDateOfLastDailyTip(long date) {
+    public void setDateOfLastDailyTip(long date) {
         String userId = getUserId();
         if (userId != null) {
             mDatabase.child("users").child(userId).child("dateOfLastDailyTip").setValue(date);
         }
     }
 
-    public DatabaseReference getPlantReference(String plantId) {
+    public DatabaseReference getUserReference() {
         String userId = getUserId();
-        return userId == null ? null : mDatabase.child("users").child(userId).child("plants").child(plantId);
+        return userId == null ? null : mDatabase.child("users").child(userId);
+    }
+
+    public DatabaseReference getAllPlantsReference() {
+        DatabaseReference userRef = getUserReference();
+        return userRef == null ? null : userRef.child("plants");
+    }
+
+    public DatabaseReference getPlantReference(String plantId) {
+        DatabaseReference plantsRef = getAllPlantsReference();
+        return plantsRef == null ? null : plantsRef.child(plantId);
     }
 
     public DatabaseReference getPlantEntryReference(String species) {
@@ -1465,8 +1286,8 @@ public class DatabaseManager {
     }
 
     public DatabaseReference getUserPhotosReference() {
-        String userId = getUserId();
-        return userId == null ? null : mDatabase.child("users").child(userId).child("photos");
+        DatabaseReference userRef = getUserReference();
+        return userRef == null ? null : userRef.child("photos");
     }
 
     public DatabaseReference getUserConnectionReference() {

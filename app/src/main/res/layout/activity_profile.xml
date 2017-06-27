@@ -492,7 +492,7 @@
             android:layout_height="wrap_content"
             android:src="@drawable/ic_calendar"
             fab:fab_size="mini"
-            fab:fab_label="Add to Calendar"
+            fab:fab_label="Schedule"
             fab:fab_colorNormal="@color/material_pink_300"
             fab:fab_colorPressed="@color/material_pink_300"/>
 

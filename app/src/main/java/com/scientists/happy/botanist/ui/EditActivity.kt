@@ -6,12 +6,12 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.widget.GridView
 import com.scientists.happy.botanist.R
-import com.scientists.happy.botanist.controller.EditProfileController
+import com.scientists.happy.botanist.controller.EditController
 import com.scientists.happy.botanist.data.DatabaseManager
 
-class EditProfileActivity : AppCompatActivity() {
+class EditActivity : AppCompatActivity() {
     private var mDatabase: DatabaseManager? = null
-    private var mController : EditProfileController? = null
+    private var mController : EditController? = null
     /**
      * The activity is launched
      * @param savedInstanceState - current app state
@@ -21,7 +21,7 @@ class EditProfileActivity : AppCompatActivity() {
         setContentView(R.layout.activity_edit_profile)
         val plantId = intent.extras.get("plant_id") as String
         mDatabase = DatabaseManager.getInstance()
-        mController = EditProfileController(this, plantId)
+        mController = EditController(this, plantId)
         val grid = findViewById(R.id.photo_grid_view) as GridView
         grid.emptyView = findViewById(R.id.empty_grid_view)
     }

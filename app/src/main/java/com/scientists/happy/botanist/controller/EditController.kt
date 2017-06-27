@@ -18,7 +18,7 @@ import com.scientists.happy.botanist.R
 import com.scientists.happy.botanist.data.DatabaseManager
 import com.scientists.happy.botanist.data.Plant
 
-class EditProfileController(private val mActivity: AppCompatActivity, private val mPlantId: String) {
+class EditController(private val mActivity: AppCompatActivity, private val mPlantId: String) {
     private var mProgressDialog: ProgressDialog? = null
     private var mPlantName: String? = null
     private var mPhotoNum: Int = 0

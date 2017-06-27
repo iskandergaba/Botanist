@@ -22,18 +22,22 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.StorageTask;
+import com.google.firebase.storage.UploadTask;
 import com.scientists.happy.botanist.R;
 import com.scientists.happy.botanist.data.DatabaseManager;
 import com.scientists.happy.botanist.data.Plant;
 import com.scientists.happy.botanist.data.PlantEntry;
 import com.scientists.happy.botanist.ui.DiseaseActivity;
-import com.scientists.happy.botanist.ui.EditProfileActivity;
+import com.scientists.happy.botanist.ui.EditActivity;
 import com.scientists.happy.botanist.ui.SettingsActivity;
 import com.scientists.happy.botanist.ui.SimilarPlantsActivity;
 import com.scientists.happy.botanist.ui.StatsActivity;
@@ -86,6 +90,7 @@ public class ProfileController {
         loadProfilePhoto();
         loadProfileInfo();
         hideProgressDialog();
+        mDatabase.showTutorial(mActivity, loadTutorialItems(), false);
     }
 
     public void uploadPhoto() {
@@ -97,15 +102,23 @@ public class ProfileController {
              */
             @Override
             public void onPickResult(PickResult r) {
-                mDatabase.updatePlantImage(mPlant.getPhotoPointer() + 1, mPlant.getPhotoNum() + 1,
-                        mPlant.getId(), r.getBitmap());
+                StorageTask<UploadTask.TaskSnapshot> uploadTask = mDatabase.updatePlantImage(mPlant.getPhotoPointer() + 1,
+                        mPlant.getPhotoNum() + 1, mPlant.getId(), r.getBitmap());
+                uploadTask.addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            loadProfilePhoto();
+                        }
+                    }
+                });
             }
         }).show(mActivity.getSupportFragmentManager());
     }
 
     public boolean handleOptionsItemSelected(int resId) {
         if (resId == R.id.action_edit_profile) {
-            Intent i = new Intent(mActivity, EditProfileActivity.class);
+            Intent i = new Intent(mActivity, EditActivity.class);
             i.putExtra("plant_id", mPlant.getId());
             mActivity.startActivity(i);
             return true;
@@ -520,7 +533,7 @@ public class ProfileController {
      * Fetch assets for the tutorial
      * @return - Returns the list of tutorial items
      */
-    public ArrayList<TutorialItem> loadTutorialItems() {
+    private ArrayList<TutorialItem> loadTutorialItems() {
         TutorialItem tutorialItem0 = new TutorialItem(mActivity.getString(R.string.profile_tutorial_title_0), mActivity.getString(R.string.profile_tutorial_contents_0),
                 R.color.colorAccent, R.drawable.profile_tutorial_0, R.drawable.profile_tutorial_0);
         TutorialItem tutorialItem1 = new TutorialItem(mActivity.getString(R.string.profile_tutorial_title_1), mActivity.getString(R.string.profile_tutorial_contents_1),
@@ -543,18 +556,20 @@ public class ProfileController {
     private void loadProfilePhoto() {
         if (mPlantReference != null) {
             final DatabaseReference photoFileNameReference = mPlantReference.child("profilePhoto");
-            photoFileNameReference.addValueEventListener(new ValueEventListener() {
+            photoFileNameReference.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NotNull DataSnapshot dataSnapshot) {
-                    String fileName = dataSnapshot.getValue(String.class);
-                    ImageView profilePictureView = (ImageView) mActivity.findViewById(R.id.plant_picture);
-                    int placeHolderResId = R.drawable.flowey;
-                    if (fileName != null && !fileName.equals("default")) {
-                        StorageReference photoFileReference = mUserStorage.child(fileName);
-                        Glide.with(mActivity).using(new FirebaseImageLoader()).
-                                load(photoFileReference).dontAnimate().placeholder(placeHolderResId).into(profilePictureView);
-                    } else {
-                        Glide.with(mActivity).load(placeHolderResId).dontAnimate().placeholder(placeHolderResId).into(profilePictureView);
+                    if (dataSnapshot.exists()) {
+                        String fileName = dataSnapshot.getValue(String.class);
+                        ImageView profilePictureView = (ImageView) mActivity.findViewById(R.id.plant_picture);
+                        int placeHolderResId = R.drawable.flowey;
+                        if (fileName != null && !fileName.equals("default")) {
+                            StorageReference photoFileReference = mUserStorage.child(fileName);
+                            Glide.with(mActivity).using(new FirebaseImageLoader()).
+                                    load(photoFileReference).dontAnimate().placeholder(placeHolderResId).into(profilePictureView);
+                        } else {
+                            Glide.with(mActivity).load(placeHolderResId).dontAnimate().placeholder(placeHolderResId).into(profilePictureView);
+                        }
                     }
                 }
 

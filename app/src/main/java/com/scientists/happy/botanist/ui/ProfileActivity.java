@@ -15,10 +15,8 @@ import android.view.animation.Transformation;
 
 import com.scientists.happy.botanist.R;
 import com.scientists.happy.botanist.controller.ProfileController;
-import com.scientists.happy.botanist.data.DatabaseManager;
 public class ProfileActivity extends AppCompatActivity implements View.OnClickListener {
     private static final String ID_KEY = "plant_id";
-    private DatabaseManager mDatabase;
     private int mToxicRotationAngle, mNoxiousRotationAngle, mTipsRotationAngle;
     private boolean mToxicExpanded, mNoxiousExpanded, mTipsExpanded;
 
@@ -33,7 +31,6 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
-        mDatabase = DatabaseManager.getInstance();
         Bundle extras = getIntent().getExtras();
         String plantId = extras.getString(ID_KEY);
         mController = new ProfileController(this, plantId);
@@ -51,10 +48,9 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
+    protected void onStart() {
         mController.load();
-        mDatabase.showTutorial(this, mController.loadTutorialItems(), false);
+        super.onStart();
     }
 
     @Override
