@@ -1,6 +1,7 @@
 // Singleton Database manager for Firebase
 // @author: Christopher Besser, Antonio Muscarella, and Iskander Gaba
 package com.scientists.happy.botanist.data;
+
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -13,7 +14,6 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -52,7 +52,10 @@ import com.scientists.happy.botanist.services.FertilizerReceiver;
 import com.scientists.happy.botanist.services.HeightMeasureReceiver;
 import com.scientists.happy.botanist.services.UpdatePhotoReceiver;
 import com.scientists.happy.botanist.services.WaterReceiver;
+import com.scientists.happy.botanist.ui.LoginActivity;
 import com.scientists.happy.botanist.ui.SettingsActivity;
+import com.scientists.happy.botanist.ui.SplashActivity;
+import com.scientists.happy.botanist.utils.ExecutorValueEventListener;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
@@ -61,6 +64,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executors;
 
 import za.co.riggaroo.materialhelptutorial.TutorialItem;
 import za.co.riggaroo.materialhelptutorial.tutorial.MaterialTutorialActivity;
@@ -83,43 +87,6 @@ public class DatabaseManager {
     private DatabaseReference mDatabase;
     private String mDiseaseUrl;
     private static DatabaseManager mDatabaseManager;
-    private class PrepareAutocompleteTask extends AsyncTask<Void, Void, Void> {
-        /**
-         * Background asynchronous update
-         * @param params - process parameters
-         * @return Returns nothing
-         */
-        @Override
-        protected Void doInBackground(Void... params) {
-            // Child the root before all the push() keys are found and add a ValueEventListener()
-            mDatabase.child("Lookup").addValueEventListener(new ValueEventListener() {
-                /**
-                 * Handle a change in the database contents
-                 * @param dataSnapshot - the database state
-                 */
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    // Basically, this says "For each DataSnapshot *Data* in dataSnapshot, do what's inside the method.
-                    for (DataSnapshot suggestionSnapshot : dataSnapshot.getChildren()) {
-                        // Get the suggestion by childing the key of the string you want to get.
-                        String commonName = suggestionSnapshot.getKey();
-                        String sciName = suggestionSnapshot.getValue(String.class);
-                        // Add the retrieved string to the list
-                        mAutocompleteCache.put(commonName, sciName);
-                    }
-                }
-
-                /**
-                 * Do nothing when the process is cancelled
-                 * @param databaseError - Ignored error
-                 */
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-                }
-            });
-            return null;
-        }
-    }
     /**
      * Singleton DatabaseManager constructor
      */
@@ -129,7 +96,7 @@ public class DatabaseManager {
         mAutocompleteCache = new HashMap<>();
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mStorage = FirebaseStorage.getInstance().getReference();
-        new PrepareAutocompleteTask().execute();
+        //new PrepareAutocompleteTask().execute();
     }
 
     /**
@@ -170,6 +137,41 @@ public class DatabaseManager {
         mPhotoCount = 0;
         mRating = 0;
     }
+
+    public void splashLoadAutocomplete(final SplashActivity splashActivity)  {
+        // Child the root before all the push() keys are found and add a ValueEventListener()
+        mDatabase.child("Lookup").addValueEventListener(new ExecutorValueEventListener(Executors.newSingleThreadExecutor()) {
+
+            /**
+             * Handle a change in the database contents
+             * @param dataSnapshot - the database state
+             */
+            @Override
+            protected void onDataChangeExecutor(@NonNull DataSnapshot dataSnapshot) {
+                // Basically, this says "For each DataSnapshot *Data* in dataSnapshot, do what's inside the method.
+                for (DataSnapshot suggestionSnapshot : dataSnapshot.getChildren()) {
+                    // Get the suggestion by childing the key of the string you want to get.
+                    String commonName = suggestionSnapshot.getKey();
+                    String sciName = suggestionSnapshot.getValue(String.class);
+                    // Add the retrieved string to the list
+                    mAutocompleteCache.put(commonName, sciName);
+                }
+                splashActivity.startActivity(new Intent(splashActivity, LoginActivity.class));
+                splashActivity.finish();
+            }
+
+            /**
+             * Do nothing when the process is cancelled
+             * @param databaseError - Ignored error
+             */
+            @Override
+            protected void onCancelledExecutor(@NonNull DatabaseError databaseError) {
+                splashActivity.startActivity(new Intent(splashActivity, LoginActivity.class));
+                splashActivity.finish();
+            }
+        });
+    }
+
 
     /**
      * Add a new user
