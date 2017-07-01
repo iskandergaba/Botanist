@@ -17,13 +17,10 @@ import android.net.Uri;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
-import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.firebase.ui.database.FirebaseListAdapter;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.data.BarData;
@@ -85,7 +82,6 @@ public class DatabaseManager {
     private Map<String, String> mAutocompleteCache;
     private StorageReference mStorage;
     private DatabaseReference mDatabase;
-    private String mDiseaseUrl;
     private static DatabaseManager mDatabaseManager;
     /**
      * Singleton DatabaseManager constructor
@@ -276,7 +272,7 @@ public class DatabaseManager {
 
         final String userId = getUserId();
         if (userId != null) {
-            DatabaseReference plantRef = mDatabase.child("users").child(userId).child("plants").push();
+            DatabaseReference plantRef = getAllPlantsReference().push();
             final String plantId = plantRef.getKey();
             final Plant plant = new Plant(plantId, name, species, birthday, height);
             plantRef.setValue(plant).addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -585,6 +581,7 @@ public class DatabaseManager {
                     .setValue(System.currentTimeMillis()).addOnCompleteListener(new OnCompleteListener<Void>() {
                 /**
                  * Update last fertilized time
+                 *
                  * @param task - update task
                  */
                 @Override
@@ -595,108 +592,8 @@ public class DatabaseManager {
         }
     }
 
-
     /**
-     * Get a plant adapter
-     * @param activity - the current activity
-     * @param group - group the plant belongs to
-     * @param species - plant's species
-     * @return Returns an adapter for the plants
-     */
-    public FirebaseListAdapter<String> getSimilarPlants(final Activity activity, String group, final String species) {
-        final String userId = getUserId();
-        if (userId != null) {
-            DatabaseReference databaseRef = mDatabase.child("Groups").child(group);
-            return new FirebaseListAdapter<String>(activity, String.class, R.layout.similar_plant_view, databaseRef) {
-                /**
-                 * Show images in glide
-                 * @param view - the current view
-                 * @param plant - the plant to display
-                 * @param position - the position in the menu
-                 */
-                @Override
-                protected void populateView(final View view, final String plant, final int position) {
-                    if (!plant.equals(species)) {
-                        ((TextView) view.findViewById(R.id.plant_species)).setText(plant);
-                        view.findViewById(R.id.shop_button).setOnClickListener(new View.OnClickListener() {
-                            /**
-                             * User clicked buy now
-                             * @param v - current view
-                             */
-                            @Override
-                            public void onClick(View v) {
-                                String search = plant.replaceAll(" ", "-").toLowerCase();
-                                String url = "http://www.crocus.co.uk/search/_/search." + search + "/sort.0/";
-                                Intent viewIntent = new Intent("android.intent.action.VIEW", Uri.parse(url));
-                                activity.startActivity(viewIntent);
-                            }
-                        });
-                    }
-                }
-            };
-        }
-        return null;
-    }
-
-    /**
-     * Get a plant adapter for the diseases a plant can have
-     * @param activity - the current activity
-     * @param group - group the plant belongs to
-     * @return Returns an adapter for the plants
-     */
-    public FirebaseListAdapter<String> getDiseases(final Activity activity, String group) {
-        final String userId = getUserId();
-        if (userId != null) {
-            DatabaseReference databaseRef = mDatabase.child("Diseases").child(group);
-            return new FirebaseListAdapter<String>(activity, String.class, android.R.layout.simple_list_item_1, databaseRef) {
-                /**
-                 * Show images in glide
-                 * @param view - the current view
-                 * @param disease - the disease to display
-                 * @param position - the position in the menu
-                 */
-                @Override
-                protected void populateView(final View view, final String disease, final int position) {
-                    ((TextView) view.findViewById(android.R.id.text1)).setText(disease);
-                    mDatabase.child("DiseaseUrls").child(disease).addListenerForSingleValueEvent(new ValueEventListener() {
-                        /**
-                         * Handle a change in the database contents
-                         * @param snapshot - current database contents
-                         */
-                        @Override
-                        public void onDataChange(DataSnapshot snapshot) {
-                            if (snapshot.exists()) {
-                                mDiseaseUrl = (String) snapshot.getValue();
-                            }
-                        }
-
-                        /**
-                         * Do nothing when the process is cancelled
-                         * @param databaseError - Ignored error
-                         */
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-                        }
-                    });
-                    view.findViewById(android.R.id.text1).setOnClickListener(new View.OnClickListener() {
-                        /**
-                         * User pressed a disease
-                         * @param v - current app view
-                         */
-                        @Override
-                        public void onClick(View v) {
-                            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(mDiseaseUrl));
-                            activity.startActivity(browserIntent);
-                        }
-                    });
-                }
-            };
-        }
-        return null;
-    }
-
-    /**
-     * Show the autocomplete for AddPlantActivity add species
+     * Show the autocomplete for NewPlantActivity add species
      * @param context - the current app context
      * @param autoCompleteTextView - the autocomplete view
      */
@@ -1299,5 +1196,17 @@ public class DatabaseManager {
     public StorageReference getUserStorage() {
         String userId = getUserId();
         return userId == null ? null : mStorage.child(userId);
+    }
+
+    public DatabaseReference getGroupPlantsReference(String group) {
+        return mDatabase.child("Groups").child(group);
+    }
+
+    public DatabaseReference getGroupDiseasesReference(String group) {
+        return mDatabase.child("Diseases").child(group);
+    }
+
+    public DatabaseReference getDiseaseUrlReference(String disease) {
+        return mDatabase.child("DiseaseUrls").child(disease);
     }
 }

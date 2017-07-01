@@ -37,7 +37,7 @@ import com.scientists.happy.botanist.data.DatabaseManager;
 import com.scientists.happy.botanist.data.Plant;
 import com.scientists.happy.botanist.data.PlantEntry;
 import com.scientists.happy.botanist.ui.DiseaseActivity;
-import com.scientists.happy.botanist.ui.EditActivity;
+import com.scientists.happy.botanist.ui.EditPlantActivity;
 import com.scientists.happy.botanist.ui.SettingsActivity;
 import com.scientists.happy.botanist.ui.SimilarPlantsActivity;
 import com.scientists.happy.botanist.ui.StatsActivity;
@@ -66,10 +66,10 @@ import za.co.riggaroo.materialhelptutorial.TutorialItem;
 import static android.app.Activity.RESULT_OK;
 import static android.os.Environment.getExternalStoragePublicDirectory;
 
-public class ProfileController {
+public class PlantController {
 
-    private static final String WATER_KEY = "last_watered";
-    private static final String FERTILIZER_KEY = "last_fertilized";
+    private final String WATER_KEY = "last_watered";
+    private final String FERTILIZER_KEY = "last_fertilized";
 
     private AppCompatActivity mActivity;
     private ProgressDialog mProgressDialog;
@@ -80,8 +80,10 @@ public class ProfileController {
     private final StorageReference mUserStorage = mDatabase.getUserStorage();
     private final DatabaseReference mPlantReference;
 
-    public ProfileController(AppCompatActivity activity, String plantId) {
-        this.mActivity = activity;
+    public PlantController(AppCompatActivity activity) {
+        mActivity = activity;
+        String plantIdKey = "plant_id";
+        String plantId = mActivity.getIntent().getExtras().getString(plantIdKey);
         mPlantReference = mDatabase.getPlantReference(plantId);
     }
 
@@ -118,7 +120,7 @@ public class ProfileController {
 
     public boolean handleOptionsItemSelected(int resId) {
         if (resId == R.id.action_edit_profile) {
-            Intent i = new Intent(mActivity, EditActivity.class);
+            Intent i = new Intent(mActivity, EditPlantActivity.class);
             i.putExtra("plant_id", mPlant.getId());
             mActivity.startActivity(i);
             return true;
@@ -203,7 +205,7 @@ public class ProfileController {
      */
     public AlertDialog buildHeightInputDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
-        builder.setView(R.layout.height_input_dialog).setTitle(R.string.record_new_height)
+        builder.setView(R.layout.dialog_height_input).setTitle(R.string.record_new_height)
                 .setPositiveButton(R.string.mdtp_ok, new DialogInterface.OnClickListener() {
                     /**
                      * User clicked submit

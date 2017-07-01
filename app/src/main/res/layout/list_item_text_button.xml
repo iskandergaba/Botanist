@@ -11,7 +11,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin">
 
     <TextView
-        android:id="@+id/plant_species"
+        android:id="@+id/text"
         android:layout_weight="1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -21,12 +21,11 @@
         android:fontFamily="sans-serif-condensed"/>
 
     <Button
-        android:id="@+id/shop_button"
+        android:id="@+id/button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end"
         android:clickable="true"
-        android:text="@string/shop_now"
         style="@style/Widget.AppCompat.Button.Borderless.Colored" />
 
 </LinearLayout>

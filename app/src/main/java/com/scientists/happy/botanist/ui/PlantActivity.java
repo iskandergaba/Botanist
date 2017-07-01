@@ -14,13 +14,12 @@ import android.view.animation.Animation;
 import android.view.animation.Transformation;
 
 import com.scientists.happy.botanist.R;
-import com.scientists.happy.botanist.controller.ProfileController;
-public class ProfileActivity extends AppCompatActivity implements View.OnClickListener {
-    private static final String ID_KEY = "plant_id";
+import com.scientists.happy.botanist.controller.PlantController;
+public class PlantActivity extends AppCompatActivity implements View.OnClickListener {
     private int mToxicRotationAngle, mNoxiousRotationAngle, mTipsRotationAngle;
     private boolean mToxicExpanded, mNoxiousExpanded, mTipsExpanded;
 
-    private ProfileController mController;
+    private PlantController mController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,9 +30,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
-        Bundle extras = getIntent().getExtras();
-        String plantId = extras.getString(ID_KEY);
-        mController = new ProfileController(this, plantId);
+        mController = new PlantController(this);
         ActivityCompat.postponeEnterTransition(this);
         // Setting OnClickListeners
         findViewById(R.id.camera_fab).setOnClickListener(this);

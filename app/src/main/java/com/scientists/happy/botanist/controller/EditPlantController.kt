@@ -18,7 +18,8 @@ import com.scientists.happy.botanist.R
 import com.scientists.happy.botanist.data.DatabaseManager
 import com.scientists.happy.botanist.data.Plant
 
-class EditController(private val mActivity: AppCompatActivity, private val mPlantId: String) {
+class EditPlantController(private val mActivity: AppCompatActivity) {
+    private val mPlantId: String = mActivity.intent.extras.getString("plant_id")
     private var mProgressDialog: ProgressDialog? = null
     private var mPlantName: String? = null
     private var mPhotoNum: Int = 0
@@ -30,7 +31,7 @@ class EditController(private val mActivity: AppCompatActivity, private val mPlan
     private val mUserStorage = mDatabase.userStorage
 
     init {
-        mDatabase.getPlantReference(mPlantId).addValueEventListener(object : ValueEventListener {
+        mPlantReference.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 if (dataSnapshot.exists()) {
                     val plant = dataSnapshot.getValue(Plant::class.java)
@@ -53,6 +54,8 @@ class EditController(private val mActivity: AppCompatActivity, private val mPlan
     fun load() {
         showProgressDialog(mActivity.getString(R.string.loading_text))
         loadNameSection()
+        val grid = mActivity.findViewById(R.id.photo_grid_view) as GridView
+        grid.emptyView = mActivity.findViewById(R.id.empty_grid_view)
         populatePhotoGrid(mActivity)
         hideProgressDialog()
     }
@@ -67,11 +70,10 @@ class EditController(private val mActivity: AppCompatActivity, private val mPlan
         val loadingProgressBar = activity.findViewById(R.id.loading_indicator) as ProgressBar
         loadingProgressBar.visibility = View.VISIBLE
         if (mUserPhotosReference != null) {
-            val plantRef = mDatabase.getPlantReference(mPlantId)
             // An SQL-like hack to retrieve only data with values that matches the query: "plantId*"
             // This is needed to query only images that correspond to the specific plant being edited
             val query = mUserPhotosReference.orderByValue().startAt(mPlantId).endAt(mPlantId + "\uf8ff")
-            val adapter = object : FirebaseListAdapter<String>(activity, String::class.java, R.layout.photo_item_view, query) {
+            val adapter = object : FirebaseListAdapter<String>(activity, String::class.java, R.layout.grid_item_photo, query) {
                 /**
                  * Populate a photo grid item
                  * @param view - the current view
@@ -81,7 +83,7 @@ class EditController(private val mActivity: AppCompatActivity, private val mPlan
                  * @param position - the position
                  */
                 override fun populateView(view: View, photoName: String, position: Int) {
-                    val profilePhotoRef = plantRef.child("profilePhoto")
+                    val profilePhotoRef = mPlantReference.child("profilePhoto")
                     val storageReference = mUserStorage.child(photoName)
                     val picture = view.findViewById(R.id.photo_image_view) as ImageView
                     val isProfilePicture = BooleanArray(1)
@@ -118,7 +120,7 @@ class EditController(private val mActivity: AppCompatActivity, private val mPlan
 
                 override fun onDataChanged() {
                     super.onDataChanged()
-                    val photoNumRef = plantRef.child("photoNum")
+                    val photoNumRef = mPlantReference.child("photoNum")
                     // Keep photoNum up to date. (photoNum is zero-based)
                     photoNumRef.setValue(count - 1)
                 }
@@ -189,7 +191,7 @@ class EditController(private val mActivity: AppCompatActivity, private val mPlan
     private fun loadNameSection() {
         mActivity.findViewById(R.id.rename_button).setOnClickListener {
             val builder = AlertDialog.Builder(mActivity)
-            val dialogView = View.inflate(mActivity, R.layout.name_input_dialog, null)
+            val dialogView = View.inflate(mActivity, R.layout.dialog_name_input, null)
             val inputEditText = dialogView.findViewById(R.id.name_edit_text) as EditText
             inputEditText.setText(mPlantName)
             builder.setView(dialogView).setTitle(R.string.rename)

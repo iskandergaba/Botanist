@@ -46,7 +46,7 @@ object AppRater {
     private fun showRateDialog(context: Context, editor: SharedPreferences.Editor) {
         val dialog = Dialog(context)
 
-        dialog.setContentView(R.layout.rate_app_dialog)
+        dialog.setContentView(R.layout.dialog_rate_app)
         dialog.findViewById(R.id.btn_rate).setOnClickListener {
             context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + APP_PACKAGE_NAME)))
             editor.putBoolean("dont_show_again", true)

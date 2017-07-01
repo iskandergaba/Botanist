@@ -1,9 +1,9 @@
 package com.scientists.happy.botanist.controller;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -26,7 +26,7 @@ import com.scientists.happy.botanist.services.FertilizerReceiver;
 import com.scientists.happy.botanist.services.HeightMeasureReceiver;
 import com.scientists.happy.botanist.services.UpdatePhotoReceiver;
 import com.scientists.happy.botanist.services.WaterReceiver;
-import com.scientists.happy.botanist.ui.ProfileActivity;
+import com.scientists.happy.botanist.ui.PlantActivity;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -34,11 +34,11 @@ import java.util.Calendar;
 import za.co.riggaroo.materialhelptutorial.TutorialItem;
 
 public class MainController {
-    private final Activity mActivity;
+    private final AppCompatActivity mActivity;
     private final DatabaseManager mDatabase = DatabaseManager.getInstance();
     private final DatabaseReference mUserReference = mDatabase.getUserReference();
 
-    public MainController(Activity activity) {
+    public MainController(AppCompatActivity activity) {
         mActivity = activity;
     }
 
@@ -58,7 +58,7 @@ public class MainController {
         final ProgressBar loadingProgressBar = (ProgressBar) mActivity.findViewById(R.id.loading_indicator);
         loadingProgressBar.setVisibility(View.VISIBLE);
         if (plantsReference != null) {
-            final FirebaseListAdapter<Plant> adapter = new FirebaseListAdapter<Plant>(mActivity, Plant.class, R.layout.plant_item_view, plantsReference) {
+            final FirebaseListAdapter<Plant> adapter = new FirebaseListAdapter<Plant>(mActivity, Plant.class, R.layout.grid_item_plant, plantsReference) {
                 /**
                  * Populate a grid item
                  * @param view - the current view
@@ -104,7 +104,7 @@ public class MainController {
                          */
                         @Override
                         public void onClick(View v) {
-                            Intent i = new Intent(mActivity.getApplicationContext(), ProfileActivity.class);
+                            Intent i = new Intent(mActivity.getApplicationContext(), PlantActivity.class);
                             i.putExtra("plant_id", plant.getId());
                             mActivity.startActivity(i);
                         }

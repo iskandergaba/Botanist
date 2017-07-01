@@ -1,27 +1,30 @@
-// Show users similar plants
-// @author: Antonio Muscarella, Christopher Besser and Iskander Gaba
+// View diseases a plant can get
+// @author: Iskander Gaba
 package com.scientists.happy.botanist.ui
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import com.scientists.happy.botanist.R
-import com.scientists.happy.botanist.controller.SimilarPlantsController
+import com.scientists.happy.botanist.controller.EditPlantController
 
-class SimilarPlantsActivity : AppCompatActivity() {
-
-    private var mController:SimilarPlantsController? = null
+class EditPlantActivity : AppCompatActivity() {
+    private var mController : EditPlantController? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_similar_plants)
-        mController = SimilarPlantsController(this)
+        setContentView(R.layout.activity_edit_profile)
     }
 
     override fun onStart() {
-        mController!!.load()
         super.onStart()
+        mController = EditPlantController(this)
     }
 
+    override fun onResume() {
+        super.onResume()
+        mController?.load()
+    }
+    
     override fun onSupportNavigateUp(): Boolean {
         super.onBackPressed()
         return true

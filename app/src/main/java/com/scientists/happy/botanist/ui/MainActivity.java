@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
              */
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(MainActivity.this, AddPlantActivity.class));
+                startActivity(new Intent(MainActivity.this, NewPlantActivity.class));
             }
         });
         View tipView = findViewById(R.id.daily_tip_cardview);
