@@ -7,7 +7,7 @@
     <item
         android:id="@+id/action_edit_profile"
         android:orderInCategory="1"
-        android:title="Edit"
+        android:title="@string/action_edit"
         app:showAsAction="ifRoom" />
 
     <item
@@ -15,37 +15,31 @@
         android:orderInCategory="2"
         android:title="@string/share"
         app:showAsAction="ifRoom" />
-
     <item
-        android:id="@+id/action_stats"
+        android:id="@+id/action_delete"
         android:orderInCategory="3"
-        android:title="@string/stats"
+        android:title="@string/action_delete"
         app:showAsAction="never" />
-
     <item
         android:id="@+id/action_export_gif"
         android:orderInCategory="4"
         android:title="@string/create_gif"
         app:showAsAction="never" />
-
-
+    <item
+        android:id="@+id/action_stats"
+        android:orderInCategory="5"
+        android:title="@string/stats"
+        app:showAsAction="never" />
     <item
         android:id="@+id/action_similar_plants"
-        android:orderInCategory="5"
+        android:orderInCategory="6"
         android:title="@string/similar"
         app:showAsAction="never" />
     <item
         android:id="@+id/action_diseases"
-        android:orderInCategory="6"
+        android:orderInCategory="7"
         android:title="@string/diseases"
         app:showAsAction="never" />
-
-    <item
-        android:id="@+id/action_delete"
-        android:orderInCategory="7"
-        android:title="@string/delete_dialog_title"
-        app:showAsAction="never" />
-
     <item
         android:id="@+id/action_help"
         android:orderInCategory="8"

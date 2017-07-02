@@ -1,7 +1,6 @@
 // User's account page
 // @author: Iskander Gaba
 package com.scientists.happy.botanist.ui;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -15,15 +14,9 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
+
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
-import com.github.mikephil.charting.charts.BarChart;
-import com.github.mikephil.charting.components.AxisBase;
-import com.github.mikephil.charting.components.XAxis;
-import com.github.mikephil.charting.components.YAxis;
-import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -33,54 +26,25 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.OptionalPendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.scientists.happy.botanist.R;
-import com.scientists.happy.botanist.data.DatabaseManager;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Locale;
-import za.co.riggaroo.materialhelptutorial.TutorialItem;
+import com.scientists.happy.botanist.controller.AccountController;
 public class AccountActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
     private static final String TAG = "AccountActivity";
-    private static final int RC_SIGN_IN = 9001;
     private GoogleApiClient mGoogleApiClient;
-    private ImageView mAccountImageView;
-    private TextView mNameTextView;
-    private TextView mEmailTextView;
-    private TextView mBotanistSinceTextView;
-    private TextView mPlantsNumberTextView;
-    private ProgressDialog mProgressDialog;
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
-    private DatabaseManager mDatabase;
-    /**
-     * Launch the activity
-     * @param savedInstanceState - current app state
-     */
+    private AccountController mController;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_account);
-        // Views
-        mNameTextView = (TextView) findViewById(R.id.name);
-        mEmailTextView = (TextView) findViewById(R.id.email);
-        mBotanistSinceTextView = (TextView) findViewById(R.id.botanist_since);
-        mPlantsNumberTextView = (TextView) findViewById(R.id.plants_number);
-        mAccountImageView = (ImageView) findViewById(R.id.account_picture);
-        TextView levelTextView = (TextView) findViewById(R.id.level_text_view);
-        ImageView badge = (ImageView) findViewById(R.id.user_badge);
-        ProgressBar levelProgressBar = (ProgressBar) findViewById(R.id.level_progress_bar);
+        mController = new AccountController(this);
         mAuth = FirebaseAuth.getInstance();
-        mDatabase = DatabaseManager.getInstance();
-        mDatabase.showTutorial(this, loadTutorialItems(), false);
         mAuthListener = new FirebaseAuth.AuthStateListener() {
-            /**
-             * Handle the authentication state change
-             * @param firebaseAuth - the user's authentication
-             */
+
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
@@ -91,6 +55,7 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
                 else {
                     // User is signed out
                     Log.d(TAG, "onAuthStateChanged:signed_out");
+                    signOut();
                 }
             }
         };
@@ -102,34 +67,44 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso).build();
-        double rating = mDatabase.getUserRating();
-        if (rating < 0) {
-            badge.setImageResource(R.drawable.badge_level_0);
-            levelTextView.setText(getString(R.string.level_0));
-            levelProgressBar.setProgress(0);
-        }
-        else if (rating < 0.35) {
-            badge.setImageResource(R.drawable.badge_level_1);
-            levelTextView.setText(getString(R.string.level_1));
-            levelProgressBar.setProgress(35);
-        }
-        else if (rating < 0.75) {
-            badge.setImageResource(R.drawable.badge_level_2);
-            levelTextView.setText(getString(R.string.level_2));
-            levelProgressBar.setProgress(75);
-        }
-        else {
-            badge.setImageResource(R.drawable.badge_level_3);
-            levelTextView.setText(getString(R.string.level_3));
-            levelProgressBar.setProgress(100);
-        }
-        populateUserStatsChart();
     }
 
-    /**
-     * Action overflow menu
-     * @param item - selected item
-     */
+    @Override
+    public void onStart() {
+        OptionalPendingResult<GoogleSignInResult> opr = Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient);
+        if (opr.isDone()) {
+            // If the user's cached credentials are valid, the OptionalPendingResult will be "done"
+            // and the GoogleSignInResult will be available instantly.
+            Log.d(TAG, "Got cached sign-in");
+            GoogleSignInResult result = opr.get();
+            handleSignInResult(result);
+        } else {
+            // If the user has not previously signed in on this device or the sign-in has expired,
+            // this asynchronous branch will attempt to sign in the user silently. Cross-device
+            // single sign-on will occur in this branch.
+            opr.setResultCallback(new ResultCallback<GoogleSignInResult>() {
+                /**
+                 * Try to sign in the user silently
+                 * @param googleSignInResult - the sign in attempt result
+                 */
+                @Override
+                public void onResult(@NonNull GoogleSignInResult googleSignInResult) {
+                    handleSignInResult(googleSignInResult);
+                }
+            });
+        }
+        mAuth.addAuthStateListener(mAuthListener);
+        mController.load();
+        mController.showTutorial(false);
+        super.onStart();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_account, menu);
+        return true;
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -141,59 +116,11 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
             buildRevokeAccessDialog().show();
         }
         else if (id == R.id.action_help) {
-            mDatabase.showTutorial(this, loadTutorialItems(), true);
+            mController.showTutorial(true);
         }
         return super.onOptionsItemSelected(item);
     }
 
-    /**
-     * Create Action Overflow menu
-     * @param menu - actions
-     * @return Returns success code
-     */
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_account, menu);
-        return true;
-    }
-
-    /**
-     * The app was started
-     */
-    @Override
-    public void onStart() {
-        super.onStart();
-        OptionalPendingResult<GoogleSignInResult> opr = Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient);
-        if (opr.isDone()) {
-            // If the user's cached credentials are valid, the OptionalPendingResult will be "done"
-            // and the GoogleSignInResult will be available instantly.
-            Log.d(TAG, "Got cached sign-in");
-            GoogleSignInResult result = opr.get();
-            handleSignInResult(result);
-        }
-        else {
-            // If the user has not previously signed in on this device or the sign-in has expired,
-            // this asynchronous branch will attempt to sign in the user silently. Cross-device
-            // single sign-on will occur in this branch.
-            showProgressDialog();
-            opr.setResultCallback(new ResultCallback<GoogleSignInResult>() {
-                /**
-                 * Try to sign in the user silently
-                 * @param googleSignInResult - the sign in attempt result
-                 */
-                @Override
-                public void onResult(@NonNull GoogleSignInResult googleSignInResult) {
-                    hideProgressDialog();
-                    handleSignInResult(googleSignInResult);
-                }
-            });
-        }
-        mAuth.addAuthStateListener(mAuthListener);
-    }
-
-    /**
-     * The activity was stopped
-     */
     @Override
     protected void onStop() {
         super.onStop();
@@ -202,10 +129,6 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
         }
     }
 
-    /**
-     * Handle back button press
-     * @return Returns a success code
-     */
     @Override
     public boolean onSupportNavigateUp() {
         super.onBackPressed();
@@ -213,37 +136,28 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
     }
 
     /**
-     * The sign in activity resolved
-     * @param requestCode - the request code
-     * @param resultCode - sign in result
-     * @param data - the sign in intent data
+     * Handle failed connection
+     * @param connectionResult - failed connection result
      */
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
-        if (requestCode == RC_SIGN_IN) {
-            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-            handleSignInResult(result);
-        }
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        // An unresolvable error has occurred and Google APIs (including Sign-In) will not be available.
+        Log.d(TAG, "onConnectionFailed:" + connectionResult);
+        signOut();
     }
 
     /**
-     * Handle a google signin
+     * Handle a google signIn
      * @param result - the result of the signin attempt
      */
     private void handleSignInResult(GoogleSignInResult result) {
         Log.d(TAG, "handleSignInResult:" + result.isSuccess());
+        final ImageView accountImageView = (ImageView) findViewById(R.id.account_picture);
         if (result.isSuccess()) {
             // Signed in successfully, show authenticated UI.
             GoogleSignInAccount acct = result.getSignInAccount();
             if (acct != null) {
-                SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy", Locale.US);
-                mNameTextView.setText(acct.getDisplayName());
-                mEmailTextView.setText(getString(R.string.email_fmt, acct.getEmail()));
-                mBotanistSinceTextView.setText(getString(R.string.botanist_since_fmt, dateFormat.format(mDatabase.getBotanistSince())));
-                mPlantsNumberTextView.setText(getString(R.string.plants_number_fmt, mDatabase.getPlantsNumber()));
-                Glide.with(this).load(acct.getPhotoUrl()).asBitmap().centerCrop().into(new BitmapImageViewTarget(mAccountImageView) {
+                Glide.with(this).load(acct.getPhotoUrl()).asBitmap().centerCrop().into(new BitmapImageViewTarget(accountImageView) {
                     /**
                      * Set a glide image
                      * @param resource - the image to set
@@ -252,7 +166,7 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
                     protected void setResource(Bitmap resource) {
                         RoundedBitmapDrawable circularBitmapDrawable = RoundedBitmapDrawableFactory.create(getResources(), resource);
                         circularBitmapDrawable.setCircular(true);
-                        mAccountImageView.setImageDrawable(circularBitmapDrawable);
+                        accountImageView.setImageDrawable(circularBitmapDrawable);
                     }
                 });
             }
@@ -270,23 +184,20 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
              */
             @Override
             public void onResult(@NonNull Status status) {
-                showProgressDialog();
                 mAuth.signOut();
-                mDatabase.resetMemberData();
-                mDatabase.deleteAllReminders(AccountActivity.this);
+                mController.resetDatabaseManager();
                 Intent resultIntent = new Intent();
                 setResult(RESULT_OK, resultIntent);
-                hideProgressDialog();
                 finish();
             }
         });
     }
 
     /**
-     * Remove user's access to database on signout/timeout
+     * Remove user account
      */
     private void revokeAccess() {
-        deleteUser();
+        mController.deleteUserFromDatabase();
         Auth.GoogleSignInApi.revokeAccess(mGoogleApiClient).setResultCallback(new ResultCallback<Status>() {
             /**
              * Revoke access result
@@ -303,42 +214,7 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
     }
 
     /**
-     * Delete a user from the database
-     */
-    private void deleteUser() {
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user != null) {
-            String userId = user.getUid();
-            mDatabase.deleteUserRecords(AccountActivity.this, userId);
-            user.delete().addOnCompleteListener(new OnCompleteListener<Void>() {
-                /**
-                 * Delete the user task completed
-                 * @param task - the completed task
-                 */
-                @Override
-                public void onComplete(@NonNull Task<Void> task) {
-                    if (task.isSuccessful()) {
-                        Log.d(TAG, "User account deleted.");
-                    }
-                }
-            });
-            mDatabase.resetMemberData();
-            mDatabase.deleteAllReminders(AccountActivity.this);
-        }
-    }
-
-    /**
-     * Handle failed connection
-     * @param connectionResult - failed connection result
-     */
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        // An unresolvable error has occurred and Google APIs (including Sign-In) will not be available.
-        Log.d(TAG, "onConnectionFailed:" + connectionResult);
-    }
-
-    /**
-     * Signout dialog
+     * SignOut dialog
      * @return Returns the dialog
      */
     private AlertDialog buildSignOutDialog() {
@@ -358,11 +234,7 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
             }
         });
         builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
-            /**
-             * Handle a click on the cancel button
-             * @param dialog - the log out dialog
-             * @param id - the user id
-             */
+
             public void onClick(DialogInterface dialog, int id) {
             }
         });
@@ -371,7 +243,7 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
     }
 
     /**
-     * Revoke access dialog
+     * Remove account dialog
      * @return Return the window warning user of access rekoving
      */
     private AlertDialog buildRevokeAccessDialog() {
@@ -401,77 +273,5 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
         });
         // Get the AlertDialog from create()
         return builder.create();
-    }
-
-    /**
-     * Show loading progress
-     */
-    private void showProgressDialog() {
-        if (mProgressDialog == null) {
-            mProgressDialog = new ProgressDialog(this);
-            mProgressDialog.setMessage(getString(R.string.loading_text));
-            mProgressDialog.setIndeterminate(true);
-            mProgressDialog.setCancelable(false);
-        }
-        mProgressDialog.show();
-    }
-
-    /**
-     * Hide the progress message
-     */
-    private void hideProgressDialog() {
-        if ((mProgressDialog != null) && mProgressDialog.isShowing()) {
-            mProgressDialog.hide();
-        }
-    }
-
-    /**
-     * Fetch assets for the tutorial
-     * @return - Returns the list of tutorial items
-     */
-    private ArrayList<TutorialItem> loadTutorialItems() {
-        TutorialItem tutorialItem0 = new TutorialItem(getString(R.string.account_tutorial_title_0), getString(R.string.account_tutorial_contents_0),
-                R.color.colorAccent, R.drawable.account_tutorial_0,  R.drawable.account_tutorial_0);
-        TutorialItem tutorialItem1 = new TutorialItem(getString(R.string.account_tutorial_title_1), getString(R.string.account_tutorial_contents_1),
-                R.color.colorAccent, R.drawable.account_tutorial_1,  R.drawable.account_tutorial_1);
-        TutorialItem tutorialItem2 = new TutorialItem(getString(R.string.account_tutorial_title_2), getString(R.string.account_tutorial_contents_2),
-                R.color.colorAccent, R.drawable.account_tutorial_2,  R.drawable.account_tutorial_2);
-        ArrayList<TutorialItem> tutorialItems = new ArrayList<>();
-        tutorialItems.add(tutorialItem0);
-        tutorialItems.add(tutorialItem1);
-        tutorialItems.add(tutorialItem2);
-        return tutorialItems;
-    }
-  
-    /**
-     * Show user stats graph
-     */
-    private void populateUserStatsChart() {
-        final String[] userStatsChartXAxisLabel = getResources().getStringArray(R.array.user_stats_x_axis_labels);
-        BarChart chart = (BarChart) findViewById(R.id.user_stats_chart);
-        chart.setTouchEnabled(false);
-        XAxis xAxis = chart.getXAxis();
-        xAxis.setGranularity(1);
-        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-        xAxis.setValueFormatter(new IAxisValueFormatter() {
-            /**
-             * Format the value
-             * @param value - value to fit to the axis
-             * @param axis - the axis to fit to
-             * @return Returns the formatted value
-             */
-            @Override
-            public String getFormattedValue(float value, AxisBase axis) {
-                int v = (int) value;
-                return userStatsChartXAxisLabel[v];
-            }
-        });
-        xAxis.setDrawGridLines(false);
-        xAxis.setTextSize(11f);
-        YAxis rightAxis = chart.getAxisRight();
-        rightAxis.setEnabled(false);
-        chart.getAxisLeft().setGranularity(1);
-        chart.getDescription().setEnabled(false);
-        mDatabase.populateUserStatsChart(this, chart);
     }
 }

@@ -174,4 +174,6 @@
     <string name="photos">Photos</string>
     <string name="upload_photo">Upload photo</string>
     <string name="learn_more">Learn more</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_edit">Edit</string>
 </resources>
