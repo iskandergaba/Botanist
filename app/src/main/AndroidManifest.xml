@@ -35,7 +35,7 @@
 
         <activity
             android:name=".ui.SplashActivity"
-            android:theme="@style/AppTheme.SplashScreen">
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -53,8 +53,8 @@
 
         </activity>
         <activity
-            android:name=".ui.AddPlantActivity"
-            android:label="@string/title_activity_add_plant"
+            android:name=".ui.NewPlantActivity"
+            android:label="@string/title_activity_new_plant"
             android:parentActivityName=".ui.MainActivity"
             android:screenOrientation="portrait">
             <meta-data
@@ -79,7 +79,7 @@
         </activity>
         <activity
             android:name=".ui.ShopActivity"
-            android:label="Shop"
+            android:label="@string/title_activity_shop"
             android:parentActivityName=".ui.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -95,7 +95,7 @@
                 android:value="com.scientists.happy.botanist.ui.MainActivity" />
         </activity>
         <activity
-            android:name=".ui.ProfileActivity"
+            android:name=".ui.PlantActivity"
             android:label="@string/title_activity_profile"
             android:parentActivityName=".ui.MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
@@ -106,35 +106,35 @@
         <activity
             android:name=".ui.StatsActivity"
             android:label="@string/title_activity_stats"
-            android:parentActivityName=".ui.ProfileActivity">
+            android:parentActivityName=".ui.PlantActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.scientists.happy.botanist.ui.ProfileActivity" />
+                android:value="com.scientists.happy.botanist.ui.PlantActivity" />
         </activity>
         <activity
-            android:name=".ui.EditProfileActivity"
-            android:label="Edit Profile"
-            android:parentActivityName=".ui.ProfileActivity">
+            android:name=".ui.EditPlantActivity"
+            android:label="@string/title_activity_edit_plant"
+            android:parentActivityName=".ui.PlantActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.scientists.happy.botanist.ui.ProfileActivity" />
+                android:value="com.scientists.happy.botanist.ui.PlantActivity" />
         </activity>
         <activity
             android:name=".ui.SimilarPlantsActivity"
             android:label="@string/title_activity_similar_plants"
-            android:parentActivityName=".ui.ProfileActivity">
+            android:parentActivityName=".ui.PlantActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.scientists.happy.botanist.ui.ProfileActivity" />
+                android:value="com.scientists.happy.botanist.ui.PlantActivity" />
         </activity>
         <activity
             android:name=".ui.DiseaseActivity"
             android:label="@string/title_activity_disease"
-            android:parentActivityName=".ui.ProfileActivity">
+            android:parentActivityName=".ui.PlantActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:theme="@style/AppTheme.NoActionBar"
-                android:value="com.scientists.happy.botanist.ui.ProfileActivity" />
+                android:value="com.scientists.happy.botanist.ui.PlantActivity" />
         </activity>
         <activity android:name="za.co.riggaroo.materialhelptutorial.tutorial.MaterialTutorialActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>

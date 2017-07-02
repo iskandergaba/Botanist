@@ -8,4 +8,6 @@
     <color name="material_cyan_200">#80deea</color>
     <color name="material_purple_200">#ce93d8</color>
     <color name="material_orange_200">#ffcc80</color>
+    <color name="material_brown_400">#8d6e63</color>
+    <color name="material_pink_300">#f06292</color>
 </resources>
