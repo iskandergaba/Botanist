@@ -11,9 +11,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.media.MediaScannerConnection;
-import android.net.Uri;
-import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.widget.ArrayAdapter;
@@ -317,23 +314,6 @@ public class DatabaseManager {
             });
         }
         return null;
-    }
-
-    /**
-     * Delete gif reference from the Android Gallery
-     * @param context - app context
-     */
-    public void updateGallery(Context context) {
-        MediaScannerConnection.scanFile(context, new String[]{Environment.getExternalStorageDirectory().toString()}, null,
-                new MediaScannerConnection.OnScanCompletedListener() {
-                    /**
-                     * Gallery scan completed
-                     * @param path - path of the deleted image
-                     * @param uri of the deleted image
-                     */
-                    public void onScanCompleted(String path, Uri uri) {
-                    }
-                });
     }
 
     /**

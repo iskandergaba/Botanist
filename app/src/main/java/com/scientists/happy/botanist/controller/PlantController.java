@@ -462,10 +462,10 @@ public class PlantController {
                         String path = outFile.getAbsolutePath();
                         mPlantReference.child("gifLocation").setValue(path);
                         mResult = "GIF saved in: " + path;
+                        notifyGallery(path);
                     } catch (IOException e) {
                         mResult = "Failed to make GIF";
                     } finally {
-                        mDatabase.updateGallery(mActivity);
                         hideProgressDialog();
                         makeToastResult(mActivity);
                     }
@@ -488,6 +488,15 @@ public class PlantController {
                 }
             });
         }
+    }
+
+    private void notifyGallery(String path) {
+        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        //change mCurrentPhotoPath for your imagepath
+        File f = new File(path);
+        Uri contentUri = Uri.fromFile(f);
+        mediaScanIntent.setData(contentUri);
+        mActivity.sendBroadcast(mediaScanIntent);
     }
 
     /**
