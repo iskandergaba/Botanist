@@ -5,11 +5,12 @@ package com.scientists.happy.botanist.ui
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import com.scientists.happy.botanist.R
+import com.scientists.happy.botanist.controller.ActivityController
 import com.scientists.happy.botanist.controller.DiseaseController
 
 class DiseaseActivity : AppCompatActivity() {
 
-    private var mController:DiseaseController? = null
+    private var mController:ActivityController? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

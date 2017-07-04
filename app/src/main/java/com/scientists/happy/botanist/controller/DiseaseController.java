@@ -14,23 +14,30 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 import com.scientists.happy.botanist.R;
-import com.scientists.happy.botanist.data.DatabaseManager;
 
-public class DiseaseController {
+import java.util.ArrayList;
 
-    private final DatabaseManager mDatabase = DatabaseManager.getInstance();
-    private final AppCompatActivity mActivity;
+import za.co.riggaroo.materialhelptutorial.TutorialItem;
+
+public class DiseaseController extends ActivityController {
+
     private final String mGroup;
 
     public DiseaseController(AppCompatActivity activity) {
-        mActivity = activity;
-        mGroup = mActivity.getIntent().getExtras().getString("group");
+        super(activity);
+        mGroup = getActivity().getIntent().getExtras().getString("group");
     }
 
+    @Override
     public void load() {
-        ListView listView = (ListView) mActivity.findViewById(R.id.diseases);
-        listView.setEmptyView(mActivity.findViewById(R.id.empty_list_view));
+        ListView listView = (ListView) getActivity().findViewById(R.id.diseases);
+        listView.setEmptyView(getActivity().findViewById(R.id.empty_list_view));
         populateDiseasesList(listView);
+    }
+
+    @Override
+    protected ArrayList<TutorialItem> loadTutorialItems() {
+        return null;
     }
 
     /**
@@ -38,8 +45,8 @@ public class DiseaseController {
      */
     private void populateDiseasesList(final ListView list) {
 
-        DatabaseReference databaseRef = mDatabase.getGroupDiseasesReference(mGroup);
-        FirebaseListAdapter<String> listAdapter = new FirebaseListAdapter<String>(mActivity, String.class, R.layout.list_item_text_button, databaseRef) {
+        DatabaseReference databaseRef = getDatabaseManager().getGroupDiseasesReference(mGroup);
+        FirebaseListAdapter<String> listAdapter = new FirebaseListAdapter<String>(getActivity(), String.class, R.layout.list_item_text_button, databaseRef) {
             String diseaseUrl;
             /**
              * Show images in glide
@@ -50,7 +57,7 @@ public class DiseaseController {
             @Override
             protected void populateView(final View view, final String disease, final int position) {
                 ((TextView) view.findViewById(R.id.text)).setText(disease);
-                mDatabase.getDiseaseUrlReference(disease).addListenerForSingleValueEvent(new ValueEventListener() {
+                getDatabaseManager().getDiseaseUrlReference(disease).addListenerForSingleValueEvent(new ValueEventListener() {
                     /**
                      * Handle a change in the database contents
                      * @param snapshot - current database contents

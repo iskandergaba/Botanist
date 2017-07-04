@@ -11,23 +11,26 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
 import com.scientists.happy.botanist.R
-import com.scientists.happy.botanist.data.DatabaseManager
 import com.scientists.happy.botanist.utils.DateAxisValueFormatter
 import com.scientists.happy.botanist.utils.DayAxisValueFormatter
+import za.co.riggaroo.materialhelptutorial.TutorialItem
 import java.util.*
 
-class StatsController(private val mActivity: AppCompatActivity) {
+class StatsController(activity: AppCompatActivity) : ActivityController(activity) {
 
-    private var mPlantId : String = mActivity.intent.extras.getString("plant_id")
-    private val mDatabase = DatabaseManager.getInstance()
+    private var mPlantId : String = activity.intent.extras.getString("plant_id")
 
-    fun load() {
+    override fun load() {
         populateHeightChart()
         populateWaterChart()
     }
 
+    override fun loadTutorialItems(): ArrayList<TutorialItem>? {
+        return null
+    }
+
     private fun populateHeightChart() {
-        val chart : LineChart = mActivity.findViewById(R.id.height_chart) as LineChart
+        val chart : LineChart = activity.findViewById(R.id.height_chart) as LineChart
         chart.setTouchEnabled(false)
         val xAxis = chart.xAxis
         xAxis.position = XAxis.XAxisPosition.BOTTOM
@@ -39,7 +42,7 @@ class StatsController(private val mActivity: AppCompatActivity) {
         rightAxis.isEnabled = false
         chart.description.isEnabled = false
 
-        val heightsRef : DatabaseReference? = mDatabase.getPlantHeightsReference(mPlantId)
+        val heightsRef : DatabaseReference? = databaseManager.getPlantHeightsReference(mPlantId)
         heightsRef?.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (snapshot.exists()) {
@@ -65,13 +68,13 @@ class StatsController(private val mActivity: AppCompatActivity) {
     }
 
     private fun populateWaterChart() {
-        val chart : BarChart = mActivity.findViewById(R.id.water_chart) as BarChart
+        val chart : BarChart = activity.findViewById(R.id.water_chart) as BarChart
         chart.setTouchEnabled(false)
         val xAxis = chart.xAxis
         // Separate labels by one day
         xAxis.granularity = 1f
         xAxis.position = XAxis.XAxisPosition.BOTTOM
-        xAxis.valueFormatter = DayAxisValueFormatter(mActivity)
+        xAxis.valueFormatter = DayAxisValueFormatter(activity)
         xAxis.setDrawGridLines(false)
         xAxis.textSize = 11f
         val rightAxis = chart.axisRight
@@ -80,7 +83,7 @@ class StatsController(private val mActivity: AppCompatActivity) {
         chart.axisLeft.granularity = 1f
         chart.description.isEnabled = false
 
-        val wateringRef : DatabaseReference? = mDatabase.getPlantWateringReference(mPlantId)
+        val wateringRef : DatabaseReference? = databaseManager.getPlantWateringReference(mPlantId)
         wateringRef?.addListenerForSingleValueEvent(object : ValueEventListener {
             internal var watering: MutableMap<Long, Int> = LinkedHashMap()
             /**

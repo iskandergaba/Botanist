@@ -10,7 +10,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 
 import com.scientists.happy.botanist.R;
-import com.scientists.happy.botanist.data.DatabaseManager;
 import com.vansuita.pickimage.bean.PickResult;
 import com.vansuita.pickimage.bundle.PickSetup;
 import com.vansuita.pickimage.dialog.PickImageDialog;
@@ -25,22 +24,20 @@ import java.util.Locale;
 
 import za.co.riggaroo.materialhelptutorial.TutorialItem;
 
-public class NewPlantController {
-
-    private final AppCompatActivity mActivity;
-    private final DatabaseManager mDatabase = DatabaseManager.getInstance();
+public class NewPlantController extends ActivityController {
 
     private GregorianCalendar mBirthday;
     private Bitmap mBitmap;
 
     public NewPlantController(AppCompatActivity activity) {
-        mActivity = activity;
+        super(activity);
     }
 
+    @Override
     public void load() {
-        final EditText nameEditText = (EditText) mActivity.findViewById(R.id.name_edit_text);
-        final EditText heightEditText = (EditText) mActivity.findViewById(R.id.height_edit_text);
-        final EditText birthdayEditText = (EditText) mActivity.findViewById(R.id.birthday_edit_text);
+        final EditText nameEditText = (EditText) getActivity().findViewById(R.id.name_edit_text);
+        final EditText heightEditText = (EditText) getActivity().findViewById(R.id.height_edit_text);
+        final EditText birthdayEditText = (EditText) getActivity().findViewById(R.id.birthday_edit_text);
         birthdayEditText.setOnClickListener(new View.OnClickListener() {
             /**
              * Handle click event
@@ -64,13 +61,13 @@ public class NewPlantController {
                 }
             }
         });
-        final AutoCompleteTextView speciesAutoCompleteText = (AutoCompleteTextView) mActivity.findViewById(R.id.species_edit_text);
-        mDatabase.setSpeciesAutoComplete(mActivity, speciesAutoCompleteText);
-        Intent intent = mActivity.getIntent();
+        final AutoCompleteTextView speciesAutoCompleteText = (AutoCompleteTextView) getActivity().findViewById(R.id.species_edit_text);
+        getDatabaseManager().setSpeciesAutoComplete(getActivity(), speciesAutoCompleteText);
+        Intent intent = getActivity().getIntent();
         if (intent.hasExtra("species")) {
             speciesAutoCompleteText.setText(intent.getStringExtra("species"));
         }
-        final ImageView picture = (ImageView) mActivity.findViewById(R.id.picture);
+        final ImageView picture = (ImageView) getActivity().findViewById(R.id.picture);
         picture.setOnClickListener(new View.OnClickListener() {
             /**
              * Handle click event in the picture
@@ -89,40 +86,37 @@ public class NewPlantController {
                         mBitmap = r.getBitmap();
                         picture.setImageBitmap(mBitmap);
                     }
-                }).show(mActivity.getSupportFragmentManager());
+                }).show(getActivity().getSupportFragmentManager());
             }
         });
         mBirthday = new GregorianCalendar();
 
-        final Button addPlantButton = (Button) mActivity.findViewById(R.id.add_plant_button);
+        final Button addPlantButton = (Button) getActivity().findViewById(R.id.add_plant_button);
         addPlantButton.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
                 String height = heightEditText.getText().toString();
-                boolean isAddSuccessful = mDatabase.addPlant(mActivity, nameEditText.getText().toString(),
+                boolean isAddSuccessful = getDatabaseManager().addPlant(getActivity(), nameEditText.getText().toString(),
                         speciesAutoCompleteText.getText().toString(), mBirthday.getTimeInMillis(),
                         height.equals("") ? 0 : Double.parseDouble(height), mBitmap);
                 if (isAddSuccessful) {
-                    mActivity.finish();
+                    getActivity().finish();
                 }
             }
         });
     }
 
-    private ArrayList<TutorialItem> loadTutorialItems() {
-        TutorialItem tutorialItem2 = new TutorialItem(mActivity.getString(R.string.add_tutorial_title_0), mActivity.getString(R.string.add_tutorial_contents_0),
+    @Override
+    protected ArrayList<TutorialItem> loadTutorialItems() {
+        TutorialItem tutorialItem2 = new TutorialItem(getActivity().getString(R.string.add_tutorial_title_0), getActivity().getString(R.string.add_tutorial_contents_0),
                 R.color.colorAccent, R.drawable.add_tutorial_0,  R.drawable.add_tutorial_0);
-        TutorialItem tutorialItem3 = new TutorialItem(mActivity.getString(R.string.add_tutorial_title_1), mActivity.getString(R.string.add_tutorial_contents_1),
+        TutorialItem tutorialItem3 = new TutorialItem(getActivity().getString(R.string.add_tutorial_title_1), getActivity().getString(R.string.add_tutorial_contents_1),
                 R.color.colorAccent, R.drawable.add_tutorial_1,  R.drawable.add_tutorial_1);
         ArrayList<TutorialItem> tutorialItems = new ArrayList<>();
         tutorialItems.add(tutorialItem2);
         tutorialItems.add(tutorialItem3);
         return tutorialItems;
-    }
-
-    public void showTutorial(boolean isForceShow) {
-        mDatabase.showTutorial(mActivity, loadTutorialItems(), isForceShow);
     }
 
     /**
@@ -148,10 +142,10 @@ public class NewPlantController {
                 mBirthday.get(Calendar.YEAR), mBirthday.get(Calendar.MONTH),
                 mBirthday.get(Calendar.DAY_OF_MONTH));
         datePickerDialog.setVersion(DatePickerDialog.Version.VERSION_2);
-        datePickerDialog.setTitle(mActivity.getString(R.string.set_birthday));
+        datePickerDialog.setTitle(getActivity().getString(R.string.set_birthday));
         datePickerDialog.vibrate(false);
         datePickerDialog.dismissOnPause(true);
         datePickerDialog.setOnDateSetListener(listener);
-        datePickerDialog.show(mActivity.getFragmentManager(), "date_picker");
+        datePickerDialog.show(getActivity().getFragmentManager(), "date_picker");
     }
 }

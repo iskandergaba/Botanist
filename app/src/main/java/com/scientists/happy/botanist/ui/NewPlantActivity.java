@@ -17,13 +17,13 @@ public class NewPlantActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_plant);
         mController = new NewPlantController(this);
-        mController.showTutorial(false);
         overridePendingTransition(R.anim.slide_up, R.anim.hold);
     }
 
     @Override
     protected void onStart() {
         mController.load();
+        mController.showTutorial(false);
         super.onStart();
     }
 

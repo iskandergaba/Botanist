@@ -17,11 +17,6 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Toast;
 
-import com.github.mikephil.charting.charts.BarChart;
-import com.github.mikephil.charting.data.BarData;
-import com.github.mikephil.charting.data.BarDataSet;
-import com.github.mikephil.charting.data.BarEntry;
-import com.github.mikephil.charting.utils.ColorTemplate;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -50,7 +45,6 @@ import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
 
@@ -314,32 +308,6 @@ public class DatabaseManager {
             });
         }
         return null;
-    }
-
-    /**
-     * populate the user's account statistics
-     * @param chart - the chart to populate
-     */
-    public void populateUserStatsChart(Context context, final BarChart chart) {
-        String userId = getUserId();
-        if (userId != null) {
-            int[] colors = context.getResources().getIntArray(R.array.user_stats_chart_colors);
-            List<BarEntry> entries = new ArrayList<>();
-            entries.add(new BarEntry(0f, getAddedCount()));
-            entries.add(new BarEntry(1f, getDeletedCount()));
-            entries.add(new BarEntry(2f, getWaterCount()));
-            entries.add(new BarEntry(3f, getMeasureCount()));
-            entries.add(new BarEntry(4f, getPhotoCount()));
-
-            BarDataSet barDataSet = new BarDataSet(entries, "Plant Operations");
-            barDataSet.setColors(ColorTemplate.createColors(colors));
-            barDataSet.setValueTextSize(11f);
-
-            BarData data = new BarData(barDataSet);
-            data.setBarWidth(0.9f); // set custom bar width
-            chart.setData(data);
-            chart.invalidate(); // refresh
-        }
     }
 
     /**

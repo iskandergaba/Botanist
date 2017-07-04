@@ -11,30 +11,38 @@ import android.widget.TextView;
 import com.firebase.ui.database.FirebaseListAdapter;
 import com.google.firebase.database.DatabaseReference;
 import com.scientists.happy.botanist.R;
-import com.scientists.happy.botanist.data.DatabaseManager;
 import com.scientists.happy.botanist.ui.NewPlantActivity;
 
-public class SimilarPlantsController {
-    private AppCompatActivity mActivity;
+import java.util.ArrayList;
+
+import za.co.riggaroo.materialhelptutorial.TutorialItem;
+
+public class SimilarPlantsController extends ActivityController {
+
     private final String mGroup, mSpecies;
-    private final DatabaseManager mDatabase = DatabaseManager.getInstance();
 
     public SimilarPlantsController(AppCompatActivity activity) {
-        mActivity = activity;
-        Bundle extras = mActivity.getIntent().getExtras();
+        super(activity);
+        Bundle extras = getActivity().getIntent().getExtras();
         mSpecies = extras.getString("species");
         mGroup = extras.getString("group");
     }
 
+    @Override
     public void load() {
-        ListView list = (ListView) mActivity.findViewById(R.id.similar_plants);
-        list.setEmptyView(mActivity.findViewById(R.id.empty_list_view));
+        ListView list = (ListView) getActivity().findViewById(R.id.similar_plants);
+        list.setEmptyView(getActivity().findViewById(R.id.empty_list_view));
         populateSimilarPlantsGrid(list);
     }
 
+    @Override
+    protected ArrayList<TutorialItem> loadTutorialItems() {
+        return null;
+    }
+
     private void populateSimilarPlantsGrid(final ListView list) {
-        DatabaseReference databaseRef = mDatabase.getGroupPlantsReference(mGroup);
-        FirebaseListAdapter<String> adapter = new FirebaseListAdapter<String>(mActivity, String.class, R.layout.list_item_text_button, databaseRef) {
+        DatabaseReference databaseRef = getDatabaseManager().getGroupPlantsReference(mGroup);
+        FirebaseListAdapter<String> adapter = new FirebaseListAdapter<String>(getActivity(), String.class, R.layout.list_item_text_button, databaseRef) {
             /**
              * Show images in glide
              * @param view - the current view

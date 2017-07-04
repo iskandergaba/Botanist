@@ -13,7 +13,6 @@ import android.widget.GridView;
 
 import com.scientists.happy.botanist.R;
 import com.scientists.happy.botanist.controller.MainController;
-import com.scientists.happy.botanist.data.DatabaseManager;
 import com.scientists.happy.botanist.utils.AppRater;
 public class MainActivity extends AppCompatActivity {
     private static final int VIEW_ACCOUNT = 1;
@@ -60,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         mController.load();
+        mController.showTutorial(false);
         super.onStart();
     }
 
@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(MainActivity.this, AboutActivity.class));
                 return true;
             case R.id.action_help:
-                DatabaseManager.getInstance().showTutorial(this, mController.loadTutorialItems(), true);
+                mController.showTutorial(true);
                 break;
         }
         return super.onOptionsItemSelected(item);

@@ -47,6 +47,7 @@ public class PlantActivity extends AppCompatActivity implements View.OnClickList
     @Override
     protected void onStart() {
         mController.load();
+        mController.showTutorial(false);
         super.onStart();
     }
 
@@ -64,7 +65,34 @@ public class PlantActivity extends AppCompatActivity implements View.OnClickList
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        return mController.handleOptionsItemSelected(item.getItemId());
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.action_edit_profile:
+                mController.startEditPlantActivity();
+                return true;
+            case R.id.action_share:
+                mController.sharePlant();
+                return true;
+            case R.id.action_delete:
+                mController.showDeleteDialog();
+                return true;
+            case R.id.action_export_gif:
+                mController.exportGif();
+                return true;
+            case R.id.action_stats:
+                mController.startStatsActivity();
+                return true;
+            case R.id.action_similar_plants:
+                mController.startSimilarPlantsActivity();
+                return true;
+            case R.id.action_diseases:
+                mController.startDiseaseActivity();
+                return true;
+            case R.id.action_help:
+                mController.showTutorial(true);
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -79,17 +107,17 @@ public class PlantActivity extends AppCompatActivity implements View.OnClickList
             case R.id.camera_fab:
                 mController.uploadPhoto();
                 break;
-            case R.id.height_button:
-                mController.buildHeightInputDialog().show();
-                break;
             case R.id.water_button:
-                mController.buildWateredDialog().show();
+                mController.showWaterDialog();
+                break;
+            case R.id.height_button:
+                mController.showHeightInputDialog();
                 break;
             case R.id.poop_button:
-                mController.buildFertilizedDialog().show();
+                mController.showFertilizationDialog();
                 break;
             case R.id.calendar_button:
-                mController.buildCalendarDialog().show();
+                mController.showCalendarDialog();
                 break;
             case R.id.care_tips_expand_collapse:
                 View careTips = findViewById(R.id.care_tips_box);
