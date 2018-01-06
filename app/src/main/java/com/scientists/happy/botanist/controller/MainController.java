@@ -95,7 +95,7 @@ public class MainController extends ActivityController {
                     ((TextView) view.findViewById(R.id.grid_item_nickname)).setText(plant.getName());
                     ((TextView) view.findViewById(R.id.grid_item_species)).setText(plant.getSpecies());
                     final ImageView picture = view.findViewById(R.id.grid_item_image_view);
-                    Glide.with(mActivity).using(new FirebaseImageLoader()).load(storageReference).dontAnimate()
+                    Glide.with(getActivity()).using(new FirebaseImageLoader()).load(storageReference).dontAnimate()
                             .placeholder(R.drawable.flowey).into(picture);
                     // One day, before the progress bar becomes empty
                     long interval = getDatabaseManager().getReminderIntervalInMillis(1);
@@ -121,16 +121,16 @@ public class MainController extends ActivityController {
                          */
                         @Override
                         public void onClick(View v) {
-                            Intent i = new Intent(mActivity.getApplicationContext(), PlantActivity.class);
+                            Intent i = new Intent(getActivity().getApplicationContext(), PlantActivity.class);
                             i.putExtra("plant_id", plant.getId());
-                            mActivity.startActivity(i);
+                            getActivity().startActivity(i);
                         }
                     });
-                    getDatabaseManager().setReminders(mActivity, plant, position, new WaterReceiver());
-                    getDatabaseManager().setReminders(mActivity, plant, position + DatabaseManager.HEIGHT_MEASURE_RECEIVER_ID_OFFSET, new HeightMeasureReceiver());
-                    getDatabaseManager().setReminders(mActivity, plant, position + DatabaseManager.FERTILIZER_RECEIVER_ID_OFFSET, new FertilizerReceiver());
-                    getDatabaseManager().setReminders(mActivity, plant, position + DatabaseManager.UPDATE_PHOTO_RECEIVER_ID_OFFSET, new UpdatePhotoReceiver());
-                    getDatabaseManager().setBirthdayReminder(mActivity, plant, position + DatabaseManager.BIRTHDAY_RECEIVER_ID_OFFSET);
+                    getDatabaseManager().setReminders(getActivity(), plant, position, new WaterReceiver());
+                    getDatabaseManager().setReminders(getActivity(), plant, position + DatabaseManager.HEIGHT_MEASURE_RECEIVER_ID_OFFSET, new HeightMeasureReceiver());
+                    getDatabaseManager().setReminders(getActivity(), plant, position + DatabaseManager.FERTILIZER_RECEIVER_ID_OFFSET, new FertilizerReceiver());
+                    getDatabaseManager().setReminders(getActivity(), plant, position + DatabaseManager.UPDATE_PHOTO_RECEIVER_ID_OFFSET, new UpdatePhotoReceiver());
+                    getDatabaseManager().setBirthdayReminder(getActivity(), plant, position + DatabaseManager.BIRTHDAY_RECEIVER_ID_OFFSET);
                 }
             };
 

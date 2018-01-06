@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
+    android:focusable="true"
     android:clickable="true">
 
     <ImageView
@@ -38,7 +39,7 @@
             android:layout_weight="1"
             android:src="@drawable/ic_delete"
             style="?android:attr/buttonStyleSmall"
-            android:background="@color/transparent"
+            android:background="@android:color/transparent"
             android:foreground="?attr/selectableItemBackground"/>
 
         <ImageView
@@ -49,7 +50,7 @@
             android:src="@drawable/ic_check_mark"
             android:tint="@android:color/white"
             style="?android:attr/buttonStyleSmall"
-            android:background="@color/transparent"
+            android:background="@android:color/transparent"
             android:foreground="?attr/selectableItemBackground"/>
 
     </LinearLayout>

@@ -78,7 +78,7 @@ public class DiseaseController extends ActivityController {
                     }
                 });
                 Button learnMoreButton = view.findViewById(R.id.button);
-                learnMoreButton.setText(mActivity.getString(R.string.learn_more));
+                learnMoreButton.setText(getActivity().getString(R.string.learn_more));
                 learnMoreButton.setOnClickListener(new View.OnClickListener() {
                     /**
                      * User pressed a disease
@@ -87,7 +87,7 @@ public class DiseaseController extends ActivityController {
                     @Override
                     public void onClick(View v) {
                         Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(diseaseUrl));
-                        mActivity.startActivity(browserIntent);
+                        getActivity().startActivity(browserIntent);
                     }
                 });
             }

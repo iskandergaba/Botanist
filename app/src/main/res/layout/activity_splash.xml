@@ -15,7 +15,7 @@
         android:layout_height="0dp"
         android:layout_weight="0.7"
         android:src="@drawable/logo_botanist_big"
-        android:contentDescription="@string/accessibility_logo"/>
+        android:contentDescription="@string/botanist_logo_desc"/>
 
     <TextView
         android:layout_width="match_parent"

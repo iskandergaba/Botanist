@@ -62,9 +62,9 @@ public class SimilarPlantsController extends ActivityController {
                          */
                         @Override
                         public void onClick(View v) {
-                            Intent addIntent = new Intent(mActivity, NewPlantActivity.class);
+                            Intent addIntent = new Intent(getActivity(), NewPlantActivity.class);
                             addIntent.putExtra("species", plant);
-                            mActivity.startActivity(addIntent);
+                            getActivity().startActivity(addIntent);
                         }
                     });
                 }
