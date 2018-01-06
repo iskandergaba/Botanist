@@ -2,7 +2,7 @@
 // @author: Iskander Gaba
 package com.scientists.happy.botanist.data
 
-import java.util.LinkedHashMap
+import java.util.*
 
 @Suppress("unused")
 class Plant {
@@ -105,8 +105,8 @@ class Plant {
         this.species = species
         this.birthday = birthday
         this.height = height
-        this.watering = LinkedHashMap<String, String>()
-        this.heights = LinkedHashMap<String, Double>()
+        this.watering = LinkedHashMap()
+        this.heights = LinkedHashMap()
         this.lastMeasureNotification = System.currentTimeMillis()
         this.lastFertilizerNotification = lastMeasureNotification
         this.lastWaterNotification = lastMeasureNotification

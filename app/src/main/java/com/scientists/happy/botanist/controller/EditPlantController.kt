@@ -35,7 +35,7 @@ class EditPlantController(activity: AppCompatActivity) : ActivityController(acti
                 if (dataSnapshot.exists()) {
                     val plant = dataSnapshot.getValue(Plant::class.java)
                     if (plant != null) {
-                        val nameTextView = activity.findViewById(R.id.name_text_view) as TextView
+                        val nameTextView = activity.findViewById<TextView>(R.id.name_text_view)
                         mPlantName = plant.name
                         nameTextView.text = mPlantName
                         mPhotoNum = plant.photoNum
@@ -53,7 +53,7 @@ class EditPlantController(activity: AppCompatActivity) : ActivityController(acti
     override fun load() {
         showProgressDialog(activity.getString(R.string.loading_text))
         loadNameSection()
-        val grid = activity.findViewById(R.id.photo_grid_view) as GridView
+        val grid = activity.findViewById<GridView>(R.id.photo_grid_view)
         grid.emptyView = activity.findViewById(R.id.empty_grid_view)
         populatePhotoGrid(activity)
         hideProgressDialog()
@@ -68,9 +68,9 @@ class EditPlantController(activity: AppCompatActivity) : ActivityController(acti
      * @param activity - the current activity
      */
     private fun populatePhotoGrid(activity: Activity) {
-        val grid = activity.findViewById(R.id.photo_grid_view) as GridView
-        val emptyGridView = activity.findViewById(R.id.empty_grid_view) as TextView
-        val loadingProgressBar = activity.findViewById(R.id.loading_indicator) as ProgressBar
+        val grid = activity.findViewById<GridView>(R.id.photo_grid_view)
+        val emptyGridView = activity.findViewById<TextView>(R.id.empty_grid_view)
+        val loadingProgressBar = activity.findViewById<ProgressBar>(R.id.loading_indicator)
         loadingProgressBar.visibility = View.VISIBLE
         if (mUserPhotosReference != null) {
             // An SQL-like hack to retrieve only data with values that matches the query: "plantId*"
@@ -88,23 +88,23 @@ class EditPlantController(activity: AppCompatActivity) : ActivityController(acti
                 override fun populateView(view: View, photoName: String, position: Int) {
                     val profilePhotoRef = mPlantReference.child("profilePhoto")
                     val storageReference = mUserStorage.child(photoName)
-                    val picture = view.findViewById(R.id.photo_image_view) as ImageView
+                    val picture = view.findViewById<ImageView>(R.id.photo_image_view)
                     val isProfilePicture = BooleanArray(1)
                     Glide.with(activity).using(FirebaseImageLoader()).load(storageReference).dontAnimate()
                             .placeholder(R.drawable.flowey).into(picture)
-                    val setButton = view.findViewById(R.id.set_photo_btn)
+                    val setButton = view.findViewById<View>(R.id.set_photo_btn)
                     setButton.setOnClickListener {
                         profilePhotoRef.setValue(photoName)
                         notifyDataSetChanged()
                     }
-                    view.findViewById(R.id.delete_photo_btn).setOnClickListener {
+                    view.findViewById<ImageView>(R.id.delete_photo_btn).setOnClickListener {
                         buildDeletePhotoDialog(storageReference,
                                 profilePhotoRef, position, isProfilePicture[0]).show()
                     }
                     profilePhotoRef.addListenerForSingleValueEvent(object : ValueEventListener {
                         override fun onDataChange(dataSnapshot: DataSnapshot) {
                             val profilePhoto = dataSnapshot.value as String?
-                            val isSetIndicator = view.findViewById(R.id.is_set_indicator)
+                            val isSetIndicator = view.findViewById<View>(R.id.is_set_indicator)
                             isProfilePicture[0] = profilePhoto != null && profilePhoto == photoName
                             if (isProfilePicture[0]) {
                                 setButton.visibility = View.GONE
@@ -192,10 +192,10 @@ class EditPlantController(activity: AppCompatActivity) : ActivityController(acti
     }
 
     private fun loadNameSection() {
-        activity.findViewById(R.id.rename_button).setOnClickListener {
+        activity.findViewById<Button>(R.id.rename_button).setOnClickListener {
             val builder = AlertDialog.Builder(activity)
             val dialogView = View.inflate(activity, R.layout.dialog_name_input, null)
-            val inputEditText = dialogView.findViewById(R.id.name_edit_text) as EditText
+            val inputEditText = dialogView.findViewById<EditText>(R.id.name_edit_text)
             inputEditText.setText(mPlantName)
             builder.setView(dialogView).setTitle(R.string.rename)
             // Set up the buttons

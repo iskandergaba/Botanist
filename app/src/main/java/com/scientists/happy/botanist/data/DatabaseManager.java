@@ -13,8 +13,6 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -43,6 +41,7 @@ import com.scientists.happy.botanist.utils.ExecutorValueEventListener;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
@@ -64,7 +63,7 @@ public class DatabaseManager {
     private long mBotanistSince;
     private double mRating;
     private ProgressDialog mProgressDialog;
-    private Map<String, String> mAutocompleteCache;
+    private Map<String, String> mSpeciesCache;
     private StorageReference mStorage;
     private DatabaseReference mDatabase;
     private static DatabaseManager mDatabaseManager;
@@ -74,7 +73,7 @@ public class DatabaseManager {
     private DatabaseManager() {
         // Just in case we want to add offline caching to the app
         // FirebaseDatabase.getInstance().setPersistenceEnabled(true);
-        mAutocompleteCache = new HashMap<>();
+        mSpeciesCache = new HashMap<>();
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mStorage = FirebaseStorage.getInstance().getReference();
     }
@@ -134,7 +133,7 @@ public class DatabaseManager {
                     String commonName = suggestionSnapshot.getKey();
                     String sciName = suggestionSnapshot.getValue(String.class);
                     // Add the retrieved string to the list
-                    mAutocompleteCache.put(commonName, sciName);
+                    mSpeciesCache.put(commonName, sciName);
                 }
                 splashActivity.startActivity(new Intent(splashActivity, LoginActivity.class));
                 splashActivity.finish();
@@ -244,11 +243,11 @@ public class DatabaseManager {
             hideProgressDialog();
             return false;
         }
-        else if (mAutocompleteCache.containsKey(species)) {
+        else if (mSpeciesCache.containsKey(species)) {
             // If the user typed a common name, fetch the scientific name
-            species = mAutocompleteCache.get(species);
+            species = mSpeciesCache.get(species);
         }
-        else if (!mAutocompleteCache.containsValue(species)) {
+        else if (!mSpeciesCache.containsValue(species)) {
             // The user must have entered neither the scientific nor the common name
             hideProgressDialog();
             return false;
@@ -410,18 +409,6 @@ public class DatabaseManager {
                 }
             });
         }
-    }
-
-    /**
-     * Show the autocomplete for NewPlantActivity add species
-     * @param context - the current app context
-     * @param autoCompleteTextView - the autocomplete view
-     */
-    public void setSpeciesAutoComplete(Context context, AutoCompleteTextView autoCompleteTextView) {
-        final ArrayAdapter<String> autoComplete = new ArrayAdapter<>(context, android.R.layout.simple_list_item_1);
-        autoComplete.addAll(mAutocompleteCache.keySet());
-        autoComplete.addAll(mAutocompleteCache.values());
-        autoCompleteTextView.setAdapter(autoComplete);
     }
 
     /**
@@ -1038,5 +1025,12 @@ public class DatabaseManager {
 
     public DatabaseReference getDiseaseUrlReference(String disease) {
         return mDatabase.child("DiseaseUrls").child(disease);
+    }
+
+    public String[] getSpeciesNames() {
+        int size = mSpeciesCache.keySet().size();
+        String[] species = mSpeciesCache.values().toArray(new String[size]);
+        Arrays.sort(species);
+        return species;
     }
 }

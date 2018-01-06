@@ -152,7 +152,7 @@ public class AccountActivity extends AppCompatActivity implements GoogleApiClien
      */
     private void handleSignInResult(GoogleSignInResult result) {
         Log.d(TAG, "handleSignInResult:" + result.isSuccess());
-        final ImageView accountImageView = (ImageView) findViewById(R.id.account_picture);
+        final ImageView accountImageView = findViewById(R.id.account_picture);
         if (result.isSuccess()) {
             // Signed in successfully, show authenticated UI.
             GoogleSignInAccount acct = result.getSignInAccount();

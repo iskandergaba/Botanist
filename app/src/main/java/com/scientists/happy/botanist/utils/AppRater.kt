@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
+import android.widget.Button
 
 import com.scientists.happy.botanist.R
 
@@ -47,14 +48,14 @@ object AppRater {
         val dialog = Dialog(context)
 
         dialog.setContentView(R.layout.dialog_rate_app)
-        dialog.findViewById(R.id.btn_rate).setOnClickListener {
+        dialog.findViewById<Button>(R.id.btn_rate).setOnClickListener {
             context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + APP_PACKAGE_NAME)))
             editor.putBoolean("dont_show_again", true)
             editor.apply()
             dialog.dismiss()
         }
-        dialog.findViewById(R.id.btn_later).setOnClickListener { dialog.dismiss() }
-        dialog.findViewById(R.id.btn_no).setOnClickListener {
+        dialog.findViewById<Button>(R.id.btn_later).setOnClickListener { dialog.dismiss() }
+        dialog.findViewById<Button>(R.id.btn_no).setOnClickListener {
             editor.putBoolean("dont_show_again", true)
             editor.apply()
             dialog.dismiss()

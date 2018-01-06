@@ -6,6 +6,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.widget.Button
 import com.scientists.happy.botanist.R
 
 class ShopActivity : AppCompatActivity() {
@@ -16,11 +17,11 @@ class ShopActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_shop)
-        val potsButton = findViewById(R.id.shop_pots_button)
+        val potsButton = findViewById<Button>(R.id.shop_pots_button)
         potsButton.setOnClickListener{ openWebPage(SHOP_POTS_URL) }
-        val toolsButton = findViewById(R.id.shop_tools_button)
+        val toolsButton = findViewById<Button>(R.id.shop_tools_button)
         toolsButton.setOnClickListener{ openWebPage(SHOP_TOOLS_URL) }
-        val giftsButton = findViewById(R.id.shop_gifts_button)
+        val giftsButton = findViewById<Button>(R.id.shop_gifts_button)
         giftsButton.setOnClickListener{ openWebPage(SHOP_GIFTS_URL) }
     }
 

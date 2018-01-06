@@ -107,10 +107,10 @@ public class AccountController extends ActivityController {
     }
 
     private void populateUserInfo() {
-        TextView nameTextView = (TextView) getActivity().findViewById(R.id.name);
-        TextView emailTextView = (TextView) getActivity().findViewById(R.id.email);
-        TextView botanistSinceTextView = (TextView) getActivity().findViewById(R.id.botanist_since);
-        TextView plantsNumberTextView = (TextView) getActivity().findViewById(R.id.plants_number);
+        TextView nameTextView = getActivity().findViewById(R.id.name);
+        TextView emailTextView = getActivity().findViewById(R.id.email);
+        TextView botanistSinceTextView = getActivity().findViewById(R.id.botanist_since);
+        TextView plantsNumberTextView = getActivity().findViewById(R.id.plants_number);
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy", Locale.US);
         nameTextView.setText(mUser.getUserName());
@@ -124,7 +124,7 @@ public class AccountController extends ActivityController {
      */
     private void populateUserStatsChart() {
         final String[] userStatsChartXAxisLabel = getActivity().getResources().getStringArray(R.array.user_stats_x_axis_labels);
-        final BarChart chart = (BarChart) getActivity().findViewById(R.id.user_stats_chart);
+        final BarChart chart = getActivity().findViewById(R.id.user_stats_chart);
         chart.setTouchEnabled(false);
         XAxis xAxis = chart.getXAxis();
         xAxis.setGranularity(1);
@@ -170,9 +170,9 @@ public class AccountController extends ActivityController {
     }
 
     private void loadBadge() {
-        TextView levelTextView = (TextView) getActivity().findViewById(R.id.level_text_view);
-        ImageView badgeImageView = (ImageView) getActivity().findViewById(R.id.user_badge);
-        ProgressBar levelProgressBar = (ProgressBar) getActivity().findViewById(R.id.level_progress_bar);
+        TextView levelTextView = getActivity().findViewById(R.id.level_text_view);
+        ImageView badgeImageView = getActivity().findViewById(R.id.user_badge);
+        ProgressBar levelProgressBar = getActivity().findViewById(R.id.level_progress_bar);
         double rating = mUser.getRating();
         if (rating < 0) {
             badgeImageView.setImageResource(R.drawable.badge_level_0);

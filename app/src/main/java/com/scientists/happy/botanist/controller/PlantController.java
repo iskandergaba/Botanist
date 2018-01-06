@@ -206,7 +206,7 @@ public class PlantController extends ActivityController {
                      */
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        EditText inputEditText = (EditText) ((AlertDialog) dialog).findViewById(R.id.height_edit_text);
+                        EditText inputEditText = ((AlertDialog) dialog).findViewById(R.id.height_edit_text);
                         double newHeight = Double.parseDouble(inputEditText != null ? inputEditText.getText().toString() : "-1");
                         if (mPlant.getHeight() < newHeight) {
                             getDatabaseManager().updatePlantHeight(getActivity(), mPlant.getId(), newHeight);
@@ -539,7 +539,7 @@ public class PlantController extends ActivityController {
                 public void onDataChange(@NotNull DataSnapshot dataSnapshot) {
                     if (dataSnapshot.exists()) {
                         String fileName = dataSnapshot.getValue(String.class);
-                        ImageView profilePictureView = (ImageView) getActivity().findViewById(R.id.plant_picture);
+                        ImageView profilePictureView = getActivity().findViewById(R.id.plant_picture);
                         int placeHolderResId = R.drawable.flowey;
                         if (fileName != null && !fileName.equals("default")) {
                             StorageReference photoFileReference = mUserStorage.child(fileName);
@@ -570,12 +570,11 @@ public class PlantController extends ActivityController {
                     mPlant = dataSnapshot.getValue(Plant.class);
                     if (mPlant != null) {
                         String species = mPlant.getSpecies();
-                        TextView speciesTextView = (TextView) getActivity().findViewById(R.id.plant_species);
+                        TextView speciesTextView = getActivity().findViewById(R.id.plant_species);
                         speciesTextView.setText(getActivity().getString(R.string.species_fmt, species));
-                        CollapsingToolbarLayout collapsingToolbarLayout =
-                                (CollapsingToolbarLayout) getActivity().findViewById(R.id.toolbar_layout);
+                        CollapsingToolbarLayout collapsingToolbarLayout = getActivity().findViewById(R.id.toolbar_layout);
                         collapsingToolbarLayout.setTitle(mPlant.getName());
-                        TextView HeightTextView = (TextView) getActivity().findViewById(R.id.plant_height);
+                        TextView HeightTextView = getActivity().findViewById(R.id.plant_height);
                         HeightTextView.setText(getActivity().getString(R.string.height_fmt, mPlant.getHeight()));
                         loadCareTips(species);
                     }
@@ -614,18 +613,18 @@ public class PlantController extends ActivityController {
                         List<String> noxious = entry.getNoxious();
                         if (noxious != null) {
                             noxiousWarning.setVisibility(View.VISIBLE);
-                            TextView noxiousWarningTextView = (TextView) getActivity().findViewById(R.id.noxious_warning_box);
+                            TextView noxiousWarningTextView = getActivity().findViewById(R.id.noxious_warning_box);
                             if (noxious.contains("Noxious")) {
                                 noxiousWarningTextView.setText(R.string.noxious_warning_msg);
                             }
                             if (noxious.contains("Quarantine")) {
-                                noxiousWarningTextView.setText(noxiousWarningTextView.getText() + " \n\n" + getActivity().getString(R.string.quarantine_warning));
+                                noxiousWarningTextView.setText(String.format("%s \n\n%s", noxiousWarningTextView.getText(), getActivity().getString(R.string.quarantine_warning)));
                             }
                             if (noxious.contains("Regulated")) {
-                                noxiousWarningTextView.setText(noxiousWarningTextView.getText() + " \n\n" + getActivity().getString(R.string.regulated_warning));
+                                noxiousWarningTextView.setText(String.format("%s \n\n%s", noxiousWarningTextView.getText(), getActivity().getString(R.string.regulated_warning)));
                             }
                             if (noxious.contains("Banned")) {
-                                noxiousWarningTextView.setText(noxiousWarningTextView.getText() + " \n\n" + getActivity().getString(R.string.banned_warning));
+                                noxiousWarningTextView.setText(String.format("%s \n\n%s", noxiousWarningTextView.getText(), getActivity().getString(R.string.banned_warning)));
                             }
                         }
                     }

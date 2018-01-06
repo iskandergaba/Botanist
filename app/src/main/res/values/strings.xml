@@ -177,4 +177,6 @@
     <string name="action_delete">Delete</string>
     <string name="action_edit">Edit</string>
     <string name="leading_developer_title">Leading Developer</string>
+    <string name="plant_not_found">Plant not found</string>
+    <string name="add">Add</string>
 </resources>

@@ -1,4 +1,5 @@
 package com.scientists.happy.botanist.ui;
+
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -6,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.method.LinkMovementMethod;
 import android.view.View;
 import android.widget.TextView;
+
 import com.scientists.happy.botanist.BuildConfig;
 import com.scientists.happy.botanist.R;
 public class AboutActivity extends AppCompatActivity {
@@ -107,7 +109,7 @@ public class AboutActivity extends AppCompatActivity {
                 openWebPage(MARIMO_LINKEDIN_URL);
             }
         });
-        TextView fertilizationLink = (TextView)findViewById(R.id.github_repo_link);
+        TextView fertilizationLink = findViewById(R.id.github_repo_link);
         fertilizationLink.setMovementMethod(LinkMovementMethod.getInstance());
     }
 

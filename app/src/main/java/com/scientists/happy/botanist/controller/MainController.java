@@ -71,8 +71,8 @@ public class MainController extends ActivityController {
      */
     private void populatePlantGrid(final GridView grid) {
         final DatabaseReference plantsReference = getDatabaseManager().getAllPlantsReference();
-        final TextView emptyGridView = (TextView) getActivity().findViewById(R.id.empty_grid_view);
-        final ProgressBar loadingProgressBar = (ProgressBar) getActivity().findViewById(R.id.loading_indicator);
+        final TextView emptyGridView = getActivity().findViewById(R.id.empty_grid_view);
+        final ProgressBar loadingProgressBar = getActivity().findViewById(R.id.loading_indicator);
         loadingProgressBar.setVisibility(View.VISIBLE);
         if (plantsReference != null) {
             final FirebaseListAdapter<Plant> adapter = new FirebaseListAdapter<Plant>(getActivity(), Plant.class, R.layout.grid_item_plant, plantsReference) {
@@ -94,7 +94,7 @@ public class MainController extends ActivityController {
                     StorageReference storageReference = getDatabaseManager().getUserStorage().child(profilePhoto);
                     ((TextView) view.findViewById(R.id.grid_item_nickname)).setText(plant.getName());
                     ((TextView) view.findViewById(R.id.grid_item_species)).setText(plant.getSpecies());
-                    final ImageView picture = (ImageView) view.findViewById(R.id.grid_item_image_view);
+                    final ImageView picture = view.findViewById(R.id.grid_item_image_view);
                     Glide.with(mActivity).using(new FirebaseImageLoader()).load(storageReference).dontAnimate()
                             .placeholder(R.drawable.flowey).into(picture);
                     // One day, before the progress bar becomes empty

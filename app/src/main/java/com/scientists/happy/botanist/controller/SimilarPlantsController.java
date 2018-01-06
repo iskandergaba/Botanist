@@ -30,9 +30,9 @@ public class SimilarPlantsController extends ActivityController {
 
     @Override
     public void load() {
-        ListView list = (ListView) getActivity().findViewById(R.id.similar_plants);
+        ListView list = getActivity().findViewById(R.id.similar_plants);
         list.setEmptyView(getActivity().findViewById(R.id.empty_list_view));
-        populateSimilarPlantsGrid(list);
+        populateSimilarPlantsList(list);
     }
 
     @Override
@@ -40,7 +40,7 @@ public class SimilarPlantsController extends ActivityController {
         return null;
     }
 
-    private void populateSimilarPlantsGrid(final ListView list) {
+    private void populateSimilarPlantsList(final ListView list) {
         DatabaseReference databaseRef = getDatabaseManager().getGroupPlantsReference(mGroup);
         FirebaseListAdapter<String> adapter = new FirebaseListAdapter<String>(getActivity(), String.class, R.layout.list_item_text_button, databaseRef) {
             /**
@@ -53,7 +53,7 @@ public class SimilarPlantsController extends ActivityController {
             protected void populateView(final View view, final String plant, final int position) {
                 if (!plant.equals(mSpecies)) {
                     ((TextView) view.findViewById(R.id.text)).setText(plant);
-                    Button addPlantButton = (Button) view.findViewById(R.id.button);
+                    Button addPlantButton = view.findViewById(R.id.button);
                     addPlantButton.setText(R.string.add_plant);
                     addPlantButton.setOnClickListener(new View.OnClickListener() {
                         /**

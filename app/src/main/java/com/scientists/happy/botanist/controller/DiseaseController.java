@@ -30,7 +30,7 @@ public class DiseaseController extends ActivityController {
 
     @Override
     public void load() {
-        ListView listView = (ListView) getActivity().findViewById(R.id.diseases);
+        ListView listView = getActivity().findViewById(R.id.diseases);
         listView.setEmptyView(getActivity().findViewById(R.id.empty_list_view));
         populateDiseasesList(listView);
     }
@@ -77,7 +77,7 @@ public class DiseaseController extends ActivityController {
                     public void onCancelled(DatabaseError databaseError) {
                     }
                 });
-                Button learnMoreButton = (Button) view.findViewById(R.id.button);
+                Button learnMoreButton = view.findViewById(R.id.button);
                 learnMoreButton.setText(mActivity.getString(R.string.learn_more));
                 learnMoreButton.setOnClickListener(new View.OnClickListener() {
                     /**

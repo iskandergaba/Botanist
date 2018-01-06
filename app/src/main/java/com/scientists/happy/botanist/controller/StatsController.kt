@@ -30,7 +30,7 @@ class StatsController(activity: AppCompatActivity) : ActivityController(activity
     }
 
     private fun populateHeightChart() {
-        val chart : LineChart = activity.findViewById(R.id.height_chart) as LineChart
+        val chart : LineChart = activity.findViewById(R.id.height_chart)
         chart.setTouchEnabled(false)
         val xAxis = chart.xAxis
         xAxis.position = XAxis.XAxisPosition.BOTTOM
@@ -68,7 +68,7 @@ class StatsController(activity: AppCompatActivity) : ActivityController(activity
     }
 
     private fun populateWaterChart() {
-        val chart : BarChart = activity.findViewById(R.id.water_chart) as BarChart
+        val chart : BarChart = activity.findViewById(R.id.water_chart)
         chart.setTouchEnabled(false)
         val xAxis = chart.xAxis
         // Separate labels by one day

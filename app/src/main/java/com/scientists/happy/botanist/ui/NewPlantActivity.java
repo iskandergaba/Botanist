@@ -3,28 +3,17 @@
 package com.scientists.happy.botanist.ui;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.view.Menu;
-import android.view.MenuItem;
 
 import com.scientists.happy.botanist.R;
 import com.scientists.happy.botanist.controller.NewPlantController;
 public class NewPlantActivity extends AppCompatActivity {
-
-    private NewPlantController mController;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_plant);
-        mController = new NewPlantController(this);
+        setContentView(R.layout.activity_new_plant);
+        NewPlantController controller = new NewPlantController(this);
+        controller.load();
         overridePendingTransition(R.anim.slide_up, R.anim.hold);
-    }
-
-    @Override
-    protected void onStart() {
-        mController.load();
-        mController.showTutorial(false);
-        super.onStart();
     }
 
     @Override
@@ -37,19 +26,5 @@ public class NewPlantActivity extends AppCompatActivity {
     public boolean onSupportNavigateUp() {
         super.onBackPressed();
         return true;
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_help, menu);
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.action_help) {
-            mController.showTutorial(true);
-        }
-        return super.onOptionsItemSelected(item);
     }
 }
