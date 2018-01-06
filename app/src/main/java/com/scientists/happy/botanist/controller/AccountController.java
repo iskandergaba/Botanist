@@ -1,6 +1,5 @@
 package com.scientists.happy.botanist.controller;
 
-import android.app.ProgressDialog;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.ImageView;
@@ -24,7 +23,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 import com.scientists.happy.botanist.R;
-import com.scientists.happy.botanist.data.DatabaseManager;
 import com.scientists.happy.botanist.data.User;
 
 import java.text.SimpleDateFormat;
@@ -34,21 +32,18 @@ import java.util.Locale;
 
 import za.co.riggaroo.materialhelptutorial.TutorialItem;
 
-public class AccountController {
+public class AccountController extends ActivityController {
 
-    private final DatabaseManager mDatabase = DatabaseManager.getInstance();
-    private final AppCompatActivity mActivity;
     private User mUser;
 
-    private ProgressDialog mProgressDialog;
-
     public AccountController(AppCompatActivity activity) {
-        mActivity = activity;
+        super(activity);
     }
 
+    @Override
     public void load() {
-        showProgressDialog();
-        mDatabase.getUserReference().addListenerForSingleValueEvent(new ValueEventListener() {
+        showProgressDialog(getActivity().getString(R.string.loading_text));
+        getDatabaseManager().getUserReference().addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
@@ -67,6 +62,21 @@ public class AccountController {
         });
     }
 
+    @Override
+    protected ArrayList<TutorialItem> loadTutorialItems() {
+        TutorialItem tutorialItem0 = new TutorialItem(getActivity().getString(R.string.account_tutorial_title_0), getActivity().getString(R.string.account_tutorial_contents_0),
+                R.color.colorAccent, R.drawable.account_tutorial_0,  R.drawable.account_tutorial_0);
+        TutorialItem tutorialItem1 = new TutorialItem(getActivity().getString(R.string.account_tutorial_title_1), getActivity().getString(R.string.account_tutorial_contents_1),
+                R.color.colorAccent, R.drawable.account_tutorial_1,  R.drawable.account_tutorial_1);
+        TutorialItem tutorialItem2 = new TutorialItem(getActivity().getString(R.string.account_tutorial_title_2), getActivity().getString(R.string.account_tutorial_contents_2),
+                R.color.colorAccent, R.drawable.account_tutorial_2,  R.drawable.account_tutorial_2);
+        ArrayList<TutorialItem> tutorialItems = new ArrayList<>();
+        tutorialItems.add(tutorialItem0);
+        tutorialItems.add(tutorialItem1);
+        tutorialItems.add(tutorialItem2);
+        return tutorialItems;
+    }
+
     /**
      * Delete a user from the database
      */
@@ -74,7 +84,7 @@ public class AccountController {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
             String userId = user.getUid();
-            mDatabase.deleteUserRecords(mActivity, userId);
+            getDatabaseManager().deleteUserRecords(getActivity(), userId);
             user.delete().addOnCompleteListener(new OnCompleteListener<Void>() {
                 /**
                  * Delete the user task completed
@@ -92,33 +102,29 @@ public class AccountController {
     }
 
     public void resetDatabaseManager() {
-        mDatabase.resetMemberData();
-        mDatabase.deleteAllReminders(mActivity);
-    }
-
-    public void showTutorial(boolean isForceShow) {
-        mDatabase.showTutorial(mActivity, loadTutorialItems(), isForceShow);
+        getDatabaseManager().resetMemberData();
+        getDatabaseManager().deleteAllReminders(getActivity());
     }
 
     private void populateUserInfo() {
-        TextView nameTextView = (TextView) mActivity.findViewById(R.id.name);
-        TextView emailTextView = (TextView) mActivity.findViewById(R.id.email);
-        TextView botanistSinceTextView = (TextView) mActivity.findViewById(R.id.botanist_since);
-        TextView plantsNumberTextView = (TextView) mActivity.findViewById(R.id.plants_number);
+        TextView nameTextView = getActivity().findViewById(R.id.name);
+        TextView emailTextView = getActivity().findViewById(R.id.email);
+        TextView botanistSinceTextView = getActivity().findViewById(R.id.botanist_since);
+        TextView plantsNumberTextView = getActivity().findViewById(R.id.plants_number);
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy", Locale.US);
         nameTextView.setText(mUser.getUserName());
-        emailTextView.setText(mActivity.getString(R.string.email_fmt, mUser.getEmail()));
-        botanistSinceTextView.setText(mActivity.getString(R.string.botanist_since_fmt, dateFormat.format(mUser.getBotanistSince())));
-        plantsNumberTextView.setText(mActivity.getString(R.string.plants_number_fmt, mUser.getPlantsNumber()));
+        emailTextView.setText(getActivity().getString(R.string.email_fmt, mUser.getEmail()));
+        botanistSinceTextView.setText(getActivity().getString(R.string.botanist_since_fmt, dateFormat.format(mUser.getBotanistSince())));
+        plantsNumberTextView.setText(getActivity().getString(R.string.plants_number_fmt, mUser.getPlantsNumber()));
     }
 
     /**
      * Show user stats graph
      */
     private void populateUserStatsChart() {
-        final String[] userStatsChartXAxisLabel = mActivity.getResources().getStringArray(R.array.user_stats_x_axis_labels);
-        final BarChart chart = (BarChart) mActivity.findViewById(R.id.user_stats_chart);
+        final String[] userStatsChartXAxisLabel = getActivity().getResources().getStringArray(R.array.user_stats_x_axis_labels);
+        final BarChart chart = getActivity().findViewById(R.id.user_stats_chart);
         chart.setTouchEnabled(false);
         XAxis xAxis = chart.getXAxis();
         xAxis.setGranularity(1);
@@ -143,10 +149,8 @@ public class AccountController {
         chart.getAxisLeft().setGranularity(1);
         chart.getDescription().setEnabled(false);
 
-        mDatabase.populateUserStatsChart(mActivity, chart);
-
         if (mUser != null) {
-            int[] colors = mActivity.getResources().getIntArray(R.array.user_stats_chart_colors);
+            int[] colors = getActivity().getResources().getIntArray(R.array.user_stats_chart_colors);
             List<BarEntry> entries = new ArrayList<>();
             entries.add(new BarEntry(0f, mUser.getPlantsAdded()));
             entries.add(new BarEntry(1f, mUser.getPlantsDeleted()));
@@ -166,71 +170,30 @@ public class AccountController {
     }
 
     private void loadBadge() {
-        TextView levelTextView = (TextView) mActivity.findViewById(R.id.level_text_view);
-        ImageView badgeImageView = (ImageView) mActivity.findViewById(R.id.user_badge);
-        ProgressBar levelProgressBar = (ProgressBar) mActivity.findViewById(R.id.level_progress_bar);
+        TextView levelTextView = getActivity().findViewById(R.id.level_text_view);
+        ImageView badgeImageView = getActivity().findViewById(R.id.user_badge);
+        ProgressBar levelProgressBar = getActivity().findViewById(R.id.level_progress_bar);
         double rating = mUser.getRating();
         if (rating < 0) {
             badgeImageView.setImageResource(R.drawable.badge_level_0);
-            levelTextView.setText(mActivity.getString(R.string.level_0));
+            levelTextView.setText(getActivity().getString(R.string.level_0));
             levelProgressBar.setProgress(0);
         }
         else if (rating < 0.35) {
             badgeImageView.setImageResource(R.drawable.badge_level_1);
-            levelTextView.setText(mActivity.getString(R.string.level_1));
+            levelTextView.setText(getActivity().getString(R.string.level_1));
             levelProgressBar.setProgress(35);
         }
         else if (rating < 0.75) {
             badgeImageView.setImageResource(R.drawable.badge_level_2);
-            levelTextView.setText(mActivity.getString(R.string.level_2));
+            levelTextView.setText(getActivity().getString(R.string.level_2));
             levelProgressBar.setProgress(75);
         }
         else {
             badgeImageView.setImageResource(R.drawable.badge_level_3);
-            levelTextView.setText(mActivity.getString(R.string.level_3));
+            levelTextView.setText(getActivity().getString(R.string.level_3));
             levelProgressBar.setProgress(100);
         }
         populateUserStatsChart();
-    }
-
-
-    /**
-     * Show loading progress
-     */
-    private void showProgressDialog() {
-        if (mProgressDialog == null) {
-            mProgressDialog = new ProgressDialog(mActivity);
-            mProgressDialog.setMessage(mActivity.getString(R.string.loading_text));
-            mProgressDialog.setIndeterminate(true);
-            mProgressDialog.setCancelable(false);
-        }
-        mProgressDialog.show();
-    }
-
-    /**
-     * Hide the progress message
-     */
-    private void hideProgressDialog() {
-        if ((mProgressDialog != null) && mProgressDialog.isShowing()) {
-            mProgressDialog.hide();
-        }
-    }
-
-    /**
-     * Fetch assets for the tutorial
-     * @return - Returns the list of tutorial items
-     */
-    private ArrayList<TutorialItem> loadTutorialItems() {
-        TutorialItem tutorialItem0 = new TutorialItem(mActivity.getString(R.string.account_tutorial_title_0), mActivity.getString(R.string.account_tutorial_contents_0),
-                R.color.colorAccent, R.drawable.account_tutorial_0,  R.drawable.account_tutorial_0);
-        TutorialItem tutorialItem1 = new TutorialItem(mActivity.getString(R.string.account_tutorial_title_1), mActivity.getString(R.string.account_tutorial_contents_1),
-                R.color.colorAccent, R.drawable.account_tutorial_1,  R.drawable.account_tutorial_1);
-        TutorialItem tutorialItem2 = new TutorialItem(mActivity.getString(R.string.account_tutorial_title_2), mActivity.getString(R.string.account_tutorial_contents_2),
-                R.color.colorAccent, R.drawable.account_tutorial_2,  R.drawable.account_tutorial_2);
-        ArrayList<TutorialItem> tutorialItems = new ArrayList<>();
-        tutorialItems.add(tutorialItem0);
-        tutorialItems.add(tutorialItem1);
-        tutorialItems.add(tutorialItem2);
-        return tutorialItems;
     }
 }

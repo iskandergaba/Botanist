@@ -15,7 +15,7 @@ public class SplashActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
-        ImageView logo = (ImageView) findViewById(R.id.logo_splash);
+        ImageView logo = findViewById(R.id.logo_splash);
         Animation myFadeInAnimation = AnimationUtils.loadAnimation(this, R.anim.blink_and_fade);
         logo.startAnimation(myFadeInAnimation);
         // Instantiate the database

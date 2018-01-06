@@ -13,7 +13,6 @@ import android.widget.GridView;
 
 import com.scientists.happy.botanist.R;
 import com.scientists.happy.botanist.controller.MainController;
-import com.scientists.happy.botanist.data.DatabaseManager;
 import com.scientists.happy.botanist.utils.AppRater;
 public class MainActivity extends AppCompatActivity {
     private static final int VIEW_ACCOUNT = 1;
@@ -29,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
             actionBar.setDisplayShowHomeEnabled(true);
             getSupportActionBar().setIcon(R.drawable.ic_logo_botanist);
         }
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             /**
              * Handle action button click
@@ -51,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
                 findViewById(R.id.daily_tip_cardview).setVisibility(View.GONE);
             }
         });
-        GridView gridView = (GridView) findViewById(R.id.plants_grid);
+        GridView gridView = findViewById(R.id.plants_grid);
         gridView.setEmptyView(findViewById(R.id.empty_grid_view));
         mController = new MainController(this);
         AppRater.INSTANCE.appLaunched(this);
@@ -60,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         mController.load();
+        mController.showTutorial(false);
         super.onStart();
     }
 
@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(MainActivity.this, AboutActivity.class));
                 return true;
             case R.id.action_help:
-                DatabaseManager.getInstance().showTutorial(this, mController.loadTutorialItems(), true);
+                mController.showTutorial(true);
                 break;
         }
         return super.onOptionsItemSelected(item);

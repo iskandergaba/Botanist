@@ -11,20 +11,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.media.MediaScannerConnection;
-import android.net.Uri;
-import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.Toast;
 
-import com.github.mikephil.charting.charts.BarChart;
-import com.github.mikephil.charting.data.BarData;
-import com.github.mikephil.charting.data.BarDataSet;
-import com.github.mikephil.charting.data.BarEntry;
-import com.github.mikephil.charting.utils.ColorTemplate;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -51,9 +41,9 @@ import com.scientists.happy.botanist.utils.ExecutorValueEventListener;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
 
@@ -73,7 +63,7 @@ public class DatabaseManager {
     private long mBotanistSince;
     private double mRating;
     private ProgressDialog mProgressDialog;
-    private Map<String, String> mAutocompleteCache;
+    private Map<String, String> mSpeciesCache;
     private StorageReference mStorage;
     private DatabaseReference mDatabase;
     private static DatabaseManager mDatabaseManager;
@@ -83,7 +73,7 @@ public class DatabaseManager {
     private DatabaseManager() {
         // Just in case we want to add offline caching to the app
         // FirebaseDatabase.getInstance().setPersistenceEnabled(true);
-        mAutocompleteCache = new HashMap<>();
+        mSpeciesCache = new HashMap<>();
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mStorage = FirebaseStorage.getInstance().getReference();
     }
@@ -143,7 +133,7 @@ public class DatabaseManager {
                     String commonName = suggestionSnapshot.getKey();
                     String sciName = suggestionSnapshot.getValue(String.class);
                     // Add the retrieved string to the list
-                    mAutocompleteCache.put(commonName, sciName);
+                    mSpeciesCache.put(commonName, sciName);
                 }
                 splashActivity.startActivity(new Intent(splashActivity, LoginActivity.class));
                 splashActivity.finish();
@@ -253,11 +243,11 @@ public class DatabaseManager {
             hideProgressDialog();
             return false;
         }
-        else if (mAutocompleteCache.containsKey(species)) {
+        else if (mSpeciesCache.containsKey(species)) {
             // If the user typed a common name, fetch the scientific name
-            species = mAutocompleteCache.get(species);
+            species = mSpeciesCache.get(species);
         }
-        else if (!mAutocompleteCache.containsValue(species)) {
+        else if (!mSpeciesCache.containsValue(species)) {
             // The user must have entered neither the scientific nor the common name
             hideProgressDialog();
             return false;
@@ -317,49 +307,6 @@ public class DatabaseManager {
             });
         }
         return null;
-    }
-
-    /**
-     * Delete gif reference from the Android Gallery
-     * @param context - app context
-     */
-    public void updateGallery(Context context) {
-        MediaScannerConnection.scanFile(context, new String[]{Environment.getExternalStorageDirectory().toString()}, null,
-                new MediaScannerConnection.OnScanCompletedListener() {
-                    /**
-                     * Gallery scan completed
-                     * @param path - path of the deleted image
-                     * @param uri of the deleted image
-                     */
-                    public void onScanCompleted(String path, Uri uri) {
-                    }
-                });
-    }
-
-    /**
-     * populate the user's account statistics
-     * @param chart - the chart to populate
-     */
-    public void populateUserStatsChart(Context context, final BarChart chart) {
-        String userId = getUserId();
-        if (userId != null) {
-            int[] colors = context.getResources().getIntArray(R.array.user_stats_chart_colors);
-            List<BarEntry> entries = new ArrayList<>();
-            entries.add(new BarEntry(0f, getAddedCount()));
-            entries.add(new BarEntry(1f, getDeletedCount()));
-            entries.add(new BarEntry(2f, getWaterCount()));
-            entries.add(new BarEntry(3f, getMeasureCount()));
-            entries.add(new BarEntry(4f, getPhotoCount()));
-
-            BarDataSet barDataSet = new BarDataSet(entries, "Plant Operations");
-            barDataSet.setColors(ColorTemplate.createColors(colors));
-            barDataSet.setValueTextSize(11f);
-
-            BarData data = new BarData(barDataSet);
-            data.setBarWidth(0.9f); // set custom bar width
-            chart.setData(data);
-            chart.invalidate(); // refresh
-        }
     }
 
     /**
@@ -462,18 +409,6 @@ public class DatabaseManager {
                 }
             });
         }
-    }
-
-    /**
-     * Show the autocomplete for NewPlantActivity add species
-     * @param context - the current app context
-     * @param autoCompleteTextView - the autocomplete view
-     */
-    public void setSpeciesAutoComplete(Context context, AutoCompleteTextView autoCompleteTextView) {
-        final ArrayAdapter<String> autoComplete = new ArrayAdapter<>(context, android.R.layout.simple_list_item_1);
-        autoComplete.addAll(mAutocompleteCache.keySet());
-        autoComplete.addAll(mAutocompleteCache.values());
-        autoCompleteTextView.setAdapter(autoComplete);
     }
 
     /**
@@ -1090,5 +1025,12 @@ public class DatabaseManager {
 
     public DatabaseReference getDiseaseUrlReference(String disease) {
         return mDatabase.child("DiseaseUrls").child(disease);
+    }
+
+    public String[] getSpeciesNames() {
+        int size = mSpeciesCache.keySet().size();
+        String[] species = mSpeciesCache.values().toArray(new String[size]);
+        Arrays.sort(species);
+        return species;
     }
 }

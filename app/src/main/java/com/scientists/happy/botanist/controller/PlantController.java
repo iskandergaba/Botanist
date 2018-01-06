@@ -1,6 +1,5 @@
 package com.scientists.happy.botanist.controller;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -33,7 +32,6 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.StorageTask;
 import com.google.firebase.storage.UploadTask;
 import com.scientists.happy.botanist.R;
-import com.scientists.happy.botanist.data.DatabaseManager;
 import com.scientists.happy.botanist.data.Plant;
 import com.scientists.happy.botanist.data.PlantEntry;
 import com.scientists.happy.botanist.ui.DiseaseActivity;
@@ -66,33 +64,81 @@ import za.co.riggaroo.materialhelptutorial.TutorialItem;
 import static android.app.Activity.RESULT_OK;
 import static android.os.Environment.getExternalStoragePublicDirectory;
 
-public class PlantController {
+public class PlantController extends ActivityController {
 
     private final String WATER_KEY = "last_watered";
     private final String FERTILIZER_KEY = "last_fertilized";
 
-    private AppCompatActivity mActivity;
-    private ProgressDialog mProgressDialog;
     private Plant mPlant;
     private String mPlantGroup;
 
-    private final DatabaseManager mDatabase = DatabaseManager.getInstance();
-    private final StorageReference mUserStorage = mDatabase.getUserStorage();
+    private final StorageReference mUserStorage = getDatabaseManager().getUserStorage();
     private final DatabaseReference mPlantReference;
 
     public PlantController(AppCompatActivity activity) {
-        mActivity = activity;
+        super(activity);
         String plantIdKey = "plant_id";
-        String plantId = mActivity.getIntent().getExtras().getString(plantIdKey);
-        mPlantReference = mDatabase.getPlantReference(plantId);
+        String plantId = getActivity().getIntent().getExtras().getString(plantIdKey);
+        mPlantReference = getDatabaseManager().getPlantReference(plantId);
     }
 
+    @Override
     public void load() {
-        showProgressDialog(mActivity.getString(R.string.loading_text));
+        showProgressDialog(getActivity().getString(R.string.loading_text));
         loadProfilePhoto();
         loadProfileInfo();
         hideProgressDialog();
-        mDatabase.showTutorial(mActivity, loadTutorialItems(), false);
+    }
+
+    @Override
+    protected ArrayList<TutorialItem> loadTutorialItems() {
+        TutorialItem tutorialItem0 = new TutorialItem(getActivity().getString(R.string.profile_tutorial_title_0), getActivity().getString(R.string.profile_tutorial_contents_0),
+                R.color.colorAccent, R.drawable.profile_tutorial_0, R.drawable.profile_tutorial_0);
+        TutorialItem tutorialItem1 = new TutorialItem(getActivity().getString(R.string.profile_tutorial_title_1), getActivity().getString(R.string.profile_tutorial_contents_1),
+                R.color.colorAccent, R.drawable.profile_tutorial_1, R.drawable.profile_tutorial_1);
+        TutorialItem tutorialItem2 = new TutorialItem(getActivity().getString(R.string.profile_tutorial_title_2), getActivity().getString(R.string.profile_tutorial_contents_2),
+                R.color.colorAccent, R.drawable.profile_tutorial_2, R.drawable.profile_tutorial_2);
+        TutorialItem tutorialItem3 = new TutorialItem(getActivity().getString(R.string.profile_tutorial_title_3), getActivity().getString(R.string.profile_tutorial_contents_3),
+                R.color.colorAccent, R.drawable.profile_tutorial_3, R.drawable.profile_tutorial_3);
+        ArrayList<TutorialItem> tutorialItems = new ArrayList<>();
+        tutorialItems.add(tutorialItem0);
+        tutorialItems.add(tutorialItem1);
+        tutorialItems.add(tutorialItem2);
+        tutorialItems.add(tutorialItem3);
+        return tutorialItems;
+    }
+
+    public void startEditPlantActivity() {
+        Intent i = new Intent(getActivity(), EditPlantActivity.class);
+        i.putExtra("plant_id", mPlant.getId());
+        getActivity().startActivity(i);
+    }
+
+    public void startStatsActivity() {
+        Intent i = new Intent(getActivity(), StatsActivity.class);
+        i.putExtra("plant_id", mPlant.getId());
+        getActivity().startActivity(i);
+    }
+
+    public void startDiseaseActivity() {
+        if (mPlantGroup != null) {
+            Intent i = new Intent(getActivity(), DiseaseActivity.class);
+            i.putExtra("group", mPlantGroup);
+            getActivity().startActivity(i);
+        } else {
+            Toast.makeText(getActivity(), "Not finished loading yet", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void startSimilarPlantsActivity() {
+        if (mPlantGroup != null) {
+            Intent i = new Intent(getActivity(), SimilarPlantsActivity.class);
+            i.putExtra("species", mPlant.getSpecies());
+            i.putExtra("group", mPlantGroup);
+            getActivity().startActivity(i);
+        } else {
+            Toast.makeText(getActivity(), "Not finished loading yet", Toast.LENGTH_SHORT).show();
+        }
     }
 
     public void uploadPhoto() {
@@ -104,7 +150,7 @@ public class PlantController {
              */
             @Override
             public void onPickResult(PickResult r) {
-                StorageTask<UploadTask.TaskSnapshot> uploadTask = mDatabase.updatePlantImage(mPlant.getPhotoPointer() + 1,
+                StorageTask<UploadTask.TaskSnapshot> uploadTask = getDatabaseManager().updatePlantImage(mPlant.getPhotoPointer() + 1,
                         mPlant.getPhotoNum() + 1, mPlant.getId(), r.getBitmap());
                 uploadTask.addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                     @Override
@@ -115,67 +161,14 @@ public class PlantController {
                     }
                 });
             }
-        }).show(mActivity.getSupportFragmentManager());
-    }
-
-    public boolean handleOptionsItemSelected(int resId) {
-        if (resId == R.id.action_edit_profile) {
-            Intent i = new Intent(mActivity, EditPlantActivity.class);
-            i.putExtra("plant_id", mPlant.getId());
-            mActivity.startActivity(i);
-            return true;
-        }
-        else if (resId == R.id.action_share) {
-            sharePlant();
-            return true;
-        }
-        else if (resId == R.id.action_stats) {
-            Intent i = new Intent(mActivity, StatsActivity.class);
-            i.putExtra("plant_id", mPlant.getId());
-            mActivity.startActivity(i);
-            return true;
-        }
-        else if (resId == R.id.action_export_gif) {
-            exportGif(mPlant.getPhotoNum(), mPlant.getId(), mPlant.getName(), mPlant.getSpecies());
-            return true;
-        }
-        else if (resId == R.id.action_similar_plants) {
-            if (mPlantGroup != null) {
-                Intent i = new Intent(mActivity, SimilarPlantsActivity.class);
-                i.putExtra("species", mPlant.getSpecies());
-                i.putExtra("group", mPlantGroup);
-                mActivity.startActivity(i);
-            } else {
-                Toast.makeText(mActivity, "Not finished loading yet", Toast.LENGTH_SHORT);
-            }
-            return true;
-        }
-        else if (resId == R.id.action_diseases) {
-            if (mPlantGroup != null) {
-                Intent i = new Intent(mActivity, DiseaseActivity.class);
-                i.putExtra("group", mPlantGroup);
-                mActivity.startActivity(i);
-            } else {
-                Toast.makeText(mActivity, "Not finished loading yet", Toast.LENGTH_SHORT);
-            }
-            return true;
-        }
-        else if (resId == R.id.action_delete) {
-            buildDeleteDialog().show();
-            return true;
-        }
-        else if (resId == R.id.action_help) {
-            mDatabase.showTutorial(mActivity, loadTutorialItems(), true);
-        }
-        return false;
+        }).show(getActivity().getSupportFragmentManager());
     }
 
     /**
-     * User watered plant
-     * @return Returns warning screen
+     * Show watering dialog
      */
-    public AlertDialog buildWateredDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
+    public void showWaterDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setMessage(R.string.confirm_message).setTitle(R.string.water_plant);
         builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
             /**
@@ -184,7 +177,7 @@ public class PlantController {
              * @param id - the user id
              */
             public void onClick(DialogInterface dialog, int id) {
-                mDatabase.updatePlantWatering(mActivity, mPlant.getId());
+                getDatabaseManager().updatePlantWatering(getActivity(), mPlant.getId());
             }
         });
         builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
@@ -196,15 +189,14 @@ public class PlantController {
             public void onClick(DialogInterface dialog, int id) {
             }
         });
-        return builder.create();
+        builder.create().show();
     }
 
     /**
-     * Input mHeight window
-     * @return Returns warning screen
+     * Show input height dialog
      */
-    public AlertDialog buildHeightInputDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
+    public void showHeightInputDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setView(R.layout.dialog_height_input).setTitle(R.string.record_new_height)
                 .setPositiveButton(R.string.mdtp_ok, new DialogInterface.OnClickListener() {
                     /**
@@ -214,12 +206,12 @@ public class PlantController {
                      */
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        EditText inputEditText = (EditText) ((AlertDialog) dialog).findViewById(R.id.height_edit_text);
+                        EditText inputEditText = ((AlertDialog) dialog).findViewById(R.id.height_edit_text);
                         double newHeight = Double.parseDouble(inputEditText != null ? inputEditText.getText().toString() : "-1");
                         if (mPlant.getHeight() < newHeight) {
-                            mDatabase.updatePlantHeight(mActivity, mPlant.getId(), newHeight);
+                            getDatabaseManager().updatePlantHeight(getActivity(), mPlant.getId(), newHeight);
                         }
-                        Toast.makeText(mActivity, "Update successful", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), "Update successful", Toast.LENGTH_SHORT).show();
                     }
                 }).setNegativeButton(R.string.mdtp_cancel, new DialogInterface.OnClickListener() {
             /**
@@ -233,15 +225,14 @@ public class PlantController {
                 dialog.cancel();
             }
         });
-        return builder.create();
+        builder.create().show();
     }
 
     /**
-     * User fertilized plant
-     * @return Returns alert window
+     * Show fertilization dialog
      */
-    public AlertDialog buildFertilizedDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
+    public void showFertilizationDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setMessage(R.string.confirm_message).setTitle(R.string.fertilize_plant);
         builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
             /**
@@ -250,8 +241,8 @@ public class PlantController {
              * @param id - the user id
              */
             public void onClick(DialogInterface dialog, int id) {
-                mDatabase.updateNotificationTime(mPlant.getId(), "lastFertilizerNotification");
-                Toast.makeText(mActivity, R.string.update_success, Toast.LENGTH_SHORT).show();
+                getDatabaseManager().updateNotificationTime(mPlant.getId(), "lastFertilizerNotification");
+                Toast.makeText(getActivity(), R.string.update_success, Toast.LENGTH_SHORT).show();
             }
         });
         builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
@@ -263,115 +254,15 @@ public class PlantController {
             public void onClick(DialogInterface dialog, int id) {
             }
         });
-        return builder.create();
-    }
-
-    /**
-     * Warn the user that the plant will be deleted
-     * @return - returns the alert window
-     */
-    private AlertDialog buildDeleteDialog() {
-        // Instantiate an AlertDialog.Builder with its constructor
-        AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
-        // Chain together various setter methods to set the dialog characteristics
-        builder.setMessage(R.string.delete_message).setTitle(R.string.delete_dialog_title);
-        // Add the buttons
-        builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-            /**
-             * User clicked confirm
-             * @param dialog - the warning window
-             * @param id - the user id
-             */
-            public void onClick(DialogInterface dialog, int id) {
-                deletePlant(mPlant.getId(), mPlant.getPhotoNum());
-                Intent resultIntent = new Intent();
-                mActivity.setResult(RESULT_OK, resultIntent);
-                mActivity.finish();
-            }
-        });
-        builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
-            /**
-             * User clicked cancel
-             * @param dialog - the warning window
-             * @param id - the user id
-             */
-            public void onClick(DialogInterface dialog, int id) {
-                // User cancelled the dialog
-            }
-        });
-        // Get the AlertDialog from create()
-        return builder.create();
-    }
-
-    /**
-     * Remove plant from the database
-     * @param plantId - the id of the plant
-     * @param photoNum - the number of pictures that plant has
-     */
-    private void deletePlant(final String plantId, final int photoNum) {
-        mDatabase.deleteAllReminders(mActivity);
-        if (mPlantReference != null) {
-            mPlantReference.removeValue();
-            final DatabaseReference userPhotosRef = mDatabase.getUserPhotosReference();
-            userPhotosRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                        String key = snapshot.getKey();
-                        String photoFileName = snapshot.getValue(String.class);
-                        if (photoFileName != null && photoFileName.contains(plantId)) {
-                            userPhotosRef.child(key).removeValue();
-                            mUserStorage.child(photoFileName).delete();
-                        }
-                    }
-                    mDatabase.setPlantsNumber(mDatabase.getPlantsNumber() - 1);
-                    mDatabase.setDeletedNumber(mDatabase.getDeletedCount() + 1);
-                    mDatabase.setPhotoCount(mDatabase.getPhotoCount() - (photoNum + 1));
-                    mDatabase.updateUserRating();
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-
-                }
-            });
-        }
-    }
-
-    /**
-     * Trigger the share intent
-     */
-    private void sharePlant() {
-        if (mPlant != null) {
-            String name = mPlant.getName();
-            String gifLocation = mPlant.getGifLocation();
-            String title = "Meet my plant: " + name + "!";
-            String text = "Name: " + name + "\nSpecies: " + mPlant.getSpecies() + "\nFamily: " + mPlantGroup
-                    + "\nAge: " + String.format(Locale.US, "%.2f", getAgeInDays(mPlant.getBirthday())) + " days"
-                    + "\nHeight: " + mPlant.getHeight() + " inches\nShared via: Botanist";
-            Intent shareIntent = new Intent();
-            shareIntent.setAction(Intent.ACTION_SEND);
-            shareIntent.putExtra(Intent.EXTRA_TITLE, title);
-            shareIntent.putExtra(Intent.EXTRA_TEXT, text);
-            shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            if (gifLocation != null && gifLocation.equals("No Gif made (yet!)")) {
-                shareIntent.setType("plain/text");
-            } else {
-                Uri gifUri = Uri.parse("file://" + gifLocation);
-                shareIntent.putExtra(Intent.EXTRA_STREAM, gifUri);
-                shareIntent.setType("image/*");
-            }
-            mActivity.startActivity(Intent.createChooser(shareIntent, mActivity.getString(R.string.share_dialog_title)));
-        }
+        builder.create().show();
     }
 
     /**
      * Ask the user which reminder they want to add to their calendar
-     * @return - returns the alert window
      */
-    public AlertDialog buildCalendarDialog() {
+    public void showCalendarDialog() {
         // Instantiate an AlertDialog.Builder with its constructor
-        AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         // Chain together various setter methods to set the dialog characteristics
         builder.setMessage(R.string.calendar_dialog_text).setTitle(R.string.calendar_sync_text);
         // Add the buttons
@@ -396,27 +287,124 @@ public class PlantController {
             }
         });
         // Get the AlertDialog from create()
-        return builder.create();
+        builder.create().show();
+    }
+
+    /**
+     * Warn the user that the plant will be deleted
+     */
+    public void showDeleteDialog() {
+        // Instantiate an AlertDialog.Builder with its constructor
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        // Chain together various setter methods to set the dialog characteristics
+        builder.setMessage(R.string.delete_message).setTitle(R.string.delete_dialog_title);
+        // Add the buttons
+        builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+            /**
+             * User clicked confirm
+             * @param dialog - the warning window
+             * @param id - the user id
+             */
+            public void onClick(DialogInterface dialog, int id) {
+                deletePlant(mPlant.getId(), mPlant.getPhotoNum());
+                Intent resultIntent = new Intent();
+                getActivity().setResult(RESULT_OK, resultIntent);
+                getActivity().finish();
+            }
+        });
+        builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+            /**
+             * User clicked cancel
+             * @param dialog - the warning window
+             * @param id - the user id
+             */
+            public void onClick(DialogInterface dialog, int id) {
+                // User cancelled the dialog
+            }
+        });
+        // Get the AlertDialog from create()
+        builder.create().show();
+    }
+
+    /**
+     * Remove plant from the database
+     * @param plantId - the id of the plant
+     * @param photoNum - the number of pictures that plant has
+     */
+    private void deletePlant(final String plantId, final int photoNum) {
+        getDatabaseManager().deleteAllReminders(getActivity());
+        if (mPlantReference != null) {
+            mPlantReference.removeValue();
+            final DatabaseReference userPhotosRef = getDatabaseManager().getUserPhotosReference();
+            userPhotosRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                        String key = snapshot.getKey();
+                        String photoFileName = snapshot.getValue(String.class);
+                        if (photoFileName != null && photoFileName.contains(plantId)) {
+                            userPhotosRef.child(key).removeValue();
+                            mUserStorage.child(photoFileName).delete();
+                        }
+                    }
+                    getDatabaseManager().setPlantsNumber(getDatabaseManager().getPlantsNumber() - 1);
+                    getDatabaseManager().setDeletedNumber(getDatabaseManager().getDeletedCount() + 1);
+                    getDatabaseManager().setPhotoCount(getDatabaseManager().getPhotoCount() - (photoNum + 1));
+                    getDatabaseManager().updateUserRating();
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+        }
+    }
+
+    /**
+     * Trigger the share intent
+     */
+    public void sharePlant() {
+        if (mPlant != null) {
+            String name = mPlant.getName();
+            String gifLocation = mPlant.getGifLocation();
+            String title = "Meet my plant: " + name + "!";
+            String text = "Name: " + name + "\nSpecies: " + mPlant.getSpecies() + "\nFamily: " + mPlantGroup
+                    + "\nAge: " + String.format(Locale.US, "%.2f", getAgeInDays(mPlant.getBirthday())) + " days"
+                    + "\nHeight: " + mPlant.getHeight() + " inches\nShared via: Botanist";
+            Intent shareIntent = new Intent();
+            shareIntent.setAction(Intent.ACTION_SEND);
+            shareIntent.putExtra(Intent.EXTRA_TITLE, title);
+            shareIntent.putExtra(Intent.EXTRA_TEXT, text);
+            shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            if (gifLocation != null && gifLocation.equals("No Gif made (yet!)")) {
+                shareIntent.setType("plain/text");
+            } else {
+                Uri gifUri = Uri.parse("file://" + gifLocation);
+                shareIntent.putExtra(Intent.EXTRA_STREAM, gifUri);
+                shareIntent.setType("image/*");
+            }
+            getActivity().startActivity(Intent.createChooser(shareIntent, getActivity().getString(R.string.share_dialog_title)));
+        }
     }
 
     /**
      * Create a gif of the plant
-     * @param plantId - the id of the plant to form a gif of
-     * @param photoNum - the number of pictures of the plant that were taken
      */
-    private void exportGif(int photoNum, String plantId, String name, String species) {
+    public void exportGif() {
         // Iskander updated this because the photo counting is zero-index based
         // I changed it to zero so that if the user uploaded 2 picture only, we will still generate a GIF for them
+        int photoNum = mPlant.getPhotoNum();
         if (photoNum < 1) {
-            Toast.makeText(mActivity, "You must take at least 2 pictures to make a GIF", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "You must take at least 2 pictures to make a GIF", Toast.LENGTH_SHORT).show();
         } else {
-            createGif(plantId, name, species);
+            createGif(mPlant.getId(), mPlant.getName(), mPlant.getSpecies());
         }
     }
 
     private void createGif(final String plantId, final String name, final String species) {
-        showProgressDialog(mActivity.getString(R.string.gif_loading));
-        DatabaseReference userPhotosReference = mDatabase.getUserPhotosReference();
+        showProgressDialog(getActivity().getString(R.string.gif_loading));
+        DatabaseReference userPhotosReference = getDatabaseManager().getUserPhotosReference();
         if (userPhotosReference != null) {
             final ByteArrayOutputStream out = new ByteArrayOutputStream();
             final GifSequenceWriter gifWriter = new GifSequenceWriter();
@@ -436,7 +424,7 @@ public class PlantController {
                         if (photoName != null) {
                             StorageReference storageReference = mUserStorage.child(photoName);
                             try {
-                                Bitmap bmp = Glide.with(mActivity).using(new FirebaseImageLoader()).load(storageReference)
+                                Bitmap bmp = Glide.with(getActivity()).using(new FirebaseImageLoader()).load(storageReference)
                                         .asBitmap().skipMemoryCache(true).into(-1, -1).get();
                                 gifWriter.addFrame(bmp);
                             } catch (InterruptedException | ExecutionException e) {
@@ -462,12 +450,12 @@ public class PlantController {
                         String path = outFile.getAbsolutePath();
                         mPlantReference.child("gifLocation").setValue(path);
                         mResult = "GIF saved in: " + path;
+                        notifyGallery(path);
                     } catch (IOException e) {
                         mResult = "Failed to make GIF";
                     } finally {
-                        mDatabase.updateGallery(mActivity);
                         hideProgressDialog();
-                        makeToastResult(mActivity);
+                        makeToastResult(getActivity());
                     }
                 }
 
@@ -475,11 +463,11 @@ public class PlantController {
                 protected void onCancelledExecutor(@NonNull DatabaseError databaseError) {
                     mResult = "Failed to make GIF";
                     hideProgressDialog();
-                    makeToastResult(mActivity);
+                    makeToastResult(getActivity());
                 }
 
                 private void makeToastResult(final Context context) {
-                    mActivity.runOnUiThread(new Runnable() {
+                    getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             Toast.makeText(context, mResult, Toast.LENGTH_LONG).show();
@@ -488,6 +476,15 @@ public class PlantController {
                 }
             });
         }
+    }
+
+    private void notifyGallery(String path) {
+        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        //change mCurrentPhotoPath for your imagepath
+        File f = new File(path);
+        Uri contentUri = Uri.fromFile(f);
+        mediaScanIntent.setData(contentUri);
+        getActivity().sendBroadcast(mediaScanIntent);
     }
 
     /**
@@ -504,19 +501,19 @@ public class PlantController {
      * @param title - the title of the event to add
      */
     private void updateCalendar(String title, String type) {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mActivity);
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
         int hour = preferences.getInt("water_hour", 9);
         int minute = preferences.getInt("water_minute", 0);
         int reminderSetting;
         Calendar cal = Calendar.getInstance();
         if (type.equals(WATER_KEY)) {
             reminderSetting = Integer.parseInt(preferences.getString(SettingsActivity.WATER_REMINDER_KEY, "1"));
-            long interval = mDatabase.getReminderIntervalInMillis(reminderSetting);
+            long interval = getDatabaseManager().getReminderIntervalInMillis(reminderSetting);
             cal.setTimeInMillis(mPlant.getLastWatered() + interval);
         }
         else if (type.equals(FERTILIZER_KEY)) {
             reminderSetting = Integer.parseInt(preferences.getString(SettingsActivity.FERTILIZER_REMINDER_KEY, "2"));
-            long interval = mDatabase.getReminderIntervalInMillis(reminderSetting);
+            long interval = getDatabaseManager().getReminderIntervalInMillis(reminderSetting);
             cal.setTimeInMillis(mPlant.getLastFertilizerNotification() + interval);
         }
         cal.set(Calendar.HOUR, hour);
@@ -528,28 +525,7 @@ public class PlantController {
         calendarIntent.putExtra(CalendarContract.EXTRA_EVENT_END_TIME, cal.getTimeInMillis() + 36000);
         calendarIntent.putExtra(CalendarContract.Events.ALL_DAY, false);
         calendarIntent.putExtra(CalendarContract.Events.DESCRIPTION, title);
-        mActivity.startActivity(calendarIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
-    }
-
-    /**
-     * Fetch assets for the tutorial
-     * @return - Returns the list of tutorial items
-     */
-    private ArrayList<TutorialItem> loadTutorialItems() {
-        TutorialItem tutorialItem0 = new TutorialItem(mActivity.getString(R.string.profile_tutorial_title_0), mActivity.getString(R.string.profile_tutorial_contents_0),
-                R.color.colorAccent, R.drawable.profile_tutorial_0, R.drawable.profile_tutorial_0);
-        TutorialItem tutorialItem1 = new TutorialItem(mActivity.getString(R.string.profile_tutorial_title_1), mActivity.getString(R.string.profile_tutorial_contents_1),
-                R.color.colorAccent, R.drawable.profile_tutorial_1, R.drawable.profile_tutorial_1);
-        TutorialItem tutorialItem2 = new TutorialItem(mActivity.getString(R.string.profile_tutorial_title_2), mActivity.getString(R.string.profile_tutorial_contents_2),
-                R.color.colorAccent, R.drawable.profile_tutorial_2, R.drawable.profile_tutorial_2);
-        TutorialItem tutorialItem3 = new TutorialItem(mActivity.getString(R.string.profile_tutorial_title_3), mActivity.getString(R.string.profile_tutorial_contents_3),
-                R.color.colorAccent, R.drawable.profile_tutorial_3, R.drawable.profile_tutorial_3);
-        ArrayList<TutorialItem> tutorialItems = new ArrayList<>();
-        tutorialItems.add(tutorialItem0);
-        tutorialItems.add(tutorialItem1);
-        tutorialItems.add(tutorialItem2);
-        tutorialItems.add(tutorialItem3);
-        return tutorialItems;
+        getActivity().startActivity(calendarIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
     }
 
     /**
@@ -563,14 +539,14 @@ public class PlantController {
                 public void onDataChange(@NotNull DataSnapshot dataSnapshot) {
                     if (dataSnapshot.exists()) {
                         String fileName = dataSnapshot.getValue(String.class);
-                        ImageView profilePictureView = (ImageView) mActivity.findViewById(R.id.plant_picture);
+                        ImageView profilePictureView = getActivity().findViewById(R.id.plant_picture);
                         int placeHolderResId = R.drawable.flowey;
                         if (fileName != null && !fileName.equals("default")) {
                             StorageReference photoFileReference = mUserStorage.child(fileName);
-                            Glide.with(mActivity).using(new FirebaseImageLoader()).
+                            Glide.with(getActivity()).using(new FirebaseImageLoader()).
                                     load(photoFileReference).dontAnimate().placeholder(placeHolderResId).into(profilePictureView);
                         } else {
-                            Glide.with(mActivity).load(placeHolderResId).dontAnimate().placeholder(placeHolderResId).into(profilePictureView);
+                            Glide.with(getActivity()).load(placeHolderResId).dontAnimate().placeholder(placeHolderResId).into(profilePictureView);
                         }
                     }
                 }
@@ -594,13 +570,12 @@ public class PlantController {
                     mPlant = dataSnapshot.getValue(Plant.class);
                     if (mPlant != null) {
                         String species = mPlant.getSpecies();
-                        TextView speciesTextView = (TextView) mActivity.findViewById(R.id.plant_species);
-                        speciesTextView.setText(mActivity.getString(R.string.species_fmt, species));
-                        CollapsingToolbarLayout collapsingToolbarLayout =
-                                (CollapsingToolbarLayout) mActivity.findViewById(R.id.toolbar_layout);
+                        TextView speciesTextView = getActivity().findViewById(R.id.plant_species);
+                        speciesTextView.setText(getActivity().getString(R.string.species_fmt, species));
+                        CollapsingToolbarLayout collapsingToolbarLayout = getActivity().findViewById(R.id.toolbar_layout);
                         collapsingToolbarLayout.setTitle(mPlant.getName());
-                        TextView HeightTextView = (TextView) mActivity.findViewById(R.id.plant_height);
-                        HeightTextView.setText(mActivity.getString(R.string.height_fmt, mPlant.getHeight()));
+                        TextView HeightTextView = getActivity().findViewById(R.id.plant_height);
+                        HeightTextView.setText(getActivity().getString(R.string.height_fmt, mPlant.getHeight()));
                         loadCareTips(species);
                     }
                 }
@@ -615,7 +590,7 @@ public class PlantController {
 
     private void loadCareTips(String species) {
         if (species != null) {
-            DatabaseReference plantEntryReference = mDatabase.getPlantEntryReference(species);
+            DatabaseReference plantEntryReference = getDatabaseManager().getPlantEntryReference(species);
             plantEntryReference.addListenerForSingleValueEvent(new ValueEventListener() {
                 /**
                  * Read the data from the plant entry
@@ -626,30 +601,30 @@ public class PlantController {
                     PlantEntry entry = dataSnapshot.getValue(PlantEntry.class);
                     if (entry != null) {
                         mPlantGroup = entry.getGroup();
-                        ((TextView) mActivity.findViewById(R.id.care_tips)).setText(entry.generateCareTips());
+                        ((TextView) getActivity().findViewById(R.id.care_tips)).setText(entry.generateCareTips());
                         generateActiveGrowth(entry.getActive());
-                        View toxicWarning = mActivity.findViewById(R.id.toxic_warning);
+                        View toxicWarning = getActivity().findViewById(R.id.toxic_warning);
                         if (entry.isToxic()) {
                             toxicWarning.setVisibility(View.VISIBLE);
                         } else {
                             toxicWarning.setVisibility(View.GONE);
                         }
-                        View noxiousWarning = mActivity.findViewById(R.id.noxious_warning);
+                        View noxiousWarning = getActivity().findViewById(R.id.noxious_warning);
                         List<String> noxious = entry.getNoxious();
                         if (noxious != null) {
                             noxiousWarning.setVisibility(View.VISIBLE);
-                            TextView noxiousWarningTextView = (TextView) mActivity.findViewById(R.id.noxious_warning_box);
+                            TextView noxiousWarningTextView = getActivity().findViewById(R.id.noxious_warning_box);
                             if (noxious.contains("Noxious")) {
                                 noxiousWarningTextView.setText(R.string.noxious_warning_msg);
                             }
                             if (noxious.contains("Quarantine")) {
-                                noxiousWarningTextView.setText(noxiousWarningTextView.getText() + " \n\n" + mActivity.getString(R.string.quarantine_warning));
+                                noxiousWarningTextView.setText(String.format("%s \n\n%s", noxiousWarningTextView.getText(), getActivity().getString(R.string.quarantine_warning)));
                             }
                             if (noxious.contains("Regulated")) {
-                                noxiousWarningTextView.setText(noxiousWarningTextView.getText() + " \n\n" + mActivity.getString(R.string.regulated_warning));
+                                noxiousWarningTextView.setText(String.format("%s \n\n%s", noxiousWarningTextView.getText(), getActivity().getString(R.string.regulated_warning)));
                             }
                             if (noxious.contains("Banned")) {
-                                noxiousWarningTextView.setText(noxiousWarningTextView.getText() + " \n\n" + mActivity.getString(R.string.banned_warning));
+                                noxiousWarningTextView.setText(String.format("%s \n\n%s", noxiousWarningTextView.getText(), getActivity().getString(R.string.banned_warning)));
                             }
                         }
                     }
@@ -671,43 +646,22 @@ public class PlantController {
      */
     private void generateActiveGrowth(String activeGrowthPeriod) {
         if (activeGrowthPeriod == null || activeGrowthPeriod.trim().isEmpty() || activeGrowthPeriod.trim().equals("NA")) {
-            mActivity.findViewById(R.id.active_growth_period_view).setVisibility(View.GONE);
+            getActivity().findViewById(R.id.active_growth_period_view).setVisibility(View.GONE);
         } else {
-            mActivity.findViewById(R.id.active_growth_period_view).setVisibility(View.VISIBLE);
+            getActivity().findViewById(R.id.active_growth_period_view).setVisibility(View.VISIBLE);
             activeGrowthPeriod = activeGrowthPeriod.trim();
             if (!activeGrowthPeriod.equals("Year Round")) {
-                ((ImageView) mActivity.findViewById(R.id.winter_image)).setImageResource(R.drawable.winter_grayscale);
+                ((ImageView) getActivity().findViewById(R.id.winter_image)).setImageResource(R.drawable.winter_grayscale);
                 if (!activeGrowthPeriod.contains("Fall")) {
-                    ((ImageView) mActivity.findViewById(R.id.winter_image)).setImageResource(R.drawable.autumn_grayscale);
+                    ((ImageView) getActivity().findViewById(R.id.winter_image)).setImageResource(R.drawable.autumn_grayscale);
                 }
                 if (!activeGrowthPeriod.contains("Spring")) {
-                    ((ImageView) mActivity.findViewById(R.id.winter_image)).setImageResource(R.drawable.spring_grayscale);
+                    ((ImageView) getActivity().findViewById(R.id.winter_image)).setImageResource(R.drawable.spring_grayscale);
                 }
                 if (!activeGrowthPeriod.contains("Summer")) {
-                    ((ImageView) mActivity.findViewById(R.id.summer_image)).setImageResource(R.drawable.summer_grayscale);
+                    ((ImageView) getActivity().findViewById(R.id.summer_image)).setImageResource(R.drawable.summer_grayscale);
                 }
             }
-        }
-    }
-
-    /**
-     * Show the loading progress
-     */
-    private void showProgressDialog(String message) {
-        mProgressDialog = new ProgressDialog(mActivity);
-        mProgressDialog.setMessage(message);
-        mProgressDialog.setIndeterminate(true);
-        mProgressDialog.setCancelable(false);
-        mProgressDialog.show();
-    }
-
-    /**
-     * Dismiss the loading progress
-     */
-    private void hideProgressDialog() {
-        if ((mProgressDialog != null) && mProgressDialog.isShowing()) {
-            mProgressDialog.dismiss();
-            mProgressDialog = null;
         }
     }
 

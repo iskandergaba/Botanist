@@ -33,19 +33,36 @@ import java.util.Calendar;
 
 import za.co.riggaroo.materialhelptutorial.TutorialItem;
 
-public class MainController {
-    private final AppCompatActivity mActivity;
-    private final DatabaseManager mDatabase = DatabaseManager.getInstance();
-    private final DatabaseReference mUserReference = mDatabase.getUserReference();
+public class MainController extends ActivityController {
+
+    private final DatabaseReference mUserReference = getDatabaseManager().getUserReference();
 
     public MainController(AppCompatActivity activity) {
-        mActivity = activity;
+        super(activity);
     }
 
+    @Override
     public void load() {
-        mDatabase.showTutorial(mActivity, loadTutorialItems(), false);
-        populatePlantGrid((GridView) mActivity.findViewById(R.id.plants_grid));
-        generateDailyTip(mActivity.findViewById(R.id.daily_tip_cardview));
+        populatePlantGrid((GridView) getActivity().findViewById(R.id.plants_grid));
+        generateDailyTip(getActivity().findViewById(R.id.daily_tip_cardview));
+    }
+
+    @Override
+    public ArrayList<TutorialItem> loadTutorialItems() {
+        TutorialItem tutorialItem0 = new TutorialItem(getActivity().getString(R.string.main_tutorial_title_0_0), getActivity().getString(R.string.main_tutorial_contents_0_0),
+                R.color.colorAccent, R.drawable.main_tutorial_0_0,  R.drawable.main_tutorial_0_0);
+        TutorialItem tutorialItem1 = new TutorialItem(getActivity().getString(R.string.main_tutorial_title_0_1), getActivity().getString(R.string.main_tutorial_contents_0_1),
+                R.color.colorAccent, R.drawable.main_tutorial_0_1,  R.drawable.main_tutorial_0_1);
+        TutorialItem tutorialItem2 = new TutorialItem(getActivity().getString(R.string.main_tutorial_title_0_2), getActivity().getString(R.string.main_tutorial_contents_0_2),
+                R.color.colorAccent, R.drawable.main_tutorial_0_2,  R.drawable.main_tutorial_0_2);
+        TutorialItem tutorialItem3 = new TutorialItem(getActivity().getString(R.string.main_tutorial_title_1), getActivity().getString(R.string.main_tutorial_contents_1),
+                R.color.colorAccent, R.drawable.main_tutorial_1,  R.drawable.main_tutorial_1);
+        ArrayList<TutorialItem> tutorialItems = new ArrayList<>();
+        tutorialItems.add(tutorialItem0);
+        tutorialItems.add(tutorialItem1);
+        tutorialItems.add(tutorialItem2);
+        tutorialItems.add(tutorialItem3);
+        return tutorialItems;
     }
 
     /**
@@ -53,12 +70,12 @@ public class MainController {
      * @param grid - the current grid
      */
     private void populatePlantGrid(final GridView grid) {
-        final DatabaseReference plantsReference = mDatabase.getAllPlantsReference();
-        final TextView emptyGridView = (TextView) mActivity.findViewById(R.id.empty_grid_view);
-        final ProgressBar loadingProgressBar = (ProgressBar) mActivity.findViewById(R.id.loading_indicator);
+        final DatabaseReference plantsReference = getDatabaseManager().getAllPlantsReference();
+        final TextView emptyGridView = getActivity().findViewById(R.id.empty_grid_view);
+        final ProgressBar loadingProgressBar = getActivity().findViewById(R.id.loading_indicator);
         loadingProgressBar.setVisibility(View.VISIBLE);
         if (plantsReference != null) {
-            final FirebaseListAdapter<Plant> adapter = new FirebaseListAdapter<Plant>(mActivity, Plant.class, R.layout.grid_item_plant, plantsReference) {
+            final FirebaseListAdapter<Plant> adapter = new FirebaseListAdapter<Plant>(getActivity(), Plant.class, R.layout.grid_item_plant, plantsReference) {
                 /**
                  * Populate a grid item
                  * @param view - the current view
@@ -74,14 +91,14 @@ public class MainController {
                         profilePhoto = photoNum < 0 ? "default" : plant.getId() + "_" + photoNum + ".jpg";
                         plant.setProfilePhoto(profilePhoto);
                     }
-                    StorageReference storageReference = mDatabase.getUserStorage().child(profilePhoto);
+                    StorageReference storageReference = getDatabaseManager().getUserStorage().child(profilePhoto);
                     ((TextView) view.findViewById(R.id.grid_item_nickname)).setText(plant.getName());
                     ((TextView) view.findViewById(R.id.grid_item_species)).setText(plant.getSpecies());
-                    final ImageView picture = (ImageView) view.findViewById(R.id.grid_item_image_view);
-                    Glide.with(mActivity).using(new FirebaseImageLoader()).load(storageReference).dontAnimate()
+                    final ImageView picture = view.findViewById(R.id.grid_item_image_view);
+                    Glide.with(getActivity()).using(new FirebaseImageLoader()).load(storageReference).dontAnimate()
                             .placeholder(R.drawable.flowey).into(picture);
                     // One day, before the progress bar becomes empty
-                    long interval = mDatabase.getReminderIntervalInMillis(1);
+                    long interval = getDatabaseManager().getReminderIntervalInMillis(1);
                     long diff = System.currentTimeMillis() - plant.getLastWatered();
                     float progress = 100 - (float) (100.0 * diff / interval);
                     // The minimum value is one, just to make sure it's visible to the user
@@ -104,21 +121,21 @@ public class MainController {
                          */
                         @Override
                         public void onClick(View v) {
-                            Intent i = new Intent(mActivity.getApplicationContext(), PlantActivity.class);
+                            Intent i = new Intent(getActivity().getApplicationContext(), PlantActivity.class);
                             i.putExtra("plant_id", plant.getId());
-                            mActivity.startActivity(i);
+                            getActivity().startActivity(i);
                         }
                     });
-                    mDatabase.setReminders(mActivity, plant, position, new WaterReceiver());
-                    mDatabase.setReminders(mActivity, plant, position + DatabaseManager.HEIGHT_MEASURE_RECEIVER_ID_OFFSET, new HeightMeasureReceiver());
-                    mDatabase.setReminders(mActivity, plant, position + DatabaseManager.FERTILIZER_RECEIVER_ID_OFFSET, new FertilizerReceiver());
-                    mDatabase.setReminders(mActivity, plant, position + DatabaseManager.UPDATE_PHOTO_RECEIVER_ID_OFFSET, new UpdatePhotoReceiver());
-                    mDatabase.setBirthdayReminder(mActivity, plant, position + DatabaseManager.BIRTHDAY_RECEIVER_ID_OFFSET);
+                    getDatabaseManager().setReminders(getActivity(), plant, position, new WaterReceiver());
+                    getDatabaseManager().setReminders(getActivity(), plant, position + DatabaseManager.HEIGHT_MEASURE_RECEIVER_ID_OFFSET, new HeightMeasureReceiver());
+                    getDatabaseManager().setReminders(getActivity(), plant, position + DatabaseManager.FERTILIZER_RECEIVER_ID_OFFSET, new FertilizerReceiver());
+                    getDatabaseManager().setReminders(getActivity(), plant, position + DatabaseManager.UPDATE_PHOTO_RECEIVER_ID_OFFSET, new UpdatePhotoReceiver());
+                    getDatabaseManager().setBirthdayReminder(getActivity(), plant, position + DatabaseManager.BIRTHDAY_RECEIVER_ID_OFFSET);
                 }
             };
 
             // After deep digging, I discovered that Firebase keeps some local information in ".info"
-            DatabaseReference connectedRef = mDatabase.getUserConnectionReference();
+            DatabaseReference connectedRef = getDatabaseManager().getUserConnectionReference();
             connectedRef.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot snapshot) {
@@ -127,7 +144,7 @@ public class MainController {
                         emptyGridView.setText(R.string.loading_text);
                         loadingProgressBar.setVisibility(View.VISIBLE);
                     } else {
-                        Toast.makeText(mActivity, R.string.msg_network_error, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), R.string.msg_network_error, Toast.LENGTH_SHORT).show();
                         emptyGridView.setText(R.string.msg_network_error);
                         loadingProgressBar.setVisibility(View.GONE);
                     }
@@ -162,13 +179,14 @@ public class MainController {
      * @param tipView - the container view of the daily tip
      */
     private void generateDailyTip(final View tipView) {
-        final String[] dailyTips = mActivity.getResources().getStringArray(R.array.daily_tips_values);
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mActivity);
+        final String[] dailyTips = getActivity().getResources().getStringArray(R.array.daily_tips_values);
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
         boolean displayTip = preferences.getBoolean("daily_tip", true);
         if (mUserReference != null && displayTip) {
             mUserReference.child("indexOfLastDailyTip").addListenerForSingleValueEvent(new ValueEventListener() {
                 /**
                  * Handle a change in the user data
+                 *
                  * @param snapshot - the current database contents
                  */
                 @Override
@@ -180,29 +198,31 @@ public class MainController {
                             dailyTipIndex = (int) (Math.random() * dailyTips.length);
                         }
                         ((TextView) tipView.findViewById(R.id.daily_tip_text)).setText(dailyTips[dailyTipIndex]);
-                        mDatabase.setIndexOfLastDailyTip(dailyTipIndex);
+                        getDatabaseManager().setIndexOfLastDailyTip(dailyTipIndex);
                     } else {
                         int dailyTipIndex = (int) (Math.random() * dailyTips.length);
                         ((TextView) tipView.findViewById(R.id.daily_tip_text)).setText(dailyTips[dailyTipIndex]);
-                        mDatabase.setIndexOfLastDailyTip(dailyTipIndex);
+                        getDatabaseManager().setIndexOfLastDailyTip(dailyTipIndex);
                     }
                 }
 
                 /**
                  * Generate a random tip and hope it's not the same as last time if something wrong happens
+                 *
                  * @param databaseError - database encountered an error
                  */
                 @Override
                 public void onCancelled(DatabaseError databaseError) {
                     int dailyTipIndex = (int) (Math.random() * dailyTips.length);
                     ((TextView) tipView.findViewById(R.id.daily_tip_text)).setText(dailyTips[dailyTipIndex]);
-                    mDatabase.setIndexOfLastDailyTip(dailyTipIndex);
+                    getDatabaseManager().setIndexOfLastDailyTip(dailyTipIndex);
                 }
             });
 
             mUserReference.child("dateOfLastDailyTip").addListenerForSingleValueEvent(new ValueEventListener() {
                 /**
                  * Handle a change in the user data
+                 *
                  * @param snapshot - the current database contents
                  */
                 @Override
@@ -213,18 +233,19 @@ public class MainController {
                         lastTime.setTimeInMillis((long) snapshot.getValue());
                         if (lastTime.get(Calendar.DAY_OF_YEAR) != today.get(Calendar.DAY_OF_YEAR)) {
                             tipView.setVisibility(View.VISIBLE);
-                            mDatabase.setDateOfLastDailyTip(System.currentTimeMillis());
+                            getDatabaseManager().setDateOfLastDailyTip(System.currentTimeMillis());
                         } else {
                             tipView.setVisibility(View.GONE);
                         }
                     } else {
                         tipView.setVisibility(View.VISIBLE);
-                        mDatabase.setDateOfLastDailyTip(System.currentTimeMillis());
+                        getDatabaseManager().setDateOfLastDailyTip(System.currentTimeMillis());
                     }
                 }
 
                 /**
                  * Hide the tip view if cannot know whether it's been a day since the last tip or not
+                 *
                  * @param databaseError - database encountered an error
                  */
                 @Override
@@ -233,26 +254,5 @@ public class MainController {
                 }
             });
         }
-    }
-
-    /*
-    * Fetch assets for the tutorial
-    * @return - Returns the list of tutorial items
-    */
-    public ArrayList<TutorialItem> loadTutorialItems() {
-        TutorialItem tutorialItem0 = new TutorialItem(mActivity.getString(R.string.main_tutorial_title_0_0), mActivity.getString(R.string.main_tutorial_contents_0_0),
-                R.color.colorAccent, R.drawable.main_tutorial_0_0,  R.drawable.main_tutorial_0_0);
-        TutorialItem tutorialItem1 = new TutorialItem(mActivity.getString(R.string.main_tutorial_title_0_1), mActivity.getString(R.string.main_tutorial_contents_0_1),
-                R.color.colorAccent, R.drawable.main_tutorial_0_1,  R.drawable.main_tutorial_0_1);
-        TutorialItem tutorialItem2 = new TutorialItem(mActivity.getString(R.string.main_tutorial_title_0_2), mActivity.getString(R.string.main_tutorial_contents_0_2),
-                R.color.colorAccent, R.drawable.main_tutorial_0_2,  R.drawable.main_tutorial_0_2);
-        TutorialItem tutorialItem3 = new TutorialItem(mActivity.getString(R.string.main_tutorial_title_1), mActivity.getString(R.string.main_tutorial_contents_1),
-                R.color.colorAccent, R.drawable.main_tutorial_1,  R.drawable.main_tutorial_1);
-        ArrayList<TutorialItem> tutorialItems = new ArrayList<>();
-        tutorialItems.add(tutorialItem0);
-        tutorialItems.add(tutorialItem1);
-        tutorialItems.add(tutorialItem2);
-        tutorialItems.add(tutorialItem3);
-        return tutorialItems;
     }
 }

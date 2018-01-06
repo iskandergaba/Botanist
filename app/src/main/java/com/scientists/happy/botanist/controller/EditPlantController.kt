@@ -1,7 +1,6 @@
 package com.scientists.happy.botanist.controller
 
 import android.app.Activity
-import android.app.ProgressDialog
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.view.View
@@ -15,20 +14,20 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.storage.StorageReference
 import com.scientists.happy.botanist.R
-import com.scientists.happy.botanist.data.DatabaseManager
 import com.scientists.happy.botanist.data.Plant
+import za.co.riggaroo.materialhelptutorial.TutorialItem
+import java.util.*
 
-class EditPlantController(private val mActivity: AppCompatActivity) {
-    private val mPlantId: String = mActivity.intent.extras.getString("plant_id")
-    private var mProgressDialog: ProgressDialog? = null
+class EditPlantController(activity: AppCompatActivity) : ActivityController(activity) {
+
+    private val mPlantId: String = activity.intent.extras.getString("plant_id")
     private var mPlantName: String? = null
     private var mPhotoNum: Int = 0
     private var mPhotoPointer = -1
 
-    private val mDatabase = DatabaseManager.getInstance()
-    private val mPlantReference = mDatabase.getPlantReference(mPlantId)
-    private val mUserPhotosReference = mDatabase.userPhotosReference
-    private val mUserStorage = mDatabase.userStorage
+    private val mPlantReference = databaseManager.getPlantReference(mPlantId)
+    private val mUserPhotosReference = databaseManager.userPhotosReference
+    private val mUserStorage = databaseManager.userStorage
 
     init {
         mPlantReference.addValueEventListener(object : ValueEventListener {
@@ -36,7 +35,7 @@ class EditPlantController(private val mActivity: AppCompatActivity) {
                 if (dataSnapshot.exists()) {
                     val plant = dataSnapshot.getValue(Plant::class.java)
                     if (plant != null) {
-                        val nameTextView = mActivity.findViewById(R.id.name_text_view) as TextView
+                        val nameTextView = activity.findViewById<TextView>(R.id.name_text_view)
                         mPlantName = plant.name
                         nameTextView.text = mPlantName
                         mPhotoNum = plant.photoNum
@@ -51,13 +50,17 @@ class EditPlantController(private val mActivity: AppCompatActivity) {
         })
     }
 
-    fun load() {
-        showProgressDialog(mActivity.getString(R.string.loading_text))
+    override fun load() {
+        showProgressDialog(activity.getString(R.string.loading_text))
         loadNameSection()
-        val grid = mActivity.findViewById(R.id.photo_grid_view) as GridView
-        grid.emptyView = mActivity.findViewById(R.id.empty_grid_view)
-        populatePhotoGrid(mActivity)
+        val grid = activity.findViewById<GridView>(R.id.photo_grid_view)
+        grid.emptyView = activity.findViewById(R.id.empty_grid_view)
+        populatePhotoGrid(activity)
         hideProgressDialog()
+    }
+
+    override fun loadTutorialItems(): ArrayList<TutorialItem>? {
+        return null
     }
 
     /**
@@ -65,9 +68,9 @@ class EditPlantController(private val mActivity: AppCompatActivity) {
      * @param activity - the current activity
      */
     private fun populatePhotoGrid(activity: Activity) {
-        val grid = mActivity.findViewById(R.id.photo_grid_view) as GridView
-        val emptyGridView = activity.findViewById(R.id.empty_grid_view) as TextView
-        val loadingProgressBar = activity.findViewById(R.id.loading_indicator) as ProgressBar
+        val grid = activity.findViewById<GridView>(R.id.photo_grid_view)
+        val emptyGridView = activity.findViewById<TextView>(R.id.empty_grid_view)
+        val loadingProgressBar = activity.findViewById<ProgressBar>(R.id.loading_indicator)
         loadingProgressBar.visibility = View.VISIBLE
         if (mUserPhotosReference != null) {
             // An SQL-like hack to retrieve only data with values that matches the query: "plantId*"
@@ -85,23 +88,23 @@ class EditPlantController(private val mActivity: AppCompatActivity) {
                 override fun populateView(view: View, photoName: String, position: Int) {
                     val profilePhotoRef = mPlantReference.child("profilePhoto")
                     val storageReference = mUserStorage.child(photoName)
-                    val picture = view.findViewById(R.id.photo_image_view) as ImageView
+                    val picture = view.findViewById<ImageView>(R.id.photo_image_view)
                     val isProfilePicture = BooleanArray(1)
                     Glide.with(activity).using(FirebaseImageLoader()).load(storageReference).dontAnimate()
                             .placeholder(R.drawable.flowey).into(picture)
-                    val setButton = view.findViewById(R.id.set_photo_btn)
+                    val setButton = view.findViewById<View>(R.id.set_photo_btn)
                     setButton.setOnClickListener {
                         profilePhotoRef.setValue(photoName)
                         notifyDataSetChanged()
                     }
-                    view.findViewById(R.id.delete_photo_btn).setOnClickListener {
+                    view.findViewById<ImageView>(R.id.delete_photo_btn).setOnClickListener {
                         buildDeletePhotoDialog(storageReference,
                                 profilePhotoRef, position, isProfilePicture[0]).show()
                     }
                     profilePhotoRef.addListenerForSingleValueEvent(object : ValueEventListener {
                         override fun onDataChange(dataSnapshot: DataSnapshot) {
                             val profilePhoto = dataSnapshot.value as String?
-                            val isSetIndicator = view.findViewById(R.id.is_set_indicator)
+                            val isSetIndicator = view.findViewById<View>(R.id.is_set_indicator)
                             isProfilePicture[0] = profilePhoto != null && profilePhoto == photoName
                             if (isProfilePicture[0]) {
                                 setButton.visibility = View.GONE
@@ -133,7 +136,7 @@ class EditPlantController(private val mActivity: AppCompatActivity) {
                                                    profilePhotoRef: DatabaseReference, position: Int,
                                                    isProfilePicture: Boolean): AlertDialog {
                     //Instantiate an AlertDialog.Builder with its constructor
-                    val builder = AlertDialog.Builder(mActivity)
+                    val builder = AlertDialog.Builder(activity)
                     //Chain together various setter methods to set the dialog characteristics
                     builder.setTitle(R.string.dialog_delete_photo_title).setMessage(R.string.dialog_delete_photo_text)
                     // Add the buttons
@@ -145,7 +148,7 @@ class EditPlantController(private val mActivity: AppCompatActivity) {
                                     profilePhotoRef.setValue("default")
                                 }
                                 // Keep photoCount up-to-date
-                                mDatabase.photoCount = mDatabase.photoCount - 1
+                                databaseManager.photoCount = databaseManager.photoCount - 1
                             }
                         }
                     }
@@ -156,7 +159,7 @@ class EditPlantController(private val mActivity: AppCompatActivity) {
             }
 
             // After digging deep, I discovered that Firebase keeps some local information in ".info"
-            val connectedRef = mDatabase.userConnectionReference
+            val connectedRef = databaseManager.userConnectionReference
             connectedRef.addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     val connected = snapshot.value as Boolean
@@ -189,10 +192,10 @@ class EditPlantController(private val mActivity: AppCompatActivity) {
     }
 
     private fun loadNameSection() {
-        mActivity.findViewById(R.id.rename_button).setOnClickListener {
-            val builder = AlertDialog.Builder(mActivity)
-            val dialogView = View.inflate(mActivity, R.layout.dialog_name_input, null)
-            val inputEditText = dialogView.findViewById(R.id.name_edit_text) as EditText
+        activity.findViewById<Button>(R.id.rename_button).setOnClickListener {
+            val builder = AlertDialog.Builder(activity)
+            val dialogView = View.inflate(activity, R.layout.dialog_name_input, null)
+            val inputEditText = dialogView.findViewById<EditText>(R.id.name_edit_text)
             inputEditText.setText(mPlantName)
             builder.setView(dialogView).setTitle(R.string.rename)
             // Set up the buttons
@@ -203,27 +206,6 @@ class EditPlantController(private val mActivity: AppCompatActivity) {
                 dialog.cancel()
             }
             builder.create().show()
-        }
-    }
-
-    /**
-     * Show the loading progress
-     */
-    private fun showProgressDialog(message: String) {
-        mProgressDialog = ProgressDialog(mActivity)
-        mProgressDialog!!.setMessage(message)
-        mProgressDialog!!.isIndeterminate = true
-        mProgressDialog!!.setCancelable(false)
-        mProgressDialog!!.show()
-    }
-
-    /**
-     * Dismiss the loading progress
-     */
-    private fun hideProgressDialog() {
-        if (mProgressDialog != null && mProgressDialog!!.isShowing) {
-            mProgressDialog!!.dismiss()
-            mProgressDialog = null
         }
     }
 }

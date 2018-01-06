@@ -13,16 +13,12 @@ class StatsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_stats)
-    }
-
-    override fun onStart() {
-        super.onStart()
         mController = StatsController(this)
     }
 
-    override fun onResume() {
-        super.onResume()
+    override fun onStart() {
         mController?.load()
+        super.onStart()
     }
 
     override fun onSupportNavigateUp(): Boolean {
