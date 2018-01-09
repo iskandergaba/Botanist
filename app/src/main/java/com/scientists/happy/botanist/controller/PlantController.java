@@ -307,9 +307,6 @@ public class PlantController extends ActivityController {
              */
             public void onClick(DialogInterface dialog, int id) {
                 deletePlant(mPlant.getId(), mPlant.getPhotoNum());
-                Intent resultIntent = new Intent();
-                getActivity().setResult(RESULT_OK, resultIntent);
-                getActivity().finish();
             }
         });
         builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
@@ -351,6 +348,9 @@ public class PlantController extends ActivityController {
                     getDatabaseManager().setDeletedNumber(getDatabaseManager().getDeletedCount() + 1);
                     getDatabaseManager().setPhotoCount(getDatabaseManager().getPhotoCount() - (photoNum + 1));
                     getDatabaseManager().updateUserRating();
+                    Intent resultIntent = new Intent();
+                    getActivity().setResult(RESULT_OK, resultIntent);
+                    getActivity().finish();
                 }
 
                 @Override

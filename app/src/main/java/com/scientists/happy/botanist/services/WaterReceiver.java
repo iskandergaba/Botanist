@@ -32,13 +32,15 @@ public class WaterReceiver extends BroadcastReceiver {
         Intent resultIntent = new Intent(context, LoginActivity.class);
         PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(context).setSmallIcon(R.drawable.ic_droplet_notification)
+                new NotificationCompat.Builder(context, "default").setSmallIcon(R.drawable.ic_droplet_notification)
                         .setLargeIcon(largeIcon)
                         .setDefaults(Notification.DEFAULT_SOUND).setContentTitle(name + " is Thirsty")
                         .setContentText("Keep track of " + name + " watering record").setAutoCancel(true)
                         .setContentIntent(resultPendingIntent);
-        NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
-        mNotifyMgr.notify(notificationId, mBuilder.build());
+        NotificationManager notificationMgr = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
+        if (notificationMgr != null) {
+            notificationMgr.notify(notificationId, mBuilder.build());
+        }
         DatabaseManager.getInstance().updateNotificationTime(plantId, "lastWaterNotification");
     }
 }

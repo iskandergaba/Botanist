@@ -32,13 +32,15 @@ public class FertilizerReceiver extends BroadcastReceiver {
         Intent resultIntent = new Intent(context, LoginActivity.class);
         PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(context).setSmallIcon(R.drawable.ic_poop_notification)
+                new NotificationCompat.Builder(context, "default").setSmallIcon(R.drawable.ic_poop_notification)
                         .setLargeIcon(largeIcon)
                         .setDefaults(Notification.DEFAULT_SOUND).setContentTitle(name + " May Need Fertilizer")
                         .setContentText("Keep track of " + name + " fertilization record")
                         .setAutoCancel(true).setContentIntent(resultPendingIntent);
         NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
-        mNotifyMgr.notify(notificationId, mBuilder.build());
+        if (mNotifyMgr != null) {
+            mNotifyMgr.notify(notificationId, mBuilder.build());
+        }
         DatabaseManager.getInstance().updateNotificationTime(plantId, "lastFertilizerNotification");
     }
 }

@@ -126,10 +126,10 @@ public class MainController extends ActivityController {
                             getActivity().startActivity(i);
                         }
                     });
-                    getDatabaseManager().setReminders(getActivity(), plant, position, new WaterReceiver());
-                    getDatabaseManager().setReminders(getActivity(), plant, position + DatabaseManager.HEIGHT_MEASURE_RECEIVER_ID_OFFSET, new HeightMeasureReceiver());
-                    getDatabaseManager().setReminders(getActivity(), plant, position + DatabaseManager.FERTILIZER_RECEIVER_ID_OFFSET, new FertilizerReceiver());
-                    getDatabaseManager().setReminders(getActivity(), plant, position + DatabaseManager.UPDATE_PHOTO_RECEIVER_ID_OFFSET, new UpdatePhotoReceiver());
+                    getDatabaseManager().setReminder(getActivity(), plant, position, new WaterReceiver());
+                    getDatabaseManager().setReminder(getActivity(), plant, position + DatabaseManager.HEIGHT_MEASURE_RECEIVER_ID_OFFSET, new HeightMeasureReceiver());
+                    getDatabaseManager().setReminder(getActivity(), plant, position + DatabaseManager.FERTILIZER_RECEIVER_ID_OFFSET, new FertilizerReceiver());
+                    getDatabaseManager().setReminder(getActivity(), plant, position + DatabaseManager.UPDATE_PHOTO_RECEIVER_ID_OFFSET, new UpdatePhotoReceiver());
                     getDatabaseManager().setBirthdayReminder(getActivity(), plant, position + DatabaseManager.BIRTHDAY_RECEIVER_ID_OFFSET);
                 }
             };

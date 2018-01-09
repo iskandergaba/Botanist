@@ -32,13 +32,15 @@ public class UpdatePhotoReceiver extends BroadcastReceiver {
         Intent resultIntent = new Intent(context, LoginActivity.class);
         PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(context).setSmallIcon(R.drawable.ic_camera)
+                new NotificationCompat.Builder(context, "default").setSmallIcon(R.drawable.ic_camera)
                         .setLargeIcon(largeIcon)
                         .setDefaults(Notification.DEFAULT_SOUND).setContentTitle("Update " + name + " Picture")
                         .setContentText("Add the latest picture of " + name).setAutoCancel(true)
                         .setContentIntent(resultPendingIntent);
-        NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
-        mNotifyMgr.notify(notificationId, mBuilder.build());
+        NotificationManager notificationMgr = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
+        if (notificationMgr != null) {
+            notificationMgr.notify(notificationId, mBuilder.build());
+        }
         DatabaseManager database = DatabaseManager.getInstance();
         database.updateNotificationTime(plantId, "lastPhotoNotification");
     }

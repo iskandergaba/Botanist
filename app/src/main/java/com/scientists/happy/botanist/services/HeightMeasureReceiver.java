@@ -32,14 +32,16 @@ public class HeightMeasureReceiver extends BroadcastReceiver {
         Intent resultIntent = new Intent(context, LoginActivity.class);
         PendingIntent resultPendingIntent = PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(context).setSmallIcon(R.drawable.ic_ruler_notification)
+                new NotificationCompat.Builder(context, "default").setSmallIcon(R.drawable.ic_ruler_notification)
                         .setLargeIcon(largeIcon)
                         .setDefaults(Notification.DEFAULT_SOUND).setContentTitle("Check " + name + " Height")
                         .setContentText("Keep track of " + name + " height record").setAutoCancel(true)
                         .setContentIntent(resultPendingIntent);
-        NotificationManager mNotifyMgr = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
+        NotificationManager notificationMgr = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
         // Builds the notification and issues it.
-        mNotifyMgr.notify(notificationId, mBuilder.build());
+        if (notificationMgr != null) {
+            notificationMgr.notify(notificationId, mBuilder.build());
+        }
         DatabaseManager.getInstance().updateNotificationTime(plantId, "lastMeasureNotification");
     }
 }
